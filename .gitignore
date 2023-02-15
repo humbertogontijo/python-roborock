@@ -1,0 +1,6 @@
+dist
+venv
+.venv
+.idea
+roborock/__pycache__
+poetry.lock

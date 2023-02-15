@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "python-roborock"
+version = "0.1.4"
+description = ""
+authors = ["humbertogontijo <humbertogontijo@users.noreply.github.com>"]
+license = "GPL-3.0-only"
+readme = "README.md"
+packages = [{include = "roborock"}]
+
+[tool.poetry.scripts]
+roborock = "roborock.cli:main"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+click = ">=8"
+aiohttp = "*"
+pycryptodome = "~3.16.0"
+pycryptodomex = {version = "~3.16.0", markers = "sys_platform == 'darwin'"}
+paho-mqtt = "~1.6.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
