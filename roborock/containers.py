@@ -1,5 +1,4 @@
 from enum import Enum
-from typing import Mapping, Iterator
 
 
 class UserDataRRiotReferenceField(str, Enum):
@@ -218,37 +217,14 @@ class MultiMapListField(str, Enum):
     MAP_INFO = "map_info"
 
 
-class RoborockBase(Mapping):
+class RoborockBase(dict):
     def __init__(self, data: dict[str, any]) -> None:
-        self._data = data if isinstance(data, dict) else {}
+        super().__init__()
+        if isinstance(data, dict):
+            self.update(data)
 
-    def __getitem__(self, key):
-        return self._data.__getitem__(key)
-
-    def __setitem__(self, key, value):
-        return self._data.__setitem__(key, value)
-
-    def __len__(self) -> int:
-        return self._data.__len__()
-
-    def __iter__(self) -> Iterator:
-        return self._data.__iter__()
-
-    def keys(self):
-        return self._data.keys()
-
-    def values(self):
-        return self._data.values()
-
-    def __repr__(self):
-        return self._data.__repr__()
-
-    def __str__(self):
-        return self._data.__str__()
-
-    @property
-    def __dict__(self):
-        return self._data
+    def as_dict(self):
+        return self.__dict__
 
 
 class Reference(RoborockBase):
