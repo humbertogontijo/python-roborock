@@ -232,19 +232,19 @@ class Reference(RoborockBase):
         super().__init__(data)
 
     @property
-    def region(self):
+    def region(self) -> str:
         return self.get(UserDataRRiotReferenceField.REGION)
 
     @property
-    def api(self):
+    def api(self) -> str:
         return self.get(UserDataRRiotReferenceField.API)
 
     @property
-    def mqtt(self):
+    def mqtt(self) -> str:
         return self.get(UserDataRRiotReferenceField.MQTT)
 
     @property
-    def l_unknown(self):
+    def l_unknown(self) -> str:
         return self.get(UserDataRRiotReferenceField.L_UNKNOWN)
 
 
@@ -253,19 +253,19 @@ class RRiot(RoborockBase):
         super().__init__(data)
 
     @property
-    def user(self):
+    def user(self) -> str:
         return self.get(UserDataRRiotField.USER)
 
     @property
-    def password(self):
+    def password(self) -> str:
         return self.get(UserDataRRiotField.PASSWORD)
 
     @property
-    def h_unknown(self):
+    def h_unknown(self) -> str:
         return self.get(UserDataRRiotField.H_UNKNOWN)
 
     @property
-    def domain(self):
+    def domain(self) -> str:
         return self.get(UserDataRRiotField.DOMAIN)
 
     @property
@@ -278,35 +278,35 @@ class UserData(RoborockBase):
         super().__init__(data)
 
     @property
-    def uid(self):
+    def uid(self) -> int:
         return self.get(UserDataField.UID)
 
     @property
-    def token_type(self):
+    def token_type(self) -> str:
         return self.get(UserDataField.TOKEN_TYPE)
 
     @property
-    def token(self):
+    def token(self) -> str:
         return self.get(UserDataField.TOKEN)
 
     @property
-    def rr_uid(self):
+    def rr_uid(self) -> str:
         return self.get(UserDataField.RR_UID)
 
     @property
-    def region(self):
+    def region(self) -> str:
         return self.get(UserDataField.REGION)
 
     @property
-    def country_code(self):
+    def country_code(self) -> str:
         return self.get(UserDataField.COUNTRY_CODE)
 
     @property
-    def country(self):
+    def country(self) -> str:
         return self.get(UserDataField.COUNTRY)
 
     @property
-    def nickname(self):
+    def nickname(self) -> str:
         return self.get(UserDataField.NICKNAME)
 
     @property
@@ -314,11 +314,11 @@ class UserData(RoborockBase):
         return RRiot(self.get(UserDataField.RRIOT))
 
     @property
-    def tuya_device_state(self):
+    def tuya_device_state(self) -> int:
         return self.get(UserDataField.TUYA_DEVICE_STATE)
 
     @property
-    def avatar_url(self):
+    def avatar_url(self) -> str:
         return self.get(UserDataField.AVATAR_URL)
 
 
@@ -381,23 +381,23 @@ class HomeDataProduct(RoborockBase):
         super().__init__(data)
 
     @property
-    def id(self):
+    def id(self) -> str:
         return self.get(HomeDataProductField.ID)
 
     @property
-    def name(self):
+    def name(self) -> str:
         return self.get(HomeDataProductField.NAME)
 
     @property
-    def code(self):
+    def code(self) -> str:
         return self.get(HomeDataProductField.CODE)
 
     @property
-    def model(self):
+    def model(self) -> str:
         return self.get(HomeDataProductField.MODEL)
 
     @property
-    def iconurl(self):
+    def iconurl(self) -> str:
         return self.get(HomeDataProductField.ICONURL)
 
     @property
@@ -405,11 +405,11 @@ class HomeDataProduct(RoborockBase):
         return self.get(HomeDataProductField.ATTRIBUTE)
 
     @property
-    def capability(self):
+    def capability(self) -> int:
         return self.get(HomeDataProductField.CAPABILITY)
 
     @property
-    def category(self):
+    def category(self) -> str:
         return self.get(HomeDataProductField.CATEGORY)
 
     @property
@@ -467,7 +467,7 @@ class HomeDataDevice(RoborockBase):
         return self.get(HomeDataDeviceField.DUID)
 
     @property
-    def name(self):
+    def name(self) -> str:
         return self.get(HomeDataDeviceField.NAME)
 
     @property
@@ -475,7 +475,7 @@ class HomeDataDevice(RoborockBase):
         return self.get(HomeDataDeviceField.ATTRIBUTE)
 
     @property
-    def activetime(self):
+    def activetime(self) -> int:
         return self.get(HomeDataDeviceField.ACTIVETIME)
 
     @property
@@ -487,15 +487,15 @@ class HomeDataDevice(RoborockBase):
         return self.get(HomeDataDeviceField.RUNTIME_ENV)
 
     @property
-    def time_zone_id(self):
+    def time_zone_id(self) -> str:
         return self.get(HomeDataDeviceField.TIME_ZONE_ID)
 
     @property
-    def icon_url(self):
+    def icon_url(self) -> str:
         return self.get(HomeDataDeviceField.ICON_URL)
 
     @property
-    def product_id(self):
+    def product_id(self) -> str:
         return self.get(HomeDataDeviceField.PRODUCT_ID)
 
     @property
@@ -507,7 +507,7 @@ class HomeDataDevice(RoborockBase):
         return self.get(HomeDataDeviceField.LAT)
 
     @property
-    def share(self):
+    def share(self) -> bool:
         return self.get(HomeDataDeviceField.SHARE)
 
     @property
@@ -515,15 +515,15 @@ class HomeDataDevice(RoborockBase):
         return self.get(HomeDataDeviceField.SHARE_TIME)
 
     @property
-    def online(self):
+    def online(self) -> bool:
         return self.get(HomeDataDeviceField.ONLINE)
 
     @property
-    def fv(self):
+    def fv(self) -> str:
         return self.get(HomeDataDeviceField.FV)
 
     @property
-    def pv(self):
+    def pv(self) -> str:
         return self.get(HomeDataDeviceField.PV)
 
     @property
@@ -535,7 +535,7 @@ class HomeDataDevice(RoborockBase):
         return self.get(HomeDataDeviceField.TUYA_UUID)
 
     @property
-    def tuya_migrated(self):
+    def tuya_migrated(self) -> bool:
         return self.get(HomeDataDeviceField.TUYA_MIGRATED)
 
     @property
@@ -543,15 +543,15 @@ class HomeDataDevice(RoborockBase):
         return self.get(HomeDataDeviceField.EXTRA)
 
     @property
-    def sn(self):
+    def sn(self) -> str:
         return self.get(HomeDataDeviceField.SN)
 
     @property
-    def feature_set(self):
+    def feature_set(self) -> str:
         return self.get(HomeDataDeviceField.FEATURE_SET)
 
     @property
-    def new_feature_set(self):
+    def new_feature_set(self) -> str:
         return self.get(HomeDataDeviceField.NEW_FEATURE_SET)
 
     @property
@@ -559,7 +559,7 @@ class HomeDataDevice(RoborockBase):
         return HomeDataDeviceStatus(self.get(HomeDataDeviceField.DEVICE_STATUS))
 
     @property
-    def silent_ota_switch(self):
+    def silent_ota_switch(self) -> bool:
         return self.get(HomeDataDeviceField.SILENT_OTA_SWITCH)
 
 
@@ -581,11 +581,11 @@ class HomeData(RoborockBase):
         super().__init__(data)
 
     @property
-    def id(self):
+    def id(self) -> int:
         return self.get(HomeDataField.ID)
 
     @property
-    def name(self):
+    def name(self) -> str:
         return self.get(HomeDataField.NAME)
 
     @property
@@ -622,27 +622,27 @@ class Status(RoborockBase):
         super().__init__(data)
 
     @property
-    def msg_ver(self):
+    def msg_ver(self) -> int:
         return self.get(StatusField.MSG_VER)
 
     @property
-    def msg_seq(self):
+    def msg_seq(self) -> int:
         return self.get(StatusField.MSG_SEQ)
 
     @property
-    def state(self):
+    def state(self) -> int:
         return self.get(StatusField.STATE)
 
     @property
-    def battery(self):
+    def battery(self) -> int:
         return self.get(StatusField.BATTERY)
 
     @property
-    def clean_time(self):
+    def clean_time(self) -> int:
         return self.get(StatusField.CLEAN_TIME)
 
     @property
-    def clean_area(self):
+    def clean_area(self) -> int:
         return self.get(StatusField.CLEAN_AREA)
 
     @property
@@ -650,143 +650,143 @@ class Status(RoborockBase):
         return self.get(StatusField.ERROR_CODE)
 
     @property
-    def map_present(self):
+    def map_present(self) -> int:
         return self.get(StatusField.MAP_PRESENT)
 
     @property
-    def in_cleaning(self):
+    def in_cleaning(self) -> int:
         return self.get(StatusField.IN_CLEANING)
 
     @property
-    def in_returning(self):
+    def in_returning(self) -> int:
         return self.get(StatusField.IN_RETURNING)
 
     @property
-    def in_fresh_state(self):
+    def in_fresh_state(self) -> int:
         return self.get(StatusField.IN_FRESH_STATE)
 
     @property
-    def lab_status(self):
+    def lab_status(self) -> int:
         return self.get(StatusField.LAB_STATUS)
 
     @property
-    def water_box_status(self):
+    def water_box_status(self) -> int:
         return self.get(StatusField.WATER_BOX_STATUS)
 
     @property
-    def back_type(self):
+    def back_type(self) -> int:
         return self.get(StatusField.BACK_TYPE)
 
     @property
-    def wash_phase(self):
+    def wash_phase(self) -> int:
         return self.get(StatusField.WASH_PHASE)
 
     @property
-    def wash_ready(self):
+    def wash_ready(self) -> int:
         return self.get(StatusField.WASH_READY)
 
     @property
-    def fan_power(self):
+    def fan_power(self) -> int:
         return self.get(StatusField.FAN_POWER)
 
     @property
-    def dnd_enabled(self):
+    def dnd_enabled(self) -> int:
         return self.get(StatusField.DND_ENABLED)
 
     @property
-    def map_status(self):
+    def map_status(self) -> int:
         return self.get(StatusField.MAP_STATUS)
 
     @property
-    def is_locating(self):
+    def is_locating(self) -> int:
         return self.get(StatusField.IS_LOCATING)
 
     @property
-    def lock_status(self):
+    def lock_status(self) -> int:
         return self.get(StatusField.LOCK_STATUS)
 
     @property
-    def water_box_mode(self):
+    def water_box_mode(self) -> int:
         return self.get(StatusField.WATER_BOX_MODE)
 
     @property
-    def water_box_carriage_status(self):
+    def water_box_carriage_status(self) -> int:
         return self.get(StatusField.WATER_BOX_CARRIAGE_STATUS)
 
     @property
-    def mop_forbidden_enable(self):
+    def mop_forbidden_enable(self) -> int:
         return self.get(StatusField.MOP_FORBIDDEN_ENABLE)
 
     @property
-    def camera_status(self):
+    def camera_status(self) -> int:
         return self.get(StatusField.CAMERA_STATUS)
 
     @property
-    def is_exploring(self):
+    def is_exploring(self) -> int:
         return self.get(StatusField.IS_EXPLORING)
 
     @property
-    def home_sec_status(self):
+    def home_sec_status(self) -> int:
         return self.get(StatusField.HOME_SEC_STATUS)
 
     @property
-    def home_sec_enable_password(self):
+    def home_sec_enable_password(self) -> int:
         return self.get(StatusField.HOME_SEC_ENABLE_PASSWORD)
 
     @property
-    def adbumper_status(self):
+    def adbumper_status(self) -> list[int]:
         return self.get(StatusField.ADBUMPER_STATUS)
 
     @property
-    def water_shortage_status(self):
+    def water_shortage_status(self) -> int:
         return self.get(StatusField.WATER_SHORTAGE_STATUS)
 
     @property
-    def dock_type(self):
+    def dock_type(self) -> int:
         return self.get(StatusField.DOCK_TYPE)
 
     @property
-    def dust_collection_status(self):
+    def dust_collection_status(self) -> int:
         return self.get(StatusField.DUST_COLLECTION_STATUS)
 
     @property
-    def auto_dust_collection(self):
+    def auto_dust_collection(self) -> int:
         return self.get(StatusField.AUTO_DUST_COLLECTION)
 
     @property
-    def avoid_count(self):
+    def avoid_count(self) -> int:
         return self.get(StatusField.AVOID_COUNT)
 
     @property
-    def mop_mode(self):
+    def mop_mode(self) -> int:
         return self.get(StatusField.MOP_MODE)
 
     @property
-    def debug_mode(self):
+    def debug_mode(self) -> int:
         return self.get(StatusField.DEBUG_MODE)
 
     @property
-    def collision_avoid_status(self):
+    def collision_avoid_status(self) -> int:
         return self.get(StatusField.COLLISION_AVOID_STATUS)
 
     @property
-    def switch_map_mode(self):
+    def switch_map_mode(self) -> int:
         return self.get(StatusField.SWITCH_MAP_MODE)
 
     @property
-    def dock_error_status(self):
+    def dock_error_status(self) -> int:
         return self.get(StatusField.DOCK_ERROR_STATUS)
 
     @property
-    def charge_status(self):
+    def charge_status(self) -> int:
         return self.get(StatusField.CHARGE_STATUS)
 
     @property
-    def unsave_map_reason(self):
+    def unsave_map_reason(self) -> int:
         return self.get(StatusField.UNSAVE_MAP_REASON)
 
     @property
-    def unsave_map_flag(self):
+    def unsave_map_flag(self) -> int:
         return self.get(StatusField.UNSAVE_MAP_FLAG)
 
 
@@ -795,23 +795,23 @@ class DNDTimer(RoborockBase):
         super().__init__(data)
 
     @property
-    def start_hour(self):
+    def start_hour(self) -> int:
         return self.get(DNDTimerField.START_HOUR)
 
     @property
-    def start_minute(self):
+    def start_minute(self) -> int:
         return self.get(DNDTimerField.START_MINUTE)
 
     @property
-    def end_hour(self):
+    def end_hour(self) -> int:
         return self.get(DNDTimerField.END_HOUR)
 
     @property
-    def end_minute(self):
+    def end_minute(self) -> int:
         return self.get(DNDTimerField.END_MINUTE)
 
     @property
-    def enabled(self):
+    def enabled(self) -> int:
         return self.get(DNDTimerField.ENABLED)
 
 
@@ -820,19 +820,19 @@ class CleanSummary(RoborockBase):
         super().__init__(data)
 
     @property
-    def clean_time(self):
+    def clean_time(self) -> int:
         return self.get(CleanSummaryField.CLEAN_TIME)
 
     @property
-    def clean_area(self):
+    def clean_area(self) -> int:
         return self.get(CleanSummaryField.CLEAN_AREA)
 
     @property
-    def clean_count(self):
+    def clean_count(self) -> int:
         return self.get(CleanSummaryField.CLEAN_COUNT)
 
     @property
-    def dust_collection_count(self):
+    def dust_collection_count(self) -> int:
         return self.get(CleanSummaryField.DUST_COLLECTION_COUNT)
 
     @property
@@ -845,55 +845,55 @@ class CleanRecord(RoborockBase):
         super().__init__(data)
 
     @property
-    def begin(self):
+    def begin(self) -> int:
         return self.get(CleanRecordField.BEGIN)
 
     @property
-    def end(self):
+    def end(self) -> int:
         return self.get(CleanRecordField.END)
 
     @property
-    def duration(self):
+    def duration(self) -> int:
         return self.get(CleanRecordField.DURATION)
 
     @property
-    def area(self):
+    def area(self) -> int:
         return self.get(CleanRecordField.AREA)
 
     @property
-    def error(self):
+    def error(self) -> int:
         return self.get(CleanRecordField.ERROR)
 
     @property
-    def complete(self):
+    def complete(self) -> int:
         return self.get(CleanRecordField.COMPLETE)
 
     @property
-    def start_type(self):
+    def start_type(self) -> int:
         return self.get(CleanRecordField.START_TYPE)
 
     @property
-    def clean_type(self):
+    def clean_type(self) -> int:
         return self.get(CleanRecordField.CLEAN_TYPE)
 
     @property
-    def finish_reason(self):
+    def finish_reason(self) -> int:
         return self.get(CleanRecordField.FINISH_REASON)
 
     @property
-    def dust_collection_status(self):
+    def dust_collection_status(self) -> int:
         return self.get(CleanRecordField.DUST_COLLECTION_STATUS)
 
     @property
-    def avoid_count(self):
+    def avoid_count(self) -> int:
         return self.get(CleanRecordField.AVOID_COUNT)
 
     @property
-    def wash_count(self):
+    def wash_count(self) -> int:
         return self.get(CleanRecordField.WASH_COUNT)
 
     @property
-    def map_flag(self):
+    def map_flag(self) -> int:
         return self.get(CleanRecordField.MAP_FLAG)
 
 
@@ -902,35 +902,35 @@ class Consumable(RoborockBase):
         super().__init__(data)
 
     @property
-    def main_brush_work_time(self):
+    def main_brush_work_time(self) -> int:
         return self.get(ConsumableField.MAIN_BRUSH_WORK_TIME)
 
     @property
-    def side_brush_work_time(self):
+    def side_brush_work_time(self) -> int:
         return self.get(ConsumableField.SIDE_BRUSH_WORK_TIME)
 
     @property
-    def filter_work_time(self):
+    def filter_work_time(self) -> int:
         return self.get(ConsumableField.FILTER_WORK_TIME)
 
     @property
-    def filter_element_work_time(self):
+    def filter_element_work_time(self) -> int:
         return self.get(ConsumableField.FILTER_ELEMENT_WORK_TIME)
 
     @property
-    def sensor_dirty_time(self):
+    def sensor_dirty_time(self) -> int:
         return self.get(ConsumableField.SENSOR_DIRTY_TIME)
 
     @property
-    def strainer_work_times(self):
+    def strainer_work_times(self) -> int:
         return self.get(ConsumableField.STRAINER_WORK_TIMES)
 
     @property
-    def dust_collection_work_times(self):
+    def dust_collection_work_times(self) -> int:
         return self.get(ConsumableField.DUST_COLLECTION_WORK_TIMES)
 
     @property
-    def cleaning_brush_work_times(self):
+    def cleaning_brush_work_times(self) -> int:
         return self.get(ConsumableField.CLEANING_BRUSH_WORK_TIMES)
 
 
@@ -977,17 +977,17 @@ class MultiMapsList(RoborockBase):
         super().__init__(data)
 
     @property
-    def max_multi_map(self):
+    def max_multi_map(self) -> int:
         return self.get(MultiMapListField.MAX_MULTI_MAP)
 
     @property
-    def max_bak_map(self):
+    def max_bak_map(self) -> int:
         return self.get(MultiMapListField.MAX_BAK_MAP)
 
     @property
-    def multi_map_count(self):
+    def multi_map_count(self) -> int:
         return self.get(MultiMapListField.MULTI_MAP_COUNT)
 
     @property
-    def map_info(self):
+    def map_info(self) -> list[MultiMapsListMapInfo]:
         return [MultiMapsListMapInfo(map_info) for map_info in self.get(MultiMapListField.MAP_INFO)]
