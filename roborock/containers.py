@@ -327,7 +327,7 @@ class LoginData(RoborockBase):
         super().__init__(data)
 
     @property
-    def user_data(self):
+    def user_data(self) -> UserData:
         user_data = self.get("user_data")
         if user_data:
             return UserData(user_data)
