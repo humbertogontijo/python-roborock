@@ -1,5 +1,8 @@
 from enum import Enum
 
+from roborock.code_mappings import STATE_CODE_TO_STATUS, ERROR_CODE_TO_TEXT, FAN_SPEED_CODES, MOP_MODE_CODES, \
+    MOP_INTENSITY_CODES
+
 
 class UserDataRRiotReferenceField(str, Enum):
     REGION = "r"
@@ -630,6 +633,10 @@ class Status(RoborockBase):
         return self.get(StatusField.MSG_SEQ)
 
     @property
+    def status(self) -> str:
+        return STATE_CODE_TO_STATUS.get(self.state, f"Unknown Status {self.state}")
+
+    @property
     def state(self) -> int:
         return self.get(StatusField.STATE)
 
@@ -648,6 +655,10 @@ class Status(RoborockBase):
     @property
     def error_code(self) -> int:
         return self.get(StatusField.ERROR_CODE)
+
+    @property
+    def error(self) -> str:
+        return ERROR_CODE_TO_TEXT.get(self.error_code, f"Unknown Error {self.error_code}")
 
     @property
     def map_present(self) -> int:
@@ -686,8 +697,12 @@ class Status(RoborockBase):
         return self.get(StatusField.WASH_READY)
 
     @property
-    def fan_power(self) -> int:
+    def fan_power_code(self) -> int:
         return self.get(StatusField.FAN_POWER)
+
+    @property
+    def fan_power(self) -> str:
+        return FAN_SPEED_CODES.get(self.fan_power_code, f"Unknown power {self.fan_power_code}")
 
     @property
     def dnd_enabled(self) -> int:
@@ -708,6 +723,10 @@ class Status(RoborockBase):
     @property
     def water_box_mode(self) -> int:
         return self.get(StatusField.WATER_BOX_MODE)
+
+    @property
+    def mop_intensity(self) -> str:
+        return MOP_INTENSITY_CODES.get(self.water_box_mode, f"Unknown intensity {self.water_box_mode}")
 
     @property
     def water_box_carriage_status(self) -> int:
@@ -758,8 +777,12 @@ class Status(RoborockBase):
         return self.get(StatusField.AVOID_COUNT)
 
     @property
-    def mop_mode(self) -> int:
+    def mop_mode_code(self) -> int:
         return self.get(StatusField.MOP_MODE)
+
+    @property
+    def mop_mode(self) -> str:
+        return MOP_MODE_CODES.get(self.mop_mode_code, f"Unknown mop mode {self.mop_mode_code}")
 
     @property
     def debug_mode(self) -> int:
