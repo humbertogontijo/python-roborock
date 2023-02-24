@@ -18,5 +18,4 @@ class RoborockQueue(Queue):
 
     async def async_get(self, timeout: float | int) -> tuple[Any, RoborockException | None]:
         async with async_timeout.timeout(timeout):
-            await self.get()
-        return await asyncio.wait_for(self.get(), timeout=timeout)
+            return await self.get()
