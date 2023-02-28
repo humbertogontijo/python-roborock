@@ -2,7 +2,7 @@ import asyncio
 from asyncio import Queue
 from typing import Any
 
-from roborock import RoborockException
+from .exceptions import RoborockException
 
 
 class RoborockQueue(Queue):
