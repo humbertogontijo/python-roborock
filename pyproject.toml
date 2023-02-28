@@ -26,5 +26,6 @@ build-backend = "poetry.core.masonry.api"
 
 [project.optional-dependencies]
 test = [
-    "pytest-asyncio= *"
+    "pytest-asyncio= *",
+    "pytest = *"
 ]
