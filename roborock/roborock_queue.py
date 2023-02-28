@@ -1,4 +1,3 @@
-import asyncio
 from asyncio import Queue
 from typing import Any
 import async_timeout
@@ -7,7 +6,6 @@ from .exceptions import RoborockException
 
 
 class RoborockQueue(Queue):
-
     def __init__(self, protocol: int, *args):
         super().__init__(*args)
         self.protocol = protocol
