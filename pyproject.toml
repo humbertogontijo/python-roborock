@@ -24,8 +24,7 @@ paho-mqtt = "~1.6.1"
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
-[project.optional-dependencies]
-test = [
-    "pytest-asyncio= *",
-    "pytest = *"
-]
+[tool.poetry.dev-dependencies]
+pytest-asyncio = "*"
+pytest = "*"
+
