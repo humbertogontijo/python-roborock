@@ -10,7 +10,7 @@ def test_user_data():
     assert ud.rr_uid == "abc123"
     assert ud.region == "us"
     assert ud.country == "US"
-    assert ud.country_code == 1
+    assert ud.country_code == '1'
     assert ud.nickname == "user_nickname"
     assert ud.rriot.user == "user123"
     assert ud.rriot.password == "pass123"
