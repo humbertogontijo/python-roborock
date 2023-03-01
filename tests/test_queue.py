@@ -28,8 +28,3 @@ async def test_get():
     rq = RoborockQueue(1)
     await rq.async_put(("test", None), 1)
     assert await rq.async_get(1) == ("test", None)
-
-
-@pytest.mark.asyncio
-async def test_get():
-    pass
