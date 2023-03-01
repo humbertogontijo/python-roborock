@@ -634,7 +634,7 @@ class Status(RoborockBase):
 
     @property
     def status(self) -> str:
-        return STATE_CODE_TO_STATUS.get(self.state, f"Unknown Status {self.state}")
+        return STATE_CODE_TO_STATUS.get(self.state)
 
     @property
     def state(self) -> int:
@@ -658,7 +658,7 @@ class Status(RoborockBase):
 
     @property
     def error(self) -> str:
-        return ERROR_CODE_TO_TEXT.get(self.error_code, f"Unknown Error {self.error_code}")
+        return ERROR_CODE_TO_TEXT.get(self.error_code)
 
     @property
     def map_present(self) -> int:
@@ -702,7 +702,7 @@ class Status(RoborockBase):
 
     @property
     def fan_power(self) -> str:
-        return FAN_SPEED_CODES.get(self.fan_power_code, f"Unknown power {self.fan_power_code}")
+        return FAN_SPEED_CODES.get(self.fan_power_code)
 
     @property
     def dnd_enabled(self) -> int:
@@ -726,7 +726,7 @@ class Status(RoborockBase):
 
     @property
     def mop_intensity(self) -> str:
-        return MOP_INTENSITY_CODES.get(self.water_box_mode, f"Unknown intensity {self.water_box_mode}")
+        return MOP_INTENSITY_CODES.get(self.water_box_mode)
 
     @property
     def water_box_carriage_status(self) -> int:
@@ -782,7 +782,7 @@ class Status(RoborockBase):
 
     @property
     def mop_mode(self) -> str:
-        return MOP_MODE_CODES.get(self.mop_mode_code, f"Unknown mop mode {self.mop_mode_code}")
+        return MOP_MODE_CODES.get(self.mop_mode_code)
 
     @property
     def debug_mode(self) -> int:
