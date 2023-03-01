@@ -22,12 +22,9 @@ def test_can_create_mqtt_roborock():
     RoborockMqttClient(UserData(USER_DATA), device_map)
 
 
-def test_sync_connect():
-    home_data = HomeData(HOME_DATA_RAW)
-    device_map = {home_data.devices[0].duid: home_data.devices[0]}
-    client = RoborockMqttClient(UserData(USER_DATA), device_map)
+def test_sync_connect(mqtt_client):
     with patch("paho.mqtt.client.Client.connect", return_value=mqtt.MQTT_ERR_SUCCESS):
-        client.sync_connect()
+        mqtt_client.sync_connect()
 
 
 @pytest.mark.asyncio
