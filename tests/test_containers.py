@@ -1,4 +1,4 @@
-from roborock import UserData, HomeData, LoginData, Consumable, Status, DNDTimer, CleanSummary, CleanRecord
+from roborock import UserData, HomeData, Consumable, Status, DNDTimer, CleanSummary, CleanRecord
 from .mock_data import USER_DATA, HOME_DATA_RAW, CONSUMABLE, STATUS, DND_TIMER, CLEAN_SUMMARY, CLEAN_RECORD
 
 
@@ -10,6 +10,7 @@ def test_user_data():
     assert ud.rr_uid == "abc123"
     assert ud.region == "us"
     assert ud.country == "US"
+    assert ud.country_code == 1
     assert ud.nickname == "user_nickname"
     assert ud.rriot.user == "user123"
     assert ud.rriot.password == "pass123"
@@ -21,6 +22,7 @@ def test_user_data():
     assert ud.rriot.reference.l_unknown == "https://wood-us.roborock.com"
     assert ud.tuya_device_state == 2
     assert ud.avatar_url == "https://files.roborock.com/iottest/default_avatar.png"
+
 
 def test_home_data():
     hd = HomeData(HOME_DATA_RAW)
@@ -134,6 +136,7 @@ def test_status():
     assert s.unsave_map_reason == 0
     assert s.unsave_map_flag == 0
 
+
 def test_dnd_timer():
     dnd = DNDTimer(DND_TIMER)
     assert dnd.start_hour == 22
@@ -141,6 +144,7 @@ def test_dnd_timer():
     assert dnd.end_hour == 7
     assert dnd.end_minute == 0
     assert dnd.enabled == 1
+
 
 def test_clean_summary():
     cs = CleanSummary(CLEAN_SUMMARY)
@@ -150,6 +154,7 @@ def test_clean_summary():
     assert cs.dust_collection_count == 25
     assert len(cs.records) == 2
     assert cs.records[1] == 1672458041
+
 
 def test_clean_record():
     cr = CleanRecord(CLEAN_RECORD)

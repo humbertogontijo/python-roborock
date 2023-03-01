@@ -1,9 +1,10 @@
 from unittest.mock import patch
 
+import paho.mqtt.client as mqtt
 import pytest
 
 from roborock import RoborockClient, UserData, HomeData
-from roborock.api import PreparedRequest
+from roborock.api import PreparedRequest, RoborockMqttClient
 from tests.mock_data import BASE_URL_REQUEST, GET_CODE_RESPONSE, USER_DATA, HOME_DATA_RAW
 
 
@@ -13,6 +14,20 @@ def test_can_create_roborock_client():
 
 def test_can_create_prepared_request():
     PreparedRequest("https://sample.com")
+
+
+def test_can_create_mqtt_roborock():
+    home_data = HomeData(HOME_DATA_RAW)
+    device_map = {home_data.devices[0].duid: home_data.devices[0]}
+    RoborockMqttClient(UserData(USER_DATA), device_map)
+
+
+def test_sync_connect():
+    home_data = HomeData(HOME_DATA_RAW)
+    device_map = {home_data.devices[0].duid: home_data.devices[0]}
+    client = RoborockMqttClient(UserData(USER_DATA), device_map)
+    with patch("paho.mqtt.client.Client.connect", return_value=mqtt.MQTT_ERR_SUCCESS):
+        client.sync_connect()
 
 
 @pytest.mark.asyncio
