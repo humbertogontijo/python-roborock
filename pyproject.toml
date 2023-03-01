@@ -15,8 +15,8 @@ python = "^3.8"
 click = ">=8"
 aiohttp = "*"
 async-timeout = "*"
-pycryptodome = "~3.16.0"
-pycryptodomex = {version = "~3.16.0", markers = "sys_platform == 'darwin'"}
+pycryptodome = "~3.17.0"
+pycryptodomex = {version = "~3.17.0", markers = "sys_platform == 'darwin'"}
 paho-mqtt = "~1.6.1"
 
 
