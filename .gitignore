@@ -4,3 +4,5 @@ venv
 .idea
 roborock/__pycache__
 poetry.lock
+*.pyc
+.coverage

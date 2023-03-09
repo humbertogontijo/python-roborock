@@ -11,7 +11,7 @@ packages = [{include = "roborock"}]
 roborock = "roborock.cli:main"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 click = ">=8"
 aiohttp = "*"
 async-timeout = "*"
@@ -23,4 +23,8 @@ paho-mqtt = "~1.6.1"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.dev-dependencies]
+pytest-asyncio = "*"
+pytest = "*"
 
