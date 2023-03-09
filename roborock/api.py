@@ -138,7 +138,7 @@ class RoborockMqttClient(mqtt.Client):
             _LOGGER.error(message)
             if connection_queue:
                 await connection_queue.async_put(
-                    (None, RoborockException(message)), timeout=QUEUE_TIMEOUT
+                    (None, VacuumError(rc, message)), timeout=QUEUE_TIMEOUT
                 )
             return
         _LOGGER.info(f"Connected to mqtt {self._mqtt_host}:{self._mqtt_port}")
@@ -149,7 +149,7 @@ class RoborockMqttClient(mqtt.Client):
             _LOGGER.error(message)
             if connection_queue:
                 await connection_queue.async_put(
-                    (None, RoborockException(message)), timeout=QUEUE_TIMEOUT
+                    (None, VacuumError(rc, message)), timeout=QUEUE_TIMEOUT
                 )
             return
         _LOGGER.info(f"Subscribed to topic {topic}")
@@ -231,7 +231,7 @@ class RoborockMqttClient(mqtt.Client):
                 await self.async_disconnect()
                 if connection_queue:
                     await connection_queue.async_put(
-                        (None, RoborockException(message)), timeout=QUEUE_TIMEOUT
+                        (None, VacuumError(rc, message)), timeout=QUEUE_TIMEOUT
                     )
                 return
             if connection_queue:
@@ -286,7 +286,7 @@ class RoborockMqttClient(mqtt.Client):
                 raise RoborockException(f"Failed to connect (rc:{rc})")
         return rc == mqtt.MQTT_ERR_SUCCESS
 
-    async def _async_response(self, request_id: int, protocol_id: int = 0) -> tuple[Any, RoborockException | None]:
+    async def _async_response(self, request_id: int, protocol_id: int = 0) -> tuple[Any, VacuumError | None]:
         try:
             queue = RoborockQueue(protocol_id)
             self._waiting_queue[request_id] = queue

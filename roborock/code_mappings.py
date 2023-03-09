@@ -1,4 +1,8 @@
-STATE_CODE_TO_STATUS = {
+from __future__ import annotations
+
+from typing import Any
+
+STATE_CODE_TO_STATUS: dict[int | Any, str | Any] = {
     1: "starting",
     2: "charger_disconnected",
     3: "idle",
