@@ -109,7 +109,8 @@ def test_status():
     assert s.back_type == -1
     assert s.wash_phase == 0
     assert s.wash_ready == 0
-    assert s.fan_power == 102
+    assert s.fan_power == 'balanced'
+    assert s.fan_power_code == 102
     assert s.dnd_enabled == 0
     assert s.map_status == 3
     assert s.is_locating == 0
@@ -127,7 +128,8 @@ def test_status():
     assert s.dust_collection_status == 0
     assert s.auto_dust_collection == 1
     assert s.avoid_count == 19
-    assert s.mop_mode == 300
+    assert s.mop_mode == 'standard'
+    assert s.mop_mode_code == 300
     assert s.debug_mode == 0
     assert s.collision_avoid_status == 1
     assert s.switch_map_mode == 0
