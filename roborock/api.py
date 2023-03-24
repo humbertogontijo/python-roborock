@@ -106,7 +106,7 @@ class RoborockMqttClient(mqtt.Client):
         self._mqtt_user = rriot.user
         self._mqtt_domain = rriot.domain
         self._hashed_user = md5hex(self._mqtt_user + ":" + self._mqtt_domain)[2:10]
-        super().__init__(client_id=self._hashed_user, protocol=mqtt.MQTTv5)
+        super().__init__(protocol=mqtt.MQTTv5)
         url = urlparse(rriot.reference.mqtt)
         self._mqtt_host = url.hostname
         self._mqtt_port = url.port
@@ -231,13 +231,6 @@ class RoborockMqttClient(mqtt.Client):
             message = f"Roborock mqtt client disconnected (rc: {rc})"
             _LOGGER.warning(message)
             connection_queue = self._waiting_queue.get(1)
-            if rc != mqtt.MQTT_ERR_SUCCESS and rc != mqtt.MQTT_ERR_KEEPALIVE:
-                await self.async_disconnect()
-                if connection_queue:
-                    await connection_queue.async_put(
-                        (None, VacuumError(rc, message)), timeout=QUEUE_TIMEOUT
-                    )
-                return
             if connection_queue:
                 await connection_queue.async_put(
                     (True, None), timeout=QUEUE_TIMEOUT
