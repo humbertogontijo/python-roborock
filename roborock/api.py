@@ -16,13 +16,14 @@ import threading
 import time
 from asyncio import Lock
 from asyncio.exceptions import TimeoutError, CancelledError
-from typing import Any
+from typing import Any, Callable
 from urllib.parse import urlparse
 
 import aiohttp
 import paho.mqtt.client as mqtt
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
+from roborock.code_mappings import STATE_CODE_TO_STATUS
 
 from roborock.containers import (
     UserData,
@@ -126,6 +127,7 @@ class RoborockMqttClient(mqtt.Client):
         self._mutex = Lock()
         self._last_device_msg_in = mqtt.time_func()
         self._last_disconnection = mqtt.time_func()
+        self._status_listeners: list[Callable[[str, str], None]] = []
 
     def __del__(self) -> None:
         self.sync_disconnect()
@@ -196,7 +198,10 @@ class RoborockMqttClient(mqtt.Client):
                                 f"id={request_id} Ignoring response: {data_point_response}"
                             )
                     elif data_point_number == "121":
-                        _LOGGER.debug(f"Remote control {data_point}")
+                        status = STATE_CODE_TO_STATUS.get(data_point)
+                        _LOGGER.debug(f"Status updated to {status}")
+                        for listener in self._status_listeners:
+                            listener(device_id, status)
                     else:
                         _LOGGER.debug(
                             f"Unknown data point number received {data_point_number} with {data_point}"
@@ -222,8 +227,7 @@ class RoborockMqttClient(mqtt.Client):
     @run_in_executor()
     async def on_disconnect(self, _client: mqtt.Client, _, rc, __=None) -> None:
         try:
-            async with self._mutex:
-                self._last_disconnection = mqtt.time_func()
+            self._last_disconnection = mqtt.time_func()
             message = f"Roborock mqtt client disconnected (rc: {rc})"
             _LOGGER.warning(message)
             connection_queue = self._waiting_queue.get(1)
@@ -247,6 +251,9 @@ class RoborockMqttClient(mqtt.Client):
             now = mqtt.time_func()
             if now - self._last_disconnection > self._keepalive ** 2 and now - self._last_device_msg_in > self._keepalive:
                 self._ping_t = self._last_device_msg_in
+
+    def add_status_listener(self, callback: Callable[[str, str], None]):
+        self._status_listeners.append(callback)
 
     def _check_keepalive(self) -> None:
         self._async_check_keepalive()
