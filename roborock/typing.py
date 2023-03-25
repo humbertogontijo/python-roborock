@@ -25,6 +25,8 @@ class RoborockCommand(str, Enum):
     APP_CHARGE = "app_charge",
     APP_SPOT = "app_spot",
     FIND_ME = "find_me",
+    RESUME_ZONED_CLEAN = "resume_zoned_clean",
+    RESUME_SEGMENT_CLEAN = "resume_segment_clean",
     SET_CUSTOM_MODE = "set_custom_mode",
     SET_MOP_MODE = "set_mop_mode",
     SET_WATER_BOX_CUSTOM_MODE = "set_water_box_custom_mode",

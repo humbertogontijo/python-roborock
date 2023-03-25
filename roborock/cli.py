@@ -100,9 +100,11 @@ async def list_devices(ctx):
     click.echo(f"Known devices {', '.join([device.name for device in home_data.devices + home_data.received_devices])}")
 
 @click.command()
+@click.option("--cmd", required=True)
+@click.option("--params", required=False)
 @click.pass_context
 @run_sync()
-async def get_status(ctx):
+async def command(ctx, cmd, params):
     context: RoborockContext = ctx.obj
     login_data = context.login_data()
     if not login_data.home_data:
@@ -121,14 +123,14 @@ async def get_status(ctx):
         )
         device_map[device.duid] = RoborockDeviceInfo(device, product)
     mqtt_client = RoborockMqttClient(login_data.user_data, device_map)
-    await mqtt_client.get_status(home_data.devices[0].duid)
+    await mqtt_client.send_command(home_data.devices[0].duid, cmd, params)
     mqtt_client.__del__()
 
 
 cli.add_command(login)
 cli.add_command(discover)
 cli.add_command(list_devices)
-cli.add_command(get_status)
+cli.add_command(command)
 
 
 def main():
