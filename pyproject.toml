@@ -18,6 +18,7 @@ async-timeout = "*"
 pycryptodome = "~3.17.0"
 pycryptodomex = {version = "~3.17.0", markers = "sys_platform == 'darwin'"}
 paho-mqtt = "~1.6.1"
+Pillow = "*"
 
 
 [build-system]
