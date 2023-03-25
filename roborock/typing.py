@@ -11,6 +11,7 @@ class RoborockDevicePropField(str, Enum):
     CONSUMABLE = "consumable"
     LAST_CLEAN_RECORD = "last_clean_record"
 
+
 class RoborockCommand(str, Enum):
     GET_MAP_V1 = "get_map_v1",
     GET_STATUS = "get_status"
@@ -38,6 +39,19 @@ class RoborockCommand(str, Enum):
     APP_GOTO_TARGET = "app_goto_target",
     APP_SEGMENT_CLEAN = "app_segment_clean",
     APP_ZONED_CLEAN = "app_zoned_clean",
+    APP_GET_DRYER_SETTING = "app_get_dryer_setting"
+    APP_SET_DRYER_SETTING = "app_set_dryer_setting"
+    APP_START_WASH = "app_start_wash"
+    APP_STOP_WASH = "app_stop_wash"
+    GET_DUST_COLLECTION_MODE = "get_dust_collection_mode"
+    SET_DUST_COLLECTION_MODE = "set_dust_collection_mode"
+    GET_SMART_WASH_PARAMS = "get_smart_wash_params"
+    SET_SMART_WASH_PARAMS = "set_smart_wash_params"
+    GET_WASH_TOWEL_MODE = "get_wash_towel_mode"
+    SET_WASH_TOWEL_MODE = "set_wash_towel_mode"
+    SET_CHILD_LOCK_STATUS = "set_child_lock_status"
+    GET_CHILD_LOCK_STATUS = "get_child_lock_status"
+    START_WASH_THEN_CHARGE = "start_wash_then_charge"
 
 
 class RoborockDeviceInfo:

@@ -220,6 +220,15 @@ class MultiMapListField(str, Enum):
     MAP_INFO = "map_info"
 
 
+class SmartWashField(str, Enum):
+    SMART_WASH = "smart_wash"
+    WASH_INTERVAL = "wash_interval"
+
+
+class WashTowelField(str, Enum):
+    Wash_MODE = "wash_mode"
+
+
 class RoborockBase(dict):
     def __init__(self, data: dict[str, any]) -> None:
         super().__init__()
@@ -1018,3 +1027,25 @@ class MultiMapsList(RoborockBase):
     @property
     def map_info(self) -> list[MultiMapsListMapInfo]:
         return [MultiMapsListMapInfo(map_info) for map_info in self.get(MultiMapListField.MAP_INFO)]
+
+
+class SmartWashParameters(RoborockBase):
+    def __init__(self, data: dict[str, any]) -> None:
+        super().__init__(data)
+
+    @property
+    def smart_wash(self) -> int:
+        return self.get(SmartWashField.SMART_WASH)
+
+    @property
+    def wash_interval(self) -> int:
+        return self.get(SmartWashField.WASH_INTERVAL)
+
+
+class WashTowelMode(RoborockBase):
+    def __init__(self, data: dict[str, any]) -> None:
+        super().__init__(data)
+
+    @property
+    def wash_mode(self) -> int:
+        return self.get(WashTowelField.WASH_MODE)
