@@ -1,7 +1,7 @@
 from enum import Enum
 
 from roborock.code_mappings import STATE_CODE_TO_STATUS, ERROR_CODE_TO_TEXT, FAN_SPEED_CODES, MOP_MODE_CODES, \
-    MOP_INTENSITY_CODES
+    MOP_INTENSITY_CODES, DOCK_ERROR_TO_TEXT
 
 
 class UserDataRRiotReferenceField(str, Enum):
@@ -797,8 +797,12 @@ class Status(RoborockBase):
         return self.get(StatusField.SWITCH_MAP_MODE)
 
     @property
-    def dock_error_status(self) -> int:
+    def dock_error_status_code(self) -> int:
         return self.get(StatusField.DOCK_ERROR_STATUS)
+
+    @property
+    def dock_error_status(self) -> str:
+        return self.get(DOCK_ERROR_TO_TEXT.get(StatusField.DOCK_ERROR_STATUS))
 
     @property
     def charge_status(self) -> int:

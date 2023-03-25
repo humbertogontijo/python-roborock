@@ -82,3 +82,9 @@ MOP_INTENSITY_CODES = {
     203: "intense",
     204: "custom",
 }
+
+DOCK_ERROR_TO_TEXT = {
+    0: "ok",
+    38: 'water empty',
+    39: 'waste water tank full',
+}
