@@ -11,6 +11,7 @@ class RoborockDevicePropField(str, Enum):
     CLEAN_SUMMARY = "clean_summary"
     CONSUMABLE = "consumable"
     LAST_CLEAN_RECORD = "last_clean_record"
+    DOCK_SUMMARY = "dock_summary"
 
 
 class RoborockCommand(str, Enum):
