@@ -1,7 +1,7 @@
 from enum import Enum
 
-from roborock.code_mappings import STATE_CODE_TO_STATUS, ERROR_CODE_TO_TEXT, FAN_SPEED_CODES, MOP_MODE_CODES, \
-    MOP_INTENSITY_CODES, DOCK_ERROR_TO_TEXT
+from .code_mappings import STATE_CODE_TO_STATUS, ERROR_CODE_TO_TEXT, FAN_SPEED_CODES, MOP_MODE_CODES, \
+    MOP_INTENSITY_CODES, DOCK_ERROR_TO_TEXT, DOCK_TYPE_MAP, RoborockDockType
 
 
 class UserDataRRiotReferenceField(str, Enum):
@@ -770,8 +770,12 @@ class Status(RoborockBase):
         return self.get(StatusField.WATER_SHORTAGE_STATUS)
 
     @property
-    def dock_type(self) -> int:
+    def dock_type_code(self) -> int:
         return self.get(StatusField.DOCK_TYPE)
+
+    @property
+    def dock_type(self) -> RoborockDockType:
+        return DOCK_TYPE_MAP.get(self.get(StatusField.DOCK_TYPE), RoborockDockType.UNKNOWN)
 
     @property
     def dust_collection_status(self) -> int:
@@ -811,7 +815,7 @@ class Status(RoborockBase):
 
     @property
     def dock_error_status(self) -> str:
-        return self.get(DOCK_ERROR_TO_TEXT.get(StatusField.DOCK_ERROR_STATUS))
+        return DOCK_ERROR_TO_TEXT.get(self.get(StatusField.DOCK_ERROR_STATUS))
 
     @property
     def charge_status(self) -> int:
@@ -1040,12 +1044,3 @@ class SmartWashParameters(RoborockBase):
     @property
     def wash_interval(self) -> int:
         return self.get(SmartWashField.WASH_INTERVAL)
-
-
-class WashTowelMode(RoborockBase):
-    def __init__(self, data: dict[str, any]) -> None:
-        super().__init__(data)
-
-    @property
-    def wash_mode(self) -> int:
-        return self.get(WashTowelField.WASH_MODE)

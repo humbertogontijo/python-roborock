@@ -1,6 +1,30 @@
 from __future__ import annotations
 
+from enum import Enum
 from typing import Any
+
+
+class RoborockDockType(str, Enum):
+    NO_DOCK = "No dock"
+    AUTO_EMPTY = "Roborock auto-empty dock"  # Dust collection
+    EMPTY_WASH_FILL_DOCK = "Roborock empty wash fill dock"
+    AUTO_EMPTY_PURE = "Roborock auto-empty pure dock"
+    UNKNOWN = "Unknown Dock - please submit an issue"
+
+
+class RoborockDockDustCollectionType(str, Enum):
+    SMART = "smart"
+    QUICK = "quick"
+    DAILY = "daily"
+    STRONG = "strong"
+    MAX = "max"
+
+
+class RoborockDockWashingModeType(str, Enum):
+    LIGHT = "light"
+    BALANCED = "balanced"
+    DEEP = "deep"
+
 
 STATE_CODE_TO_STATUS: dict[int | Any, str | Any] = {
     1: "starting",
@@ -87,4 +111,23 @@ DOCK_ERROR_TO_TEXT = {
     0: "ok",
     38: 'water empty',
     39: 'waste water tank full',
+}
+
+DOCK_TYPE_MAP = {
+    0: RoborockDockType.NO_DOCK,
+    3: RoborockDockType.EMPTY_WASH_FILL_DOCK,
+}
+
+DUST_COLLECTION_MAP = {
+    0: RoborockDockDustCollectionType.SMART,
+    1: RoborockDockDustCollectionType.QUICK,
+    2: RoborockDockDustCollectionType.DAILY,
+    3: RoborockDockDustCollectionType.STRONG,
+    4: RoborockDockDustCollectionType.MAX,
+}
+
+WASH_MODE_MAP = {
+    0: RoborockDockWashingModeType.LIGHT,
+    1: RoborockDockWashingModeType.BALANCED,
+    2: RoborockDockWashingModeType.DEEP,
 }

@@ -1,7 +1,8 @@
 from enum import Enum
 
-from roborock.containers import HomeDataDevice, HomeDataProduct, Status, CleanSummary, Consumable, \
-    DNDTimer, CleanRecord
+from .code_mappings import RoborockDockDustCollectionType, RoborockDockWashingModeType
+from .containers import HomeDataDevice, HomeDataProduct, Status, CleanSummary, Consumable, \
+    DNDTimer, CleanRecord, SmartWashParameters
 
 
 class RoborockDevicePropField(str, Enum):
@@ -60,14 +61,23 @@ class RoborockDeviceInfo:
         self.product = product
 
 
+class RoborockDockSummary:
+    def __init__(self, dust_collection_mode: RoborockDockDustCollectionType,
+                 washing_mode_type: RoborockDockWashingModeType, mop_wash: SmartWashParameters) -> None:
+        self.dust_collection_mode = dust_collection_mode
+        self.washing_mode_type = washing_mode_type
+        self.mop_wash = mop_wash
+
+
 class RoborockDeviceProp:
     def __init__(self, status: Status, dnd_timer: DNDTimer, clean_summary: CleanSummary, consumable: Consumable,
-                 last_clean_record: CleanRecord):
+                 last_clean_record: CleanRecord, dock_summary: RoborockDockSummary):
         self.status = status
         self.dnd_timer = dnd_timer
         self.clean_summary = clean_summary
         self.consumable = consumable
         self.last_clean_record = last_clean_record
+        self.dock_summary = dock_summary
 
     def update(self, device_prop: 'RoborockDeviceProp'):
         if device_prop.status:
@@ -80,3 +90,5 @@ class RoborockDeviceProp:
             self.consumable = device_prop.consumable
         if device_prop.last_clean_record:
             self.last_clean_record = device_prop.last_clean_record
+        if device_prop.dock_summary:
+            self.dock_summary = device_prop.dock_summary
