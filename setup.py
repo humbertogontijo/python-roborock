@@ -5,7 +5,7 @@
 
 import setuptools
 
-__version__ = "0.0.0"
+__version__ = "0.1.10"
 
 if __name__ == "__main__":
     setuptools.setup(name="roborock", version=__version__)
