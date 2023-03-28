@@ -14,6 +14,12 @@ class RoborockDevicePropField(str, Enum):
     DOCK_SUMMARY = "dock_summary"
 
 
+class RoborockDockSummaryfield(str, Enum):
+    DUST_COLLECTION_MODE = "dust_collection_mode"
+    WASHING_MODE_TYPE = "washing_mode_type"
+    MOP_WASH = "mop_wash"
+
+
 class RoborockCommand(str, Enum):
     GET_MAP_V1 = "get_map_v1",
     GET_STATUS = "get_status"
