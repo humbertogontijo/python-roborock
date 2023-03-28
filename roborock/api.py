@@ -1,4 +1,5 @@
 """The Roborock api."""
+
 from __future__ import annotations
 
 import asyncio
@@ -23,9 +24,16 @@ import aiohttp
 import paho.mqtt.client as mqtt
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
-from roborock.code_mappings import STATE_CODE_TO_STATUS
 
-from roborock.containers import (
+from roborock.exceptions import (
+    RoborockException,
+    CommandVacuumError,
+    VacuumError,
+    RoborockTimeout,
+)
+from .code_mappings import STATE_CODE_TO_STATUS, WASH_MODE_MAP, DUST_COLLECTION_MAP, RoborockDockType, \
+    RoborockDockDustCollectionType, RoborockDockWashingModeType
+from .containers import (
     UserData,
     HomeDataDevice,
     Status,
@@ -35,20 +43,17 @@ from roborock.containers import (
     CleanRecord,
     HomeData,
     MultiMapsList,
+    SmartWashParameters,
+
 )
-from roborock.exceptions import (
-    RoborockException,
-    CommandVacuumError,
-    VacuumError,
-    RoborockTimeout,
-)
-from roborock.roborock_queue import RoborockQueue
-from roborock.typing import (
+from .roborock_queue import RoborockQueue
+from .typing import (
     RoborockDeviceInfo,
     RoborockDeviceProp,
     RoborockCommand,
+    RoborockDockSummary,
 )
-from roborock.util import run_in_executor
+from .util import run_in_executor
 
 _LOGGER = logging.getLogger(__name__)
 QUEUE_TIMEOUT = 4
@@ -78,17 +83,17 @@ class PreparedRequest:
         self.base_headers = base_headers or {}
 
     async def request(
-            self, method: str, url: str, params=None, data=None, headers=None
+        self, method: str, url: str, params=None, data=None, headers=None
     ) -> dict | list:
         _url = "/".join(s.strip("/") for s in [self.base_url, url])
         _headers = {**self.base_headers, **(headers or {})}
         async with aiohttp.ClientSession() as session:
             async with session.request(
-                    method,
-                    _url,
-                    params=params,
-                    data=data,
-                    headers=_headers,
+                method,
+                _url,
+                params=params,
+                data=data,
+                headers=_headers,
             ) as resp:
                 return await resp.json()
 
@@ -369,7 +374,7 @@ class RoborockMqttClient(mqtt.Client):
             raise RoborockException(f"Failed to publish (rc: {info.rc})")
 
     async def send_command(
-            self, device_id: str, method: RoborockCommand, params: list = None
+        self, device_id: str, method: RoborockCommand, params: list = None
     ):
         await self.validate_connection()
         timestamp = math.floor(time.time())
@@ -439,6 +444,29 @@ class RoborockMqttClient(mqtt.Client):
         if isinstance(consumable, dict):
             return Consumable(consumable)
 
+    async def get_washing_mode(self, device_id: str) -> RoborockDockWashingModeType:
+        washing_mode = await self.send_command(device_id, RoborockCommand.GET_WASH_TOWEL_MODE)
+        return WASH_MODE_MAP.get(washing_mode)
+
+    async def get_dust_collection_mode(self, device_id: str) -> RoborockDockDustCollectionType:
+        dust_collection = await self.send_command(device_id, RoborockCommand.GET_DUST_COLLECTION_MODE)
+        return DUST_COLLECTION_MAP.get(dust_collection)
+
+    async def get_mop_wash_mode(self, device_id: str) -> SmartWashParameters:
+        mop_wash_mode = await self.send_command(device_id, RoborockCommand.GET_SMART_WASH_PARAMS)
+        if isinstance(mop_wash_mode, dict):
+            return SmartWashParameters(mop_wash_mode)
+
+    async def get_dock_summary(self, device_id: str, dock_type: RoborockDockType) -> RoborockDockSummary:
+        collection_mode = await self.get_dust_collection_mode(device_id)
+        mop_wash = None
+        washing_mode = None
+        if dock_type == RoborockDockType.EMPTY_WASH_FILL_DOCK:
+            [mop_wash, washing_mode] = await asyncio.gather(
+                *[self.get_mop_wash_mode(device_id), self.get_washing_mode(device_id)])
+
+        return RoborockDockSummary(collection_mode, washing_mode, mop_wash)
+
     async def get_prop(self, device_id: str) -> RoborockDeviceProp:
         [status, dnd_timer, clean_summary, consumable] = await asyncio.gather(
             *[
@@ -453,9 +481,12 @@ class RoborockMqttClient(mqtt.Client):
             last_clean_record = await self.get_clean_record(
                 device_id, clean_summary.records[0]
             )
+        dock_summary = None
+        if status.dock_type != RoborockDockType.NO_DOCK:
+            dock_summary = await self.get_dock_summary(device_id, status.dock_type)
         if any([status, dnd_timer, clean_summary, consumable]):
             return RoborockDeviceProp(
-                status, dnd_timer, clean_summary, consumable, last_clean_record
+                status, dnd_timer, clean_summary, consumable, last_clean_record, dock_summary
             )
 
     async def get_multi_maps_list(self, device_id) -> MultiMapsList:

@@ -1,4 +1,4 @@
-from roborock import UserData, HomeData, Consumable, Status, DNDTimer, CleanSummary, CleanRecord
+from roborock import UserData, HomeData, Consumable, Status, DNDTimer, CleanSummary, CleanRecord, RoborockDockType
 from .mock_data import USER_DATA, HOME_DATA_RAW, CONSUMABLE, STATUS, DND_TIMER, CLEAN_SUMMARY, CLEAN_RECORD
 
 
@@ -124,7 +124,8 @@ def test_status():
     assert s.home_sec_enable_password == 0
     assert s.adbumper_status == [0, 0, 0]
     assert s.water_shortage_status == 0
-    assert s.dock_type == 3
+    assert s.dock_type_code == 3
+    assert s.dock_type == RoborockDockType.EMPTY_WASH_FILL_DOCK
     assert s.dust_collection_status == 0
     assert s.auto_dust_collection == 1
     assert s.avoid_count == 19
@@ -133,7 +134,8 @@ def test_status():
     assert s.debug_mode == 0
     assert s.collision_avoid_status == 1
     assert s.switch_map_mode == 0
-    assert s.dock_error_status == 0
+    assert s.dock_error_status_code == 0
+    assert s.dock_error_status == "ok"
     assert s.charge_status == 1
     assert s.unsave_map_reason == 0
     assert s.unsave_map_flag == 0

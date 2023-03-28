@@ -1,7 +1,7 @@
 from enum import Enum
 
-from roborock.code_mappings import STATE_CODE_TO_STATUS, ERROR_CODE_TO_TEXT, FAN_SPEED_CODES, MOP_MODE_CODES, \
-    MOP_INTENSITY_CODES
+from .code_mappings import STATE_CODE_TO_STATUS, ERROR_CODE_TO_TEXT, FAN_SPEED_CODES, MOP_MODE_CODES, \
+    MOP_INTENSITY_CODES, DOCK_ERROR_TO_TEXT, DOCK_TYPE_MAP, RoborockDockType
 
 
 class UserDataRRiotReferenceField(str, Enum):
@@ -218,6 +218,15 @@ class MultiMapListField(str, Enum):
     MAX_BAK_MAP = "max_bak_map"
     MULTI_MAP_COUNT = "multi_map_count"
     MAP_INFO = "map_info"
+
+
+class SmartWashField(str, Enum):
+    SMART_WASH = "smart_wash"
+    WASH_INTERVAL = "wash_interval"
+
+
+class WashTowelField(str, Enum):
+    Wash_MODE = "wash_mode"
 
 
 class RoborockBase(dict):
@@ -761,8 +770,12 @@ class Status(RoborockBase):
         return self.get(StatusField.WATER_SHORTAGE_STATUS)
 
     @property
-    def dock_type(self) -> int:
+    def dock_type_code(self) -> int:
         return self.get(StatusField.DOCK_TYPE)
+
+    @property
+    def dock_type(self) -> RoborockDockType:
+        return DOCK_TYPE_MAP.get(self.get(StatusField.DOCK_TYPE), RoborockDockType.UNKNOWN)
 
     @property
     def dust_collection_status(self) -> int:
@@ -797,8 +810,12 @@ class Status(RoborockBase):
         return self.get(StatusField.SWITCH_MAP_MODE)
 
     @property
-    def dock_error_status(self) -> int:
+    def dock_error_status_code(self) -> int:
         return self.get(StatusField.DOCK_ERROR_STATUS)
+
+    @property
+    def dock_error_status(self) -> str:
+        return DOCK_ERROR_TO_TEXT.get(self.get(StatusField.DOCK_ERROR_STATUS))
 
     @property
     def charge_status(self) -> int:
@@ -1014,3 +1031,16 @@ class MultiMapsList(RoborockBase):
     @property
     def map_info(self) -> list[MultiMapsListMapInfo]:
         return [MultiMapsListMapInfo(map_info) for map_info in self.get(MultiMapListField.MAP_INFO)]
+
+
+class SmartWashParameters(RoborockBase):
+    def __init__(self, data: dict[str, any]) -> None:
+        super().__init__(data)
+
+    @property
+    def smart_wash(self) -> int:
+        return self.get(SmartWashField.SMART_WASH)
+
+    @property
+    def wash_interval(self) -> int:
+        return self.get(SmartWashField.WASH_INTERVAL)

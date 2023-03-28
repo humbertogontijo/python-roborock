@@ -1,7 +1,8 @@
 from enum import Enum
 
-from roborock.containers import HomeDataDevice, HomeDataProduct, Status, CleanSummary, Consumable, \
-    DNDTimer, CleanRecord
+from .code_mappings import RoborockDockDustCollectionType, RoborockDockWashingModeType
+from .containers import HomeDataDevice, HomeDataProduct, Status, CleanSummary, Consumable, \
+    DNDTimer, CleanRecord, SmartWashParameters
 
 
 class RoborockDevicePropField(str, Enum):
@@ -10,6 +11,14 @@ class RoborockDevicePropField(str, Enum):
     CLEAN_SUMMARY = "clean_summary"
     CONSUMABLE = "consumable"
     LAST_CLEAN_RECORD = "last_clean_record"
+    DOCK_SUMMARY = "dock_summary"
+
+
+class RoborockDockSummaryField(str, Enum):
+    DUST_COLLECTION_MODE = "dust_collection_mode"
+    WASHING_MODE_TYPE = "washing_mode_type"
+    MOP_WASH = "mop_wash"
+
 
 class RoborockCommand(str, Enum):
     GET_MAP_V1 = "get_map_v1",
@@ -38,6 +47,19 @@ class RoborockCommand(str, Enum):
     APP_GOTO_TARGET = "app_goto_target",
     APP_SEGMENT_CLEAN = "app_segment_clean",
     APP_ZONED_CLEAN = "app_zoned_clean",
+    APP_GET_DRYER_SETTING = "app_get_dryer_setting"
+    APP_SET_DRYER_SETTING = "app_set_dryer_setting"
+    APP_START_WASH = "app_start_wash"
+    APP_STOP_WASH = "app_stop_wash"
+    GET_DUST_COLLECTION_MODE = "get_dust_collection_mode"
+    SET_DUST_COLLECTION_MODE = "set_dust_collection_mode"
+    GET_SMART_WASH_PARAMS = "get_smart_wash_params"
+    SET_SMART_WASH_PARAMS = "set_smart_wash_params"
+    GET_WASH_TOWEL_MODE = "get_wash_towel_mode"
+    SET_WASH_TOWEL_MODE = "set_wash_towel_mode"
+    SET_CHILD_LOCK_STATUS = "set_child_lock_status"
+    GET_CHILD_LOCK_STATUS = "get_child_lock_status"
+    START_WASH_THEN_CHARGE = "start_wash_then_charge"
 
 
 class RoborockDeviceInfo:
@@ -46,14 +68,23 @@ class RoborockDeviceInfo:
         self.product = product
 
 
+class RoborockDockSummary:
+    def __init__(self, dust_collection_mode: RoborockDockDustCollectionType,
+                 washing_mode_type: RoborockDockWashingModeType, mop_wash: SmartWashParameters) -> None:
+        self.dust_collection_mode = dust_collection_mode
+        self.washing_mode_type = washing_mode_type
+        self.mop_wash = mop_wash
+
+
 class RoborockDeviceProp:
     def __init__(self, status: Status, dnd_timer: DNDTimer, clean_summary: CleanSummary, consumable: Consumable,
-                 last_clean_record: CleanRecord):
+                 last_clean_record: CleanRecord, dock_summary: RoborockDockSummary):
         self.status = status
         self.dnd_timer = dnd_timer
         self.clean_summary = clean_summary
         self.consumable = consumable
         self.last_clean_record = last_clean_record
+        self.dock_summary = dock_summary
 
     def update(self, device_prop: 'RoborockDeviceProp'):
         if device_prop.status:
@@ -66,3 +97,5 @@ class RoborockDeviceProp:
             self.consumable = device_prop.consumable
         if device_prop.last_clean_record:
             self.last_clean_record = device_prop.last_clean_record
+        if device_prop.dock_summary:
+            self.dock_summary = device_prop.dock_summary
