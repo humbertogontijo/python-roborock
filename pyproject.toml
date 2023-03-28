@@ -30,6 +30,6 @@ pytest = "*"
 
 [tool.semantic_release]
 branch = "main"
+version_source = "tag_only"
 version_toml = "pyproject.toml:tool.poetry.version"
-version_variable = "setup.py:__version__"
 build_command = "pip install poetry && poetry build"
