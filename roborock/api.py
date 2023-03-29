@@ -446,11 +446,11 @@ class RoborockMqttClient(mqtt.Client):
 
     async def get_washing_mode(self, device_id: str) -> RoborockDockWashingModeType:
         washing_mode = await self.send_command(device_id, RoborockCommand.GET_WASH_TOWEL_MODE)
-        return WASH_MODE_MAP.get(washing_mode)
+        return WASH_MODE_MAP.get(washing_mode['wash_mode'])
 
     async def get_dust_collection_mode(self, device_id: str) -> RoborockDockDustCollectionType:
         dust_collection = await self.send_command(device_id, RoborockCommand.GET_DUST_COLLECTION_MODE)
-        return DUST_COLLECTION_MAP.get(dust_collection)
+        return DUST_COLLECTION_MAP.get(dust_collection['mode'])
 
     async def get_mop_wash_mode(self, device_id: str) -> SmartWashParameters:
         mop_wash_mode = await self.send_command(device_id, RoborockCommand.GET_SMART_WASH_PARAMS)
