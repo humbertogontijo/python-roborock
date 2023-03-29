@@ -14,9 +14,8 @@ class RoborockDockType(str, Enum):
 
 class RoborockDockDustCollectionType(str, Enum):
     SMART = "smart"
-    QUICK = "quick"
-    DAILY = "daily"
-    STRONG = "strong"
+    LIGHT = "light"
+    BALANCED = "balanced"
     MAX = "max"
 
 
@@ -120,9 +119,8 @@ DOCK_TYPE_MAP = {
 
 DUST_COLLECTION_MAP = {
     0: RoborockDockDustCollectionType.SMART,
-    1: RoborockDockDustCollectionType.QUICK,
-    2: RoborockDockDustCollectionType.DAILY,
-    3: RoborockDockDustCollectionType.STRONG,
+    1: RoborockDockDustCollectionType.LIGHT,
+    2: RoborockDockDustCollectionType.BALANCED,
     4: RoborockDockDustCollectionType.MAX,
 }
 
