@@ -1,29 +1,29 @@
 from __future__ import annotations
 
 import socket
-import threading
 from asyncio import AbstractEventLoop
 
 import async_timeout
-
-from roborock.exceptions import RoborockException
 
 
 class RoborockSocketListener:
     roborock_port = 58867
 
-    def __init__(self, ip: str, loop: AbstractEventLoop, on_message):
+    def __init__(self, ip: str, loop: AbstractEventLoop, on_message, timeout: float | int = 4):
         self.ip = ip
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket.setblocking(False)
         self.loop = loop
         self.on_message = on_message
+        self.timeout = timeout
 
-    def connect(self):
-        self.socket.connect(("192.168.1.232", 58867))
+    async def connect(self):
+        async with async_timeout.timeout(self.timeout):
+            await self.loop.sock_connect(self.socket, ("192.168.1.232", 58867))
 
-    async def send_message(self, data, timeout: float | int = 4):
+    async def send_message(self, data):
         response = {}
-        async with async_timeout.timeout(timeout):
+        async with async_timeout.timeout(self.timeout):
             await self.loop.sock_sendall(self.socket, data)
             while response.get('protocol') != 4:
                 message = await self.loop.sock_recv(self.socket, 4096)

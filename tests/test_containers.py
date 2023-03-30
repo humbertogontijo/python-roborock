@@ -15,7 +15,7 @@ def test_user_data():
     assert ud.rriot.user == "user123"
     assert ud.rriot.password == "pass123"
     assert ud.rriot.h_unknown == "unknown123"
-    assert ud.rriot.domain == "domain123"
+    assert ud.rriot.endpoint == "domain123"
     assert ud.rriot.reference.region == "US"
     assert ud.rriot.reference.api == "https://api-us.roborock.com"
     assert ud.rriot.reference.mqtt == "ssl://mqtt-us.roborock.com:8883"

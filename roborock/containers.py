@@ -15,7 +15,7 @@ class UserDataRRiotField(str, Enum):
     USER = "u"
     PASSWORD = "s"
     H_UNKNOWN = "h"
-    DOMAIN = "k"
+    ENDPOINT = "k"
     REFERENCE = "r"
 
 
@@ -277,8 +277,8 @@ class RRiot(RoborockBase):
         return self.get(UserDataRRiotField.H_UNKNOWN)
 
     @property
-    def domain(self) -> str:
-        return self.get(UserDataRRiotField.DOMAIN)
+    def endpoint(self) -> str:
+        return self.get(UserDataRRiotField.ENDPOINT)
 
     @property
     def reference(self) -> Reference:
