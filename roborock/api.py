@@ -158,7 +158,7 @@ class RoborockClient():
     def _get_payload(
             self, method: RoborockCommand, params: list = None
     ):
-        timestamp = 1680196427
+        timestamp = math.floor(time.time())
         request_id = self._id_counter
         self._id_counter += 1
         inner = {
@@ -255,7 +255,7 @@ class RoborockClient():
                 device_id, clean_summary.records[0]
             )
         dock_summary = None
-        if status.dock_type != RoborockDockType.NO_DOCK:
+        if status and status.dock_type != RoborockDockType.NO_DOCK:
             dock_summary = await self.get_dock_summary(device_id, status.dock_type)
         if any([status, dnd_timer, clean_summary, consumable]):
             return RoborockDeviceProp(

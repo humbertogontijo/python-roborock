@@ -10,7 +10,7 @@ endpoint = "abc"
 
 async def main():
     device_id = "1r9W0cAmDZ2COuVekgRhKA"
-    client = RoborockLocalClient(endpoint, {
+    client = RoborockLocalClient(local_ip, endpoint, {
         "1r9W0cAmDZ2COuVekgRhKA": local_key
     })
     await client.async_connect()

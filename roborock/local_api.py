@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import logging
 import socket
 
@@ -8,6 +9,7 @@ import async_timeout
 from roborock.api import RoborockClient
 from roborock.typing import RoborockCommand
 from roborock.util import get_running_loop_or_create_one
+from roborock.exceptions import RoborockTimeout
 
 secured_prefix = 199
 _LOGGER = logging.getLogger(__name__)
@@ -15,9 +17,9 @@ _LOGGER = logging.getLogger(__name__)
 
 class RoborockLocalClient(RoborockClient):
 
-    def __init__(self, endpoint: str, device_localkey: dict[str, str]):
+    def __init__(self, ip: str, endpoint: str, device_localkey: dict[str, str]):
         super().__init__(endpoint, device_localkey, True)
-        self.listener = RoborockSocketListener("192.168.1.232", super()._decode_msg)
+        self.listener = RoborockSocketListener(ip, super()._decode_msg)
 
     async def async_connect(self):
         await self.listener.connect()
@@ -54,9 +56,14 @@ class RoborockSocketListener:
 
     async def send_message(self, data: bytes, local_key: str):
         response = {}
-        async with async_timeout.timeout(self.timeout):
-            await self.loop.sock_sendall(self.socket, data)
-            while response.get('protocol') != 4:
-                message = await self.loop.sock_recv(self.socket, 4096)
-                response = self.on_message(message, local_key)
+        try:
+            async with async_timeout.timeout(self.timeout):
+                await self.loop.sock_sendall(self.socket, data)
+                while response.get('protocol') != 4:
+                    message = await self.loop.sock_recv(self.socket, 4096)
+                    response = self.on_message(message, local_key)
+        except (asyncio.TimeoutError, asyncio.CancelledError):
+            raise RoborockTimeout(
+                f"Timeout after {self.timeout} seconds waiting for response"
+            ) from None
         return response
