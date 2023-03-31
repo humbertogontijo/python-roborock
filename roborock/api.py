@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import base64
 import binascii
+import gzip
 import hashlib
 import hmac
 import json
@@ -13,20 +14,19 @@ import math
 import secrets
 import struct
 import time
-from typing import Any
+from typing import Any, Callable
 
 import aiohttp
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
 
 from roborock.exceptions import (
-    RoborockException,
+    RoborockException, RoborockTimeout, VacuumError,
 )
 from .code_mappings import WASH_MODE_MAP, DUST_COLLECTION_MAP, RoborockDockType, \
-    RoborockDockDustCollectionType, RoborockDockWashingModeType
+    RoborockDockDustCollectionType, RoborockDockWashingModeType, STATE_CODE_TO_STATUS
 from .containers import (
     UserData,
-    HomeDataDevice,
     Status,
     CleanSummary,
     Consumable,
@@ -37,6 +37,7 @@ from .containers import (
     SmartWashParameters,
 
 )
+from .roborock_queue import RoborockQueue
 from .typing import (
     RoborockDeviceProp,
     RoborockCommand,
@@ -86,7 +87,7 @@ class PreparedRequest:
                 return await resp.json()
 
 
-class RoborockClient():
+class RoborockClient:
 
     def __init__(self, endpoint: str, device_localkey: dict[str, str], prefixed=False) -> None:
         self.device_localkey = device_localkey
@@ -97,6 +98,8 @@ class RoborockClient():
         self._endpoint = base64.b64encode(md5bin(endpoint)[8:14]).decode()
         self._nonce = secrets.token_bytes(16)
         self._prefixed = prefixed
+        self._waiting_queue: dict[int, RoborockQueue] = {}
+        self._status_listeners: list[Callable[[str, str], None]] = []
 
     def _decode_msg(self, msg: bytes, local_key: str) -> dict[str, Any]:
         if self._prefixed:
@@ -112,13 +115,13 @@ class RoborockClient():
                 "timestamp": timestamp,
                 "protocol": protocol,
             }
-        crc32 = binascii.crc32(msg[0: len(msg) - 4])
+        # crc32 = binascii.crc32(msg[0: len(msg) - 4])
         [version, _seq, _random, timestamp, protocol, payload_len] = struct.unpack(
             "!3sIIIHH", msg[0:19]
         )
         [payload, expected_crc32] = struct.unpack_from(f"!{payload_len}sI", msg, 19)
-        if crc32 != expected_crc32:
-            raise RoborockException(f"Wrong CRC32 {crc32}, expected {expected_crc32}")
+        # if crc32 != expected_crc32:
+        #     raise RoborockException(f"Wrong CRC32 {crc32}, expected {expected_crc32}")
 
         aes_key = md5bin(encode_timestamp(timestamp) + local_key + self._salt)
         decipher = AES.new(aes_key, AES.MODE_ECB)
@@ -130,7 +133,7 @@ class RoborockClient():
             "payload": decrypted_payload,
         }
 
-    def _get_msg_raw(self, device_id, protocol, timestamp, payload, prefix='') -> bytes:
+    def _encode_msg(self, device_id, protocol, timestamp, payload, prefix='') -> bytes:
         local_key = self.device_localkey[device_id]
         aes_key = md5bin(encode_timestamp(timestamp) + local_key + self._salt)
         cipher = AES.new(aes_key, AES.MODE_ECB)
@@ -154,6 +157,81 @@ class RoborockClient():
         crc32 = binascii.crc32(msg[4:] if self._prefixed else msg)
         msg += struct.pack("!I", crc32)
         return msg
+
+    async def on_message(self, device_id, msg) -> None:
+        try:
+            data = self._decode_msg(msg, self.device_localkey[device_id])
+            protocol = data.get("protocol")
+            if protocol == 102 or protocol == 4:
+                payload = json.loads(data.get("payload").decode())
+                for data_point_number, data_point in payload.get("dps").items():
+                    if data_point_number == "102":
+                        data_point_response = json.loads(data_point)
+                        request_id = data_point_response.get("id")
+                        queue = self._waiting_queue.get(request_id)
+                        if queue:
+                            if queue.protocol == protocol:
+                                error = data_point_response.get("error")
+                                if error:
+                                    await queue.async_put(
+                                        (
+                                            None,
+                                            VacuumError(
+                                                error.get("code"), error.get("message")
+                                            ),
+                                        ),
+                                        timeout=QUEUE_TIMEOUT,
+                                    )
+                                else:
+                                    result = data_point_response.get("result")
+                                    if isinstance(result, list) and len(result) > 0:
+                                        result = result[0]
+                                    await queue.async_put(
+                                        (result, None), timeout=QUEUE_TIMEOUT
+                                    )
+                        elif request_id < self._id_counter:
+                            _LOGGER.debug(
+                                f"id={request_id} Ignoring response: {data_point_response}"
+                            )
+                    elif data_point_number == "121":
+                        status = STATE_CODE_TO_STATUS.get(data_point)
+                        _LOGGER.debug(f"Status updated to {status}")
+                        for listener in self._status_listeners:
+                            listener(device_id, status)
+                    else:
+                        _LOGGER.debug(
+                            f"Unknown data point number received {data_point_number} with {data_point}"
+                        )
+            elif protocol == 301:
+                payload = data.get("payload")[0:24]
+                [endpoint, _, request_id, _] = struct.unpack("<15sBH6s", payload)
+                if endpoint.decode().startswith(self._endpoint):
+                    iv = bytes(AES.block_size)
+                    decipher = AES.new(self._nonce, AES.MODE_CBC, iv)
+                    decrypted = unpad(
+                        decipher.decrypt(data.get("payload")[24:]), AES.block_size
+                    )
+                    decrypted = gzip.decompress(decrypted)
+                    queue = self._waiting_queue.get(request_id)
+                    if queue:
+                        if isinstance(decrypted, list):
+                            decrypted = decrypted[0]
+                        await queue.async_put((decrypted, None), timeout=QUEUE_TIMEOUT)
+        except Exception as ex:
+            _LOGGER.exception(ex)
+
+    async def _async_response(self, request_id: int, protocol_id: int = 0) -> tuple[Any, VacuumError | None]:
+        try:
+            queue = RoborockQueue(protocol_id)
+            self._waiting_queue[request_id] = queue
+            (response, err) = await queue.async_get(QUEUE_TIMEOUT)
+            return response, err
+        except (asyncio.TimeoutError, asyncio.CancelledError):
+            raise RoborockTimeout(
+                f"Timeout after {QUEUE_TIMEOUT} seconds waiting for response"
+            ) from None
+        finally:
+            del self._waiting_queue[request_id]
 
     def _get_payload(
             self, method: RoborockCommand, params: list = None

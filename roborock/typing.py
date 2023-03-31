@@ -1,7 +1,7 @@
 from enum import Enum
 
 from .code_mappings import RoborockDockDustCollectionType, RoborockDockWashingModeType
-from .containers import HomeDataDevice, HomeDataProduct, Status, CleanSummary, Consumable, \
+from .containers import Status, CleanSummary, Consumable, \
     DNDTimer, CleanRecord, SmartWashParameters
 
 

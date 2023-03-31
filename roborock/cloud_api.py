@@ -1,29 +1,21 @@
 from __future__ import annotations
 
 import base64
-import gzip
-import json
 import logging
 import secrets
-import struct
 import threading
 from asyncio import Lock
-from asyncio.exceptions import TimeoutError, CancelledError
 from typing import Any, Callable
 from urllib.parse import urlparse
 
 import paho.mqtt.client as mqtt
-from Crypto.Cipher import AES
-from Crypto.Util.Padding import unpad
 
 from roborock.api import md5hex, md5bin, RoborockClient
 from roborock.exceptions import (
     RoborockException,
     CommandVacuumError,
     VacuumError,
-    RoborockTimeout,
 )
-from .code_mappings import STATE_CODE_TO_STATUS
 from .containers import (
     UserData,
 )
@@ -69,7 +61,6 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
         self._mutex = Lock()
         self._last_device_msg_in = mqtt.time_func()
         self._last_disconnection = mqtt.time_func()
-        self._status_listeners: list[Callable[[str, str], None]] = []
 
     def __del__(self) -> None:
         self.sync_disconnect()
@@ -102,69 +93,10 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
 
     @run_in_executor()
     async def on_message(self, _client, _, msg, __=None) -> None:
-        try:
-            async with self._mutex:
-                self._last_device_msg_in = mqtt.time_func()
-            device_id = msg.topic.split("/").pop()
-            data = self._decode_msg(msg.payload, self.device_localkey[device_id])
-            protocol = data.get("protocol")
-            if protocol == 102:
-                payload = json.loads(data.get("payload").decode())
-                for data_point_number, data_point in payload.get("dps").items():
-                    if data_point_number == "102":
-                        data_point_response = json.loads(data_point)
-                        request_id = data_point_response.get("id")
-                        queue = self._waiting_queue.get(request_id)
-                        if queue:
-                            if queue.protocol == protocol:
-                                error = data_point_response.get("error")
-                                if error:
-                                    await queue.async_put(
-                                        (
-                                            None,
-                                            VacuumError(
-                                                error.get("code"), error.get("message")
-                                            ),
-                                        ),
-                                        timeout=QUEUE_TIMEOUT,
-                                    )
-                                else:
-                                    result = data_point_response.get("result")
-                                    if isinstance(result, list) and len(result) > 0:
-                                        result = result[0]
-                                    await queue.async_put(
-                                        (result, None), timeout=QUEUE_TIMEOUT
-                                    )
-                        elif request_id < self._id_counter:
-                            _LOGGER.debug(
-                                f"id={request_id} Ignoring response: {data_point_response}"
-                            )
-                    elif data_point_number == "121":
-                        status = STATE_CODE_TO_STATUS.get(data_point)
-                        _LOGGER.debug(f"Status updated to {status}")
-                        for listener in self._status_listeners:
-                            listener(device_id, status)
-                    else:
-                        _LOGGER.debug(
-                            f"Unknown data point number received {data_point_number} with {data_point}"
-                        )
-            elif protocol == 301:
-                payload = data.get("payload")[0:24]
-                [endpoint, _, request_id, _] = struct.unpack("<15sBH6s", payload)
-                if endpoint.decode().startswith(self._endpoint):
-                    iv = bytes(AES.block_size)
-                    decipher = AES.new(self._nonce, AES.MODE_CBC, iv)
-                    decrypted = unpad(
-                        decipher.decrypt(data.get("payload")[24:]), AES.block_size
-                    )
-                    decrypted = gzip.decompress(decrypted)
-                    queue = self._waiting_queue.get(request_id)
-                    if queue:
-                        if isinstance(decrypted, list):
-                            decrypted = decrypted[0]
-                        await queue.async_put((decrypted, None), timeout=QUEUE_TIMEOUT)
-        except Exception as ex:
-            _LOGGER.exception(ex)
+        async with self._mutex:
+            self._last_device_msg_in = mqtt.time_func()
+        device_id = msg.topic.split("/").pop()
+        super().on_message(device_id, msg)
 
     @run_in_executor()
     async def on_disconnect(self, _client: mqtt.Client, _, rc, __=None) -> None:
@@ -228,19 +160,6 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
                 raise RoborockException(f"Failed to connect (rc:{rc})")
         return rc == mqtt.MQTT_ERR_SUCCESS
 
-    async def _async_response(self, request_id: int, protocol_id: int = 0) -> tuple[Any, VacuumError | None]:
-        try:
-            queue = RoborockQueue(protocol_id)
-            self._waiting_queue[request_id] = queue
-            (response, err) = await queue.async_get(QUEUE_TIMEOUT)
-            return response, err
-        except (TimeoutError, CancelledError):
-            raise RoborockTimeout(
-                f"Timeout after {QUEUE_TIMEOUT} seconds waiting for response"
-            ) from None
-        finally:
-            del self._waiting_queue[request_id]
-
     async def async_disconnect(self) -> Any:
         async with self._mutex:
             disconnecting = self.sync_disconnect()
@@ -277,7 +196,7 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
         _LOGGER.debug(f"id={request_id} Requesting method {method} with {params}")
         request_protocol = 101
         response_protocol = 301 if method in COMMANDS_WITH_BINARY_RESPONSE else 102
-        msg = super()._get_msg_raw(device_id, request_protocol, timestamp, payload)
+        msg = super()._encode_msg(device_id, request_protocol, timestamp, payload)
         self._send_msg_raw(device_id, msg)
         (response, err) = await self._async_response(request_id, response_protocol)
         if err:
