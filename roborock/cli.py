@@ -6,9 +6,9 @@ from typing import Any, Dict
 import click
 
 from roborock import RoborockException
-from roborock.api import RoborockClient, RoborockMqttClient
+from roborock.api import RoborockApiClient
+from roborock.cloud_api import RoborockMqttClient
 from roborock.containers import LoginData
-from roborock.typing import RoborockDeviceInfo
 from roborock.util import run_sync
 
 _LOGGER = logging.getLogger(__name__)
@@ -69,23 +69,27 @@ async def login(ctx, email, password):
         return
     except RoborockException:
         pass
-    client = RoborockClient(email)
+    client = RoborockApiClient(email)
     user_data = await client.pass_login(password)
     context.update(LoginData({"user_data": user_data, "email": email}))
+
 
 async def _discover(ctx):
     context: RoborockContext = ctx.obj
     login_data = context.login_data()
-    client = RoborockClient(login_data.email)
+    client = RoborockApiClient(login_data.email)
     home_data = await client.get_home_data(login_data.user_data)
     context.update(LoginData({**login_data, "home_data": home_data}))
-    click.echo(f"Discovered devices {', '.join([device.name for device in home_data.devices + home_data.received_devices])}")
+    click.echo(
+        f"Discovered devices {', '.join([device.name for device in home_data.devices + home_data.received_devices])}")
+
 
 @click.command()
 @click.pass_context
 @run_sync()
 async def discover(ctx):
     await _discover(ctx)
+
 
 @click.command()
 @click.pass_context
@@ -99,6 +103,7 @@ async def list_devices(ctx):
     home_data = login_data.home_data
     click.echo(f"Known devices {', '.join([device.name for device in home_data.devices + home_data.received_devices])}")
 
+
 @click.command()
 @click.option("--cmd", required=True)
 @click.option("--params", required=False)
@@ -111,17 +116,9 @@ async def command(ctx, cmd, params):
         await _discover(ctx)
         login_data = context.login_data()
     home_data = login_data.home_data
-    device_map: dict[str, RoborockDeviceInfo] = {}
+    device_map: dict[str, str] = {}
     for device in home_data.devices + home_data.received_devices:
-        product = next(
-            (
-                product
-                for product in home_data.products
-                if product.id == device.product_id
-            ),
-            {},
-        )
-        device_map[device.duid] = RoborockDeviceInfo(device, product)
+        device_map[device.duid] = device.local_key
     mqtt_client = RoborockMqttClient(login_data.user_data, device_map)
     await mqtt_client.send_command(home_data.devices[0].duid, cmd, params)
     mqtt_client.__del__()

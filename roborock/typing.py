@@ -62,12 +62,6 @@ class RoborockCommand(str, Enum):
     START_WASH_THEN_CHARGE = "start_wash_then_charge"
 
 
-class RoborockDeviceInfo:
-    def __init__(self, device: HomeDataDevice, product: HomeDataProduct):
-        self.device = device
-        self.product = product
-
-
 class RoborockDockSummary:
     def __init__(self, dust_collection_mode: RoborockDockDustCollectionType,
                  washing_mode_type: RoborockDockWashingModeType, mop_wash: SmartWashParameters) -> None:
