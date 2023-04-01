@@ -86,8 +86,7 @@ class RoborockSocketListener:
                     await self.on_message(self.device_id, message)
                 except Exception as e:
                     _LOGGER.exception(e)
-            except Exception as e:
-                _LOGGER.exception(e)
+            except BrokenPipeError:
                 self.socket.close()
 
     async def connect(self):
@@ -110,4 +109,6 @@ class RoborockSocketListener:
             raise RoborockTimeout(
                 f"Timeout after {self.timeout} seconds waiting for response"
             ) from None
+        except BrokenPipeError:
+            self.socket.close()
         return response
