@@ -147,7 +147,7 @@ class RoborockClient:
         }
 
     def _encode_msg(self, device_id, request_id, protocol, timestamp, payload, prefix=None) -> bytes:
-        local_key = self.devices_info[device_id].local_key
+        local_key = self.devices_info[device_id].device.local_key
         aes_key = md5bin(encode_timestamp(timestamp) + local_key + self._salt)
         cipher = AES.new(aes_key, AES.MODE_ECB)
         encrypted = cipher.encrypt(pad(payload, AES.block_size))
@@ -173,7 +173,7 @@ class RoborockClient:
 
     async def on_message(self, device_id, msg) -> bool:
         try:
-            data = self._decode_msg(msg, self.devices_info[device_id].local_key)
+            data = self._decode_msg(msg, self.devices_info[device_id].device.local_key)
             protocol = data.get("protocol")
             if protocol == 102 or protocol == 4:
                 payload = json.loads(data.get("payload").decode())

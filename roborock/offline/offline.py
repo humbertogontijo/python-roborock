@@ -1,6 +1,8 @@
 import asyncio
 import logging
 
+from roborock.containers import HomeDataDevice, HomeDataDeviceField, HomeDataProduct, HomeDataProductField, NetworkInfo, \
+    NetworkInfoField
 from roborock.local_api import RoborockLocalClient
 from roborock.typing import RoborockLocalDeviceInfo
 
@@ -15,7 +17,16 @@ async def main():
     }
     logging.basicConfig(**logging_config)
     client = RoborockLocalClient({
-        device_id: RoborockLocalDeviceInfo(local_key, "model_test", local_ip)
+        device_id: RoborockLocalDeviceInfo(HomeDataDevice({
+            HomeDataDeviceField.NAME: "test_name",
+            HomeDataDeviceField.DUID: device_id,
+            HomeDataDeviceField.FV: "1",
+            HomeDataDeviceField.LOCAL_KEY: local_key
+        }), HomeDataProduct({
+            HomeDataProductField.MODEL: "test_model"
+        }), NetworkInfo({
+            NetworkInfoField.IP: local_ip
+        }))
     })
     await client.async_connect()
     props = await client.get_prop(device_id)

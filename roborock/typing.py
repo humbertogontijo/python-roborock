@@ -4,7 +4,7 @@ from enum import Enum
 
 from .code_mappings import RoborockDockDustCollectionType, RoborockDockWashingModeType
 from .containers import Status, CleanSummary, Consumable, \
-    DNDTimer, CleanRecord, SmartWashParameters
+    DNDTimer, CleanRecord, SmartWashParameters, HomeDataDevice, HomeDataProduct, NetworkInfo
 
 
 class RoborockDevicePropField(str, Enum):
@@ -88,15 +88,18 @@ class RoborockCommand(str, Enum):
     SET_APP_TIMEZONE = "set_app_timezone"
     GET_NETWORK_INFO = "get_network_info"
 
+
 class RoborockDeviceInfo:
-    def __init__(self, local_key: str, model: str):
-        self.local_key = local_key
-        self.model = model
+    def __init__(self, device: HomeDataDevice, product: HomeDataProduct):
+        self.device = device
+        self.product = product
+        self.network_info: NetworkInfo | None = None
+
 
 class RoborockLocalDeviceInfo(RoborockDeviceInfo):
-    def __init__(self, local_key: str, model: str, ip: str):
-        super().__init__(local_key, model)
-        self.ip = ip
+    def __init__(self, device: HomeDataDevice, product: HomeDataProduct, network_info: NetworkInfo):
+        super().__init__(device, product)
+        self.network_info = network_info
 
 class RoborockDockSummary:
     def __init__(self, dust_collection_mode: RoborockDockDustCollectionType,
