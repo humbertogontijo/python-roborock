@@ -10,7 +10,7 @@ import async_timeout
 
 from roborock.api import RoborockClient, SPECIAL_COMMANDS
 from roborock.exceptions import RoborockTimeout, CommandVacuumError
-from roborock.typing import RoborockCommand, RoborockDeviceInfo
+from roborock.typing import RoborockCommand, RoborockLocalDeviceInfo
 from roborock.util import get_running_loop_or_create_one
 
 secured_prefix = 199
@@ -35,11 +35,11 @@ class RoborockProtocol(asyncio.DatagramProtocol):
 
 class RoborockLocalClient(RoborockClient):
 
-    def __init__(self, devices_info: dict[str, RoborockDeviceInfo]):
+    def __init__(self, devices_info: dict[str, RoborockLocalDeviceInfo]):
         super().__init__("abc", devices_info)
         self.loop = get_running_loop_or_create_one()
         self.device_listener: dict[str, RoborockSocketListener] = {
-            device_id: RoborockSocketListener(device_info.network_info.ip, device_id, self.on_message)
+            device_id: RoborockSocketListener(device_info.ip, device_id, self.on_message)
             for device_id, device_info in devices_info.items()
         }
         self._mutex = Lock()
