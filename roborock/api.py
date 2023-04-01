@@ -103,21 +103,25 @@ class RoborockClient:
         self._waiting_queue: dict[int, RoborockQueue] = {}
         self._status_listeners: list[Callable[[str, str], None]] = []
 
+    def add_status_listener(self, callback: Callable[[str, str], None]):
+        self._status_listeners.append(callback)
+
     def _decode_msg(self, msg: bytes, local_key: str) -> dict[str, Any]:
         if msg[4:7] == "1.0".encode():
             msg = msg[4:]
         elif msg[0:3] != "1.0".encode():
             raise RoborockException(f"Unknown protocol version {msg[0:3]}")
         if len(msg) == 17:
-            [version, _seq, _random, timestamp, protocol] = struct.unpack(
+            [version, request_id, _random, timestamp, protocol] = struct.unpack(
                 "!3sIIIH", msg[0:17]
             )
             return {
                 "version": version,
+                "request_id": request_id,
                 "timestamp": timestamp,
                 "protocol": protocol,
             }
-        [version, _seq, _random, timestamp, protocol, payload_len] = struct.unpack(
+        [version, request_id, _random, timestamp, protocol, payload_len] = struct.unpack(
             "!3sIIIHH", msg[0:19]
         )
         extra_len = len(msg) - 23 - payload_len
@@ -132,12 +136,13 @@ class RoborockClient:
         decrypted_payload = unpad(decipher.decrypt(payload), AES.block_size) if payload else extra
         return {
             "version": version,
+            "request_id": request_id,
             "timestamp": timestamp,
             "protocol": protocol,
             "payload": decrypted_payload
         }
 
-    def _encode_msg(self, device_id, protocol, timestamp, payload, prefix=None) -> bytes:
+    def _encode_msg(self, device_id, request_id, protocol, timestamp, payload, prefix=None) -> bytes:
         local_key = self.device_localkey[device_id]
         aes_key = md5bin(encode_timestamp(timestamp) + local_key + self._salt)
         cipher = AES.new(aes_key, AES.MODE_ECB)
@@ -145,7 +150,7 @@ class RoborockClient:
         encrypted_len = len(encrypted)
         values = [
             "1.0".encode(),
-            self._seq,
+            request_id,
             self._random,
             timestamp,
             protocol,

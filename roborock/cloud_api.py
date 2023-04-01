@@ -118,9 +118,6 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
             if now - self._last_disconnection > self._keepalive ** 2 and now - self._last_device_msg_in > self._keepalive:
                 self._ping_t = self._last_device_msg_in
 
-    def add_status_listener(self, callback: Callable[[str, str], None]):
-        self._status_listeners.append(callback)
-
     def _check_keepalive(self) -> None:
         self._async_check_keepalive()
         super()._check_keepalive()

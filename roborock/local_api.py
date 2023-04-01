@@ -46,7 +46,7 @@ class RoborockLocalClient(RoborockClient):
             _LOGGER.debug(f"id={request_id} Requesting method {method} with {params}")
             prefix = secured_prefix if method in SPECIAL_COMMANDS else get_prefix
             protocol = 4
-            msg = self._encode_msg(device_id, protocol, timestamp, payload, prefix)
+            msg = self._encode_msg(device_id, request_id, protocol, timestamp, payload, prefix)
             # Send the command to the Roborock device
             listener = self.device_listener.get(device_id)
             await listener.send_message(msg)
