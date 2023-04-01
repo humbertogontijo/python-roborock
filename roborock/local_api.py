@@ -3,14 +3,14 @@ from __future__ import annotations
 import asyncio
 import logging
 import socket
-from asyncio import Lock
+from asyncio import Lock, Future
 from typing import Callable, Coroutine, Any
 
 import async_timeout
 
 from roborock.api import RoborockClient, SPECIAL_COMMANDS
 from roborock.exceptions import RoborockTimeout, CommandVacuumError
-from roborock.typing import RoborockCommand
+from roborock.typing import RoborockCommand, RoborockDeviceInfo
 from roborock.util import get_running_loop_or_create_one
 
 secured_prefix = 199
@@ -21,13 +21,26 @@ set_prefix = 151
 _LOGGER = logging.getLogger(__name__)
 
 
+class RoborockProtocol(asyncio.DatagramProtocol):
+
+    def __init__(self, fut: Future):
+        self.fut = fut
+
+    def datagram_received(self, data, addr):
+        self.fut.set_result((data, addr))
+
+    def error_received(self, exc):
+        self.fut.set_exception(exc)
+
+
 class RoborockLocalClient(RoborockClient):
 
-    def __init__(self, ip: str, device_localkey: dict[str, str]):
-        super().__init__("abc", device_localkey)
+    def __init__(self, devices_info: dict[str, RoborockDeviceInfo]):
+        super().__init__("abc", devices_info)
+        self.loop = get_running_loop_or_create_one()
         self.device_listener: dict[str, RoborockSocketListener] = {
-            device_id: RoborockSocketListener(ip, device_id, self.on_message)
-            for device_id in device_localkey
+            device_id: RoborockSocketListener(device_info.network_info.ip, device_id, self.on_message)
+            for device_id, device_info in devices_info.items()
         }
         self._mutex = Lock()
 

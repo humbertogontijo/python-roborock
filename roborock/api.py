@@ -42,6 +42,7 @@ from .typing import (
     RoborockDeviceProp,
     RoborockCommand,
     RoborockDockSummary,
+    RoborockDeviceInfo,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -92,8 +93,8 @@ class PreparedRequest:
 
 class RoborockClient:
 
-    def __init__(self, endpoint: str, device_localkey: dict[str, str]) -> None:
-        self.device_localkey = device_localkey
+    def __init__(self, endpoint: str, devices_info: dict[str, RoborockDeviceInfo]) -> None:
+        self.devices_info = devices_info
         self._seq = 1
         self._random = 4711
         self._id_counter = 10000
@@ -146,7 +147,7 @@ class RoborockClient:
         }
 
     def _encode_msg(self, device_id, request_id, protocol, timestamp, payload, prefix=None) -> bytes:
-        local_key = self.device_localkey[device_id]
+        local_key = self.devices_info[device_id].device.local_key
         aes_key = md5bin(encode_timestamp(timestamp) + local_key + self._salt)
         cipher = AES.new(aes_key, AES.MODE_ECB)
         encrypted = cipher.encrypt(pad(payload, AES.block_size))
@@ -172,7 +173,7 @@ class RoborockClient:
 
     async def on_message(self, device_id, msg) -> bool:
         try:
-            data = self._decode_msg(msg, self.device_localkey[device_id])
+            data = self._decode_msg(msg, self.devices_info[device_id].device.local_key)
             protocol = data.get("protocol")
             if protocol == 102 or protocol == 4:
                 payload = json.loads(data.get("payload").decode())

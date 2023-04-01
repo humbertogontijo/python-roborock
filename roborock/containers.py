@@ -229,6 +229,14 @@ class WashTowelField(str, Enum):
     Wash_MODE = "wash_mode"
 
 
+class NetworkInfoField(str, Enum):
+    SSID = "ssid"
+    IP = "ip"
+    MAC = "mac"
+    BSSID = "bssid"
+    RSSI = "rssi"
+
+
 class RoborockBase(dict):
     def __init__(self, data: dict[str, any]) -> None:
         super().__init__()
@@ -1044,3 +1052,23 @@ class SmartWashParameters(RoborockBase):
     @property
     def wash_interval(self) -> int:
         return self.get(SmartWashField.WASH_INTERVAL)
+
+class NetworkInfo(RoborockBase):
+    def __init__(self, data: dict[str, any]) -> None:
+        super().__init__(data)
+
+    @property
+    def ssid(self) -> str:
+        return self.get(NetworkInfoField.SSID)
+    @property
+    def ip(self) -> str:
+        return self.get(NetworkInfoField.IP)
+    @property
+    def mac(self) -> str:
+        return self.get(NetworkInfoField.MAC)
+    @property
+    def bssid(self) -> str:
+        return self.get(NetworkInfoField.BSSID)
+    @property
+    def rssi(self) -> int:
+        return self.get(NetworkInfoField.RSSI)
