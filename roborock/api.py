@@ -106,6 +106,9 @@ class RoborockClient:
     def add_status_listener(self, callback: Callable[[str, str], None]):
         self._status_listeners.append(callback)
 
+    async def async_disconnect(self) -> Any:
+        raise NotImplementedError
+
     def _decode_msg(self, msg: bytes, local_key: str) -> dict[str, Any]:
         if msg[4:7] == "1.0".encode():
             msg = msg[4:]

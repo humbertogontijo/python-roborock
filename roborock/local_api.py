@@ -4,7 +4,7 @@ import asyncio
 import logging
 import socket
 from asyncio import Lock
-from typing import Callable, Coroutine
+from typing import Callable, Coroutine, Any
 
 import async_timeout
 
@@ -36,6 +36,9 @@ class RoborockLocalClient(RoborockClient):
             listener.connect()
             for listener in self.device_listener.values()
         ])
+
+    async def async_disconnect(self) -> Any:
+        await asyncio.gather(*[listener.disconnect() for listener in self.device_listener.values()])
 
     async def send_command(
             self, device_id: str, method: RoborockCommand, params: list = None
@@ -87,16 +90,22 @@ class RoborockSocketListener:
                 except Exception as e:
                     _LOGGER.exception(e)
             except BrokenPipeError:
-                self.socket.close()
+                await self.disconnect()
 
     async def connect(self):
         async with self._mutex:
             if not self.is_connected or self.socket.is_closed:
+                self.socket = RoborockSocket(socket.AF_INET, socket.SOCK_STREAM)
+                self.socket.setblocking(False)
                 async with async_timeout.timeout(self.timeout):
                     _LOGGER.info(f"Connecting to {self.ip}")
                     await self.loop.sock_connect(self.socket, (self.ip, 58867))
                     self.is_connected = True
                 self.loop.create_task(self._main_coro())
+
+    async def disconnect(self):
+        self.socket.close()
+        self.is_connected = False
 
     async def send_message(self, data: bytes):
         response = {}
@@ -110,5 +119,5 @@ class RoborockSocketListener:
                 f"Timeout after {self.timeout} seconds waiting for response"
             ) from None
         except BrokenPipeError:
-            self.socket.close()
+            await self.disconnect()
         return response
