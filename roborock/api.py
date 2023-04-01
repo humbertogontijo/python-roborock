@@ -47,7 +47,9 @@ from .typing import (
 _LOGGER = logging.getLogger(__name__)
 QUEUE_TIMEOUT = 4
 MQTT_KEEPALIVE = 60
-
+SPECIAL_COMMANDS = [
+    RoborockCommand.GET_MAP_V1,
+]
 
 def md5hex(message: str) -> str:
     md5 = hashlib.md5()
@@ -119,6 +121,12 @@ class RoborockClient:
         [version, _seq, _random, timestamp, protocol, payload_len] = struct.unpack(
             "!3sIIIHH", msg[0:19]
         )
+        if not payload_len:
+            return {
+                "version": version,
+                "timestamp": timestamp,
+                "protocol": protocol,
+            }
         [payload, expected_crc32] = struct.unpack_from(f"!{payload_len}sI", msg, 19)
         # if crc32 != expected_crc32:
         #     raise RoborockException(f"Wrong CRC32 {crc32}, expected {expected_crc32}")
@@ -158,7 +166,7 @@ class RoborockClient:
         msg += struct.pack("!I", crc32)
         return msg
 
-    async def on_message(self, device_id, msg) -> None:
+    async def on_message(self, device_id, msg) -> bool:
         try:
             data = self._decode_msg(msg, self.device_localkey[device_id])
             protocol = data.get("protocol")
@@ -184,11 +192,12 @@ class RoborockClient:
                                     )
                                 else:
                                     result = data_point_response.get("result")
-                                    if isinstance(result, list) and len(result) > 0:
+                                    if isinstance(result, list) and len(result) == 1:
                                         result = result[0]
                                     await queue.async_put(
                                         (result, None), timeout=QUEUE_TIMEOUT
                                     )
+                                    return True
                         elif request_id < self._id_counter:
                             _LOGGER.debug(
                                 f"id={request_id} Ignoring response: {data_point_response}"
@@ -217,6 +226,7 @@ class RoborockClient:
                         if isinstance(decrypted, list):
                             decrypted = decrypted[0]
                         await queue.async_put((decrypted, None), timeout=QUEUE_TIMEOUT)
+                        return True
         except Exception as ex:
             _LOGGER.exception(ex)
 
@@ -234,7 +244,7 @@ class RoborockClient:
             del self._waiting_queue[request_id]
 
     def _get_payload(
-            self, method: RoborockCommand, params: list = None
+            self, method: RoborockCommand, params: list = None, secured=False
     ):
         timestamp = math.floor(time.time())
         request_id = self._id_counter
@@ -243,11 +253,12 @@ class RoborockClient:
             "id": request_id,
             "method": method,
             "params": params or [],
-            "security": {
-                "endpoint": self._endpoint,
-                "nonce": self._nonce.hex().upper(),
-            },
         }
+        if secured:
+            inner["security"] = {
+                "endpoint": self._endpoint,
+                "nonce": "39344139463753454b4851444f4a4442",
+            }
         payload = bytes(
             json.dumps(
                 {
@@ -328,10 +339,10 @@ class RoborockClient:
             ]
         )
         last_clean_record = None
-        if clean_summary and clean_summary.records and len(clean_summary.records) > 0:
-            last_clean_record = await self.get_clean_record(
-                device_id, clean_summary.records[0]
-            )
+        # if clean_summary and clean_summary.records and len(clean_summary.records) > 0:
+        #     last_clean_record = await self.get_clean_record(
+        #         device_id, clean_summary.records[0]
+        #     )
         dock_summary = None
         if status and status.dock_type != RoborockDockType.NO_DOCK:
             dock_summary = await self.get_dock_summary(device_id, status.dock_type)

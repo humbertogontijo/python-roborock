@@ -10,7 +10,7 @@ from urllib.parse import urlparse
 
 import paho.mqtt.client as mqtt
 
-from roborock.api import md5hex, md5bin, RoborockClient
+from roborock.api import md5hex, md5bin, RoborockClient, SPECIAL_COMMANDS
 from roborock.exceptions import (
     RoborockException,
     CommandVacuumError,
@@ -28,9 +28,6 @@ from .util import run_in_executor
 _LOGGER = logging.getLogger(__name__)
 QUEUE_TIMEOUT = 4
 MQTT_KEEPALIVE = 60
-COMMANDS_WITH_BINARY_RESPONSE = [
-    RoborockCommand.GET_MAP_V1,
-]
 
 
 class RoborockMqttClient(RoborockClient, mqtt.Client):
@@ -192,10 +189,10 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
             self, device_id: str, method: RoborockCommand, params: list = None
     ):
         await self.validate_connection()
-        request_id, timestamp, payload = super()._get_payload(method, params)
+        request_id, timestamp, payload = super()._get_payload(method, params, True)
         _LOGGER.debug(f"id={request_id} Requesting method {method} with {params}")
         request_protocol = 101
-        response_protocol = 301 if method in COMMANDS_WITH_BINARY_RESPONSE else 102
+        response_protocol = 301 if method in SPECIAL_COMMANDS else 102
         msg = super()._encode_msg(device_id, request_protocol, timestamp, payload)
         self._send_msg_raw(device_id, msg)
         (response, err) = await self._async_response(request_id, response_protocol)
