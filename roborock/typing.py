@@ -60,6 +60,30 @@ class RoborockCommand(str, Enum):
     SET_CHILD_LOCK_STATUS = "set_child_lock_status"
     GET_CHILD_LOCK_STATUS = "get_child_lock_status"
     START_WASH_THEN_CHARGE = "start_wash_then_charge"
+    GET_CURRENT_SOUND = "get_current_sound"
+    GET_SERIAL_NUMBER = "get_serial_number"
+    GET_TIMEZONE = "get_timezone"
+    GET_SERVER_TIMER = "get_server_timer"
+    GET_CUSTOMIZE_CLEAN_MODE = "get_customize_clean_mode"
+    GET_CLEAN_SEQUENCE = "get_clean_sequence"
+    SET_FDS_ENDPOINT = "set_fds_endpoint" # Seems to be logging server
+    ENABLE_LOG_UPLOAD = "enable_log_upload"
+    APP_WAKEUP_ROBOT = "app_wakeup_robot"
+    GET_LED_STATUS = "get_led_status"
+    GET_FLOW_LED_STATUS = "get_flow_led_status"
+    SET_FLOW_LED_STATUS = "set_flow_led_status"
+    GET_SOUND_PROGRESS = "get_sound_progress"
+    GET_SOUND_VOLUME = "get_sound_volume"
+    TEST_SOUND_VOLUME = "test_sound_volume"
+    CHANGE_SOUND_VOLUME = "change_sound_volume"
+    GET_CARPET_MODE = "get_carpet_mode"
+    SET_CARPET_MODE = "set_carpet_mode"
+    GET_CARPET_CLEAN_MODE = "get_carpet_clean_mode"
+    SET_CARPET_CLEAN_MODE = "set_carpet_clean_mode"
+    UPD_SERVER_TIMER = "upd_server_timer" # Server timer seems to be with schedules
+    SET_SERVER_TIMER = "set_server_timer"
+    APP_GET_INIT_STATUS = "get_init_status"
+    SET_APP_TIMEZONE = "set_app_timezone"
 
 
 class RoborockDockSummary:
