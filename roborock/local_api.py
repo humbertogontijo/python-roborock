@@ -23,8 +23,8 @@ _LOGGER = logging.getLogger(__name__)
 
 class RoborockLocalClient(RoborockClient):
 
-    def __init__(self, ip: str, endpoint: str, device_localkey: dict[str, str]):
-        super().__init__(endpoint, device_localkey, True)
+    def __init__(self, ip: str, device_localkey: dict[str, str]):
+        super().__init__("abc", device_localkey)
         self.device_listener: dict[str, RoborockSocketListener] = {
             device_id: RoborockSocketListener(ip, device_id, self.on_message)
             for device_id in device_localkey

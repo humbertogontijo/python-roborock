@@ -92,22 +92,21 @@ class PreparedRequest:
 
 class RoborockClient:
 
-    def __init__(self, endpoint: str, device_localkey: dict[str, str], prefixed=False) -> None:
+    def __init__(self, endpoint: str, device_localkey: dict[str, str]) -> None:
         self.device_localkey = device_localkey
         self._seq = 1
         self._random = 4711
         self._id_counter = 10000
         self._salt = "TXdfu$jyZ#TZHsg4"
-        self._endpoint = base64.b64encode(md5bin(endpoint)[8:14]).decode()
+        self._endpoint = endpoint
         self._nonce = secrets.token_bytes(16)
-        self._prefixed = prefixed
         self._waiting_queue: dict[int, RoborockQueue] = {}
         self._status_listeners: list[Callable[[str, str], None]] = []
 
     def _decode_msg(self, msg: bytes, local_key: str) -> dict[str, Any]:
-        if self._prefixed:
+        if msg[4:7] == "1.0".encode():
             msg = msg[4:]
-        if msg[0:3] != "1.0".encode():
+        elif msg[0:3] != "1.0".encode():
             raise RoborockException(f"Unknown protocol version {msg[0:3]}")
         if len(msg) == 17:
             [version, _seq, _random, timestamp, protocol] = struct.unpack(
@@ -118,31 +117,27 @@ class RoborockClient:
                 "timestamp": timestamp,
                 "protocol": protocol,
             }
-        # crc32 = binascii.crc32(msg[0: len(msg) - 4])
         [version, _seq, _random, timestamp, protocol, payload_len] = struct.unpack(
             "!3sIIIHH", msg[0:19]
         )
-        if not payload_len:
-            return {
-                "version": version,
-                "timestamp": timestamp,
-                "protocol": protocol,
-            }
-        [payload, expected_crc32] = struct.unpack_from(f"!{payload_len}sI", msg, 19)
-        # if crc32 != expected_crc32:
-        #     raise RoborockException(f"Wrong CRC32 {crc32}, expected {expected_crc32}")
+        extra_len = len(msg) - 23 - payload_len
+        [payload, expected_crc32, extra] = struct.unpack_from(f"!{payload_len}sI{extra_len}s", msg, 19)
+        if not extra_len:
+            crc32 = binascii.crc32(msg[0: 19 + payload_len])
+            if crc32 != expected_crc32:
+                raise RoborockException(f"Wrong CRC32 {crc32}, expected {expected_crc32}")
 
         aes_key = md5bin(encode_timestamp(timestamp) + local_key + self._salt)
         decipher = AES.new(aes_key, AES.MODE_ECB)
-        decrypted_payload = unpad(decipher.decrypt(payload), AES.block_size)
+        decrypted_payload = unpad(decipher.decrypt(payload), AES.block_size) if payload else extra
         return {
             "version": version,
             "timestamp": timestamp,
             "protocol": protocol,
-            "payload": decrypted_payload,
+            "payload": decrypted_payload
         }
 
-    def _encode_msg(self, device_id, protocol, timestamp, payload, prefix='') -> bytes:
+    def _encode_msg(self, device_id, protocol, timestamp, payload, prefix=None) -> bytes:
         local_key = self.device_localkey[device_id]
         aes_key = md5bin(encode_timestamp(timestamp) + local_key + self._salt)
         cipher = AES.new(aes_key, AES.MODE_ECB)
@@ -157,13 +152,13 @@ class RoborockClient:
             encrypted_len,
             encrypted
         ]
-        if self._prefixed:
+        if prefix:
             values = [prefix] + values
         msg = struct.pack(
-            f"!{'I' if self._prefixed else ''}3sIIIHH{encrypted_len}s",
+            f"!{'I' if prefix else ''}3sIIIHH{encrypted_len}s",
             *values
         )
-        crc32 = binascii.crc32(msg[4:] if self._prefixed else msg)
+        crc32 = binascii.crc32(msg[4:] if prefix else msg)
         msg += struct.pack("!I", crc32)
         return msg
 
@@ -258,7 +253,7 @@ class RoborockClient:
         if secured:
             inner["security"] = {
                 "endpoint": self._endpoint,
-                "nonce": "39344139463753454b4851444f4a4442",
+                "nonce": self._nonce.hex().upper(),
             }
         payload = bytes(
             json.dumps(

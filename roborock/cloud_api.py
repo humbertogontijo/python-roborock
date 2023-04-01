@@ -36,9 +36,10 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
 
     def __init__(self, user_data: UserData, device_localkey: dict[str, str]) -> None:
         rriot = user_data.rriot
-        self._mqtt_user = rriot.user
-        RoborockClient.__init__(self, rriot.endpoint, device_localkey)
+        endpoint = base64.b64encode(md5bin(rriot.endpoint)[8:14]).decode()
+        RoborockClient.__init__(self, endpoint, device_localkey)
         mqtt.Client.__init__(self, protocol=mqtt.MQTTv5)
+        self._mqtt_user = rriot.user
         self._hashed_user = md5hex(self._mqtt_user + ":" + rriot.endpoint)[2:10]
         url = urlparse(rriot.reference.mqtt)
         self._mqtt_host = url.hostname
@@ -94,7 +95,7 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
         async with self._mutex:
             self._last_device_msg_in = mqtt.time_func()
         device_id = msg.topic.split("/").pop()
-        super().on_message(device_id, msg)
+        await super().on_message(device_id, msg.payload)
 
     @run_in_executor()
     async def on_disconnect(self, _client: mqtt.Client, _, rc, __=None) -> None:
