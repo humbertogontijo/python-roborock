@@ -5,7 +5,7 @@ import logging
 import secrets
 import threading
 from asyncio import Lock
-from typing import Any, Callable
+from typing import Any
 from urllib.parse import urlparse
 
 import paho.mqtt.client as mqtt
@@ -22,7 +22,7 @@ from .containers import (
 )
 from .roborock_queue import RoborockQueue
 from .typing import (
-    RoborockCommand, RoborockDeviceProp,
+    RoborockCommand, RoborockDeviceProp, RoborockDeviceInfo,
 )
 from .util import run_in_executor
 
@@ -34,10 +34,10 @@ MQTT_KEEPALIVE = 60
 class RoborockMqttClient(RoborockClient, mqtt.Client):
     _thread: threading.Thread
 
-    def __init__(self, user_data: UserData, device_localkey: dict[str, str]) -> None:
+    def __init__(self, user_data: UserData, devices_info: dict[str, RoborockDeviceInfo]) -> None:
         rriot = user_data.rriot
         endpoint = base64.b64encode(md5bin(rriot.endpoint)[8:14]).decode()
-        RoborockClient.__init__(self, endpoint, device_localkey)
+        RoborockClient.__init__(self, endpoint, devices_info)
         mqtt.Client.__init__(self, protocol=mqtt.MQTTv5)
         self._mqtt_user = rriot.user
         self._hashed_user = md5hex(self._mqtt_user + ":" + rriot.endpoint)[2:10]
@@ -192,7 +192,7 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
         _LOGGER.debug(f"id={request_id} Requesting method {method} with {params}")
         request_protocol = 101
         response_protocol = 301 if method in SPECIAL_COMMANDS else 102
-        msg = super()._encode_msg(device_id, request_protocol, timestamp, payload)
+        msg = super()._encode_msg(device_id, request_id, request_protocol, timestamp, payload)
         self._send_msg_raw(device_id, msg)
         (response, err) = await self._async_response(request_id, response_protocol)
         if err:
