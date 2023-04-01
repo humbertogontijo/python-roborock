@@ -9,9 +9,9 @@ from typing import Any
 from urllib.parse import urlparse
 
 import paho.mqtt.client as mqtt
-from roborock.code_mappings import RoborockDockType
 
 from roborock.api import md5hex, md5bin, RoborockClient, SPECIAL_COMMANDS
+from roborock.code_mappings import RoborockDockType
 from roborock.exceptions import (
     RoborockException,
     CommandVacuumError,
@@ -19,10 +19,11 @@ from roborock.exceptions import (
 )
 from .containers import (
     UserData,
+    RoborockDeviceInfo,
 )
 from .roborock_queue import RoborockQueue
 from .typing import (
-    RoborockCommand, RoborockDeviceProp, RoborockDeviceInfo,
+    RoborockCommand, RoborockDeviceProp,
 )
 from .util import run_in_executor
 

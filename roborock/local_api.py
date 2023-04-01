@@ -9,8 +9,9 @@ from typing import Callable, Coroutine, Any
 import async_timeout
 
 from roborock.api import RoborockClient, SPECIAL_COMMANDS
+from roborock.containers import RoborockLocalDeviceInfo
 from roborock.exceptions import RoborockTimeout, CommandVacuumError
-from roborock.typing import RoborockCommand, RoborockLocalDeviceInfo
+from roborock.typing import RoborockCommand
 from roborock.util import get_running_loop_or_create_one
 
 secured_prefix = 199
@@ -72,12 +73,14 @@ class RoborockLocalClient(RoborockClient):
             _LOGGER.debug(f"id={request_id} Response from {method}: {response}")
             return response
 
+
 class RoborockSocket(socket.socket):
     _closed = None
 
     @property
     def is_closed(self):
         return self._closed
+
 
 class RoborockSocketListener:
     roborock_port = 58867

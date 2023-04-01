@@ -8,7 +8,7 @@ import click
 from roborock import RoborockException
 from roborock.api import RoborockApiClient
 from roborock.cloud_api import RoborockMqttClient
-from roborock.containers import LoginData
+from roborock.containers import LoginData, RoborockDeviceInfo
 from roborock.util import run_sync
 
 _LOGGER = logging.getLogger(__name__)
@@ -116,9 +116,9 @@ async def command(ctx, cmd, params):
         await _discover(ctx)
         login_data = context.login_data()
     home_data = login_data.home_data
-    device_map: dict[str, str] = {}
+    device_map: dict[str, RoborockDeviceInfo] = {}
     for device in home_data.devices + home_data.received_devices:
-        device_map[device.duid] = device.local_key
+        device_map[device.duid] = RoborockDeviceInfo({"device": device})
     mqtt_client = RoborockMqttClient(login_data.user_data, device_map)
     await mqtt_client.send_command(home_data.devices[0].duid, cmd, params)
     mqtt_client.__del__()

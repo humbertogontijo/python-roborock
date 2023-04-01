@@ -4,7 +4,7 @@ from enum import Enum
 
 from .code_mappings import RoborockDockDustCollectionType, RoborockDockWashingModeType
 from .containers import Status, CleanSummary, Consumable, \
-    DNDTimer, CleanRecord, SmartWashParameters, HomeDataDevice, HomeDataProduct, NetworkInfo
+    DNDTimer, CleanRecord, SmartWashParameters
 
 
 class RoborockDevicePropField(str, Enum):
@@ -68,7 +68,7 @@ class RoborockCommand(str, Enum):
     GET_SERVER_TIMER = "get_server_timer"
     GET_CUSTOMIZE_CLEAN_MODE = "get_customize_clean_mode"
     GET_CLEAN_SEQUENCE = "get_clean_sequence"
-    SET_FDS_ENDPOINT = "set_fds_endpoint" # Seems to be logging server
+    SET_FDS_ENDPOINT = "set_fds_endpoint"  # Seems to be logging server
     ENABLE_LOG_UPLOAD = "enable_log_upload"
     APP_WAKEUP_ROBOT = "app_wakeup_robot"
     GET_LED_STATUS = "get_led_status"
@@ -82,24 +82,12 @@ class RoborockCommand(str, Enum):
     SET_CARPET_MODE = "set_carpet_mode"
     GET_CARPET_CLEAN_MODE = "get_carpet_clean_mode"
     SET_CARPET_CLEAN_MODE = "set_carpet_clean_mode"
-    UPD_SERVER_TIMER = "upd_server_timer" # Server timer seems to be with schedules
+    UPD_SERVER_TIMER = "upd_server_timer"  # Server timer seems to be with schedules
     SET_SERVER_TIMER = "set_server_timer"
     APP_GET_INIT_STATUS = "get_init_status"
     SET_APP_TIMEZONE = "set_app_timezone"
     GET_NETWORK_INFO = "get_network_info"
 
-
-class RoborockDeviceInfo:
-    def __init__(self, device: HomeDataDevice, product: HomeDataProduct):
-        self.device = device
-        self.product = product
-        self.network_info: NetworkInfo | None = None
-
-
-class RoborockLocalDeviceInfo(RoborockDeviceInfo):
-    def __init__(self, device: HomeDataDevice, product: HomeDataProduct, network_info: NetworkInfo):
-        super().__init__(device, product)
-        self.network_info = network_info
 
 class RoborockDockSummary:
     def __init__(self, dust_collection_mode: RoborockDockDustCollectionType,

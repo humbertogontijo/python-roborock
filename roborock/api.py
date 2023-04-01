@@ -35,14 +35,14 @@ from .containers import (
     HomeData,
     MultiMapsList,
     SmartWashParameters,
+    RoborockDeviceInfo,
 
 )
 from .roborock_queue import RoborockQueue
 from .typing import (
     RoborockDeviceProp,
     RoborockCommand,
-    RoborockDockSummary,
-    RoborockDeviceInfo,
+    RoborockDockSummary
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -371,11 +371,14 @@ class RoborockClient:
             )
 
     async def get_multi_maps_list(self, device_id) -> MultiMapsList:
-        multi_maps_list = await self.send_command(
-            device_id, RoborockCommand.GET_MULTI_MAPS_LIST
-        )
-        if isinstance(multi_maps_list, dict):
-            return MultiMapsList(multi_maps_list)
+        try:
+            multi_maps_list = await self.send_command(
+                device_id, RoborockCommand.GET_MULTI_MAPS_LIST
+            )
+            if isinstance(multi_maps_list, dict):
+                return MultiMapsList(multi_maps_list)
+        except RoborockTimeout as e:
+            _LOGGER.error(e)
 
     async def get_map_v1(self, device_id):
         return await self.send_command(device_id, RoborockCommand.GET_MAP_V1)

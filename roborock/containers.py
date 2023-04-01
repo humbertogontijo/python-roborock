@@ -237,6 +237,15 @@ class NetworkInfoField(str, Enum):
     RSSI = "rssi"
 
 
+class RoborockDeviceInfoField(str, Enum):
+    DEVICE = "device"
+    PRODUCT = "product"
+
+
+class RoborockLocalDeviceInfoField(str, Enum):
+    NETWORK_INFO = "network_info"
+
+
 class RoborockBase(dict):
     def __init__(self, data: dict[str, any]) -> None:
         super().__init__()
@@ -248,8 +257,6 @@ class RoborockBase(dict):
 
 
 class Reference(RoborockBase):
-    def __init__(self, data: dict[str, any]) -> None:
-        super().__init__(data)
 
     @property
     def region(self) -> str:
@@ -269,8 +276,6 @@ class Reference(RoborockBase):
 
 
 class RRiot(RoborockBase):
-    def __init__(self, data: dict[str, any]) -> None:
-        super().__init__(data)
 
     @property
     def user(self) -> str:
@@ -294,8 +299,6 @@ class RRiot(RoborockBase):
 
 
 class UserData(RoborockBase):
-    def __init__(self, data: dict[str, any]) -> None:
-        super().__init__(data)
 
     @property
     def uid(self) -> int:
@@ -343,8 +346,6 @@ class UserData(RoborockBase):
 
 
 class LoginData(RoborockBase):
-    def __init__(self, data: dict[str, any]) -> None:
-        super().__init__(data)
 
     @property
     def user_data(self) -> UserData:
@@ -364,8 +365,6 @@ class LoginData(RoborockBase):
 
 
 class HomeDataProductSchema(RoborockBase):
-    def __init__(self, data: dict[str, any]) -> None:
-        super().__init__(data)
 
     @property
     def id(self):
@@ -397,8 +396,6 @@ class HomeDataProductSchema(RoborockBase):
 
 
 class HomeDataProduct(RoborockBase):
-    def __init__(self, data: dict[str, any]) -> None:
-        super().__init__(data)
 
     @property
     def id(self) -> str:
@@ -438,8 +435,6 @@ class HomeDataProduct(RoborockBase):
 
 
 class HomeDataDeviceStatus(RoborockBase):
-    def __init__(self, data: dict[str, any]) -> None:
-        super().__init__(data)
 
     @property
     def id(self):
@@ -479,8 +474,6 @@ class HomeDataDeviceStatus(RoborockBase):
 
 
 class HomeDataDevice(RoborockBase):
-    def __init__(self, data: dict[str, any]) -> None:
-        super().__init__(data)
 
     @property
     def duid(self) -> str:
@@ -584,8 +577,6 @@ class HomeDataDevice(RoborockBase):
 
 
 class HomeDataRoom(RoborockBase):
-    def __init__(self, data: dict[str, any]) -> None:
-        super().__init__(data)
 
     @property
     def id(self):
@@ -597,8 +588,6 @@ class HomeDataRoom(RoborockBase):
 
 
 class HomeData(RoborockBase):
-    def __init__(self, data: dict[str, any]) -> None:
-        super().__init__(data)
 
     @property
     def id(self) -> int:
@@ -638,8 +627,6 @@ class HomeData(RoborockBase):
 
 
 class Status(RoborockBase):
-    def __init__(self, data: dict[str, any]) -> None:
-        super().__init__(data)
 
     @property
     def msg_ver(self) -> int:
@@ -839,8 +826,6 @@ class Status(RoborockBase):
 
 
 class DNDTimer(RoborockBase):
-    def __init__(self, data: dict[str, any]) -> None:
-        super().__init__(data)
 
     @property
     def start_hour(self) -> int:
@@ -864,8 +849,6 @@ class DNDTimer(RoborockBase):
 
 
 class CleanSummary(RoborockBase):
-    def __init__(self, data: dict[str, any]) -> None:
-        super().__init__(data)
 
     @property
     def clean_time(self) -> int:
@@ -889,8 +872,6 @@ class CleanSummary(RoborockBase):
 
 
 class CleanRecord(RoborockBase):
-    def __init__(self, data: dict[str, any]) -> None:
-        super().__init__(data)
 
     @property
     def begin(self) -> int:
@@ -946,8 +927,6 @@ class CleanRecord(RoborockBase):
 
 
 class Consumable(RoborockBase):
-    def __init__(self, data: dict[str, any]) -> None:
-        super().__init__(data)
 
     @property
     def main_brush_work_time(self) -> int:
@@ -983,8 +962,6 @@ class Consumable(RoborockBase):
 
 
 class MultiMapsListMapInfoBakMaps(RoborockBase):
-    def __init__(self, data: dict[str, any]) -> None:
-        super().__init__(data)
 
     @property
     def mapflag(self):
@@ -996,8 +973,6 @@ class MultiMapsListMapInfoBakMaps(RoborockBase):
 
 
 class MultiMapsListMapInfo(RoborockBase):
-    def __init__(self, data: dict[str, any]) -> None:
-        super().__init__(data)
 
     @property
     def mapflag(self):
@@ -1021,8 +996,6 @@ class MultiMapsListMapInfo(RoborockBase):
 
 
 class MultiMapsList(RoborockBase):
-    def __init__(self, data: dict[str, any]) -> None:
-        super().__init__(data)
 
     @property
     def max_multi_map(self) -> int:
@@ -1042,8 +1015,6 @@ class MultiMapsList(RoborockBase):
 
 
 class SmartWashParameters(RoborockBase):
-    def __init__(self, data: dict[str, any]) -> None:
-        super().__init__(data)
 
     @property
     def smart_wash(self) -> int:
@@ -1053,22 +1024,40 @@ class SmartWashParameters(RoborockBase):
     def wash_interval(self) -> int:
         return self.get(SmartWashField.WASH_INTERVAL)
 
-class NetworkInfo(RoborockBase):
-    def __init__(self, data: dict[str, any]) -> None:
-        super().__init__(data)
 
+class NetworkInfo(RoborockBase):
     @property
     def ssid(self) -> str:
         return self.get(NetworkInfoField.SSID)
+
     @property
     def ip(self) -> str:
         return self.get(NetworkInfoField.IP)
+
     @property
     def mac(self) -> str:
         return self.get(NetworkInfoField.MAC)
+
     @property
     def bssid(self) -> str:
         return self.get(NetworkInfoField.BSSID)
+
     @property
     def rssi(self) -> int:
         return self.get(NetworkInfoField.RSSI)
+
+
+class RoborockDeviceInfo(RoborockBase):
+    @property
+    def device(self) -> HomeDataDevice:
+        return HomeDataDevice(self.get(RoborockDeviceInfoField.DEVICE))
+
+    @property
+    def product(self) -> HomeDataProduct:
+        return HomeDataProduct(self.get(RoborockDeviceInfoField.PRODUCT))
+
+
+class RoborockLocalDeviceInfo(RoborockDeviceInfo):
+    @property
+    def network_info(self) -> NetworkInfo:
+        return NetworkInfo(self.get(RoborockLocalDeviceInfoField.NETWORK_INFO))
