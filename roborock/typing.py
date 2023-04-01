@@ -72,7 +72,7 @@ class RoborockDockSummary:
 
 class RoborockDeviceProp:
     def __init__(self, status: Status, dnd_timer: DNDTimer, clean_summary: CleanSummary, consumable: Consumable,
-                 last_clean_record: CleanRecord, dock_summary: RoborockDockSummary):
+                 last_clean_record: CleanRecord = None, dock_summary: RoborockDockSummary = None):
         self.status = status
         self.dnd_timer = dnd_timer
         self.clean_summary = clean_summary
