@@ -9,6 +9,7 @@ from typing import Any, Callable
 from urllib.parse import urlparse
 
 import paho.mqtt.client as mqtt
+from roborock.code_mappings import RoborockDockType
 
 from roborock.api import md5hex, md5bin, RoborockClient, SPECIAL_COMMANDS
 from roborock.exceptions import (
@@ -21,7 +22,7 @@ from .containers import (
 )
 from .roborock_queue import RoborockQueue
 from .typing import (
-    RoborockCommand,
+    RoborockCommand, RoborockDeviceProp,
 )
 from .util import run_in_executor
 
@@ -205,3 +206,17 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
         else:
             _LOGGER.debug(f"id={request_id} Response from {method}: {response}")
         return response
+
+    async def get_prop(self, device_id: str) -> RoborockDeviceProp:
+        device_prop = await super().get_prop(device_id)
+        last_clean_record = None
+        if device_prop.clean_summary and device_prop.clean_summary.records and len(device_prop.clean_summary.records) > 0:
+            last_clean_record = await self.get_clean_record(
+                device_id, device_prop.clean_summary.records[0]
+            )
+        device_prop.last_clean_record = last_clean_record
+        dock_summary = None
+        if device_prop.status and device_prop.status.dock_type != RoborockDockType.NO_DOCK:
+            dock_summary = await self.get_dock_summary(device_id, device_prop.status.dock_type)
+        device_prop.dock_summary = dock_summary
+        return device_prop

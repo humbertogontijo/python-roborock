@@ -51,6 +51,7 @@ SPECIAL_COMMANDS = [
     RoborockCommand.GET_MAP_V1,
 ]
 
+
 def md5hex(message: str) -> str:
     md5 = hashlib.md5()
     md5.update(message.encode())
@@ -107,7 +108,7 @@ class RoborockClient:
         if self._prefixed:
             msg = msg[4:]
         if msg[0:3] != "1.0".encode():
-            raise RoborockException("Unknown protocol version")
+            raise RoborockException(f"Unknown protocol version {msg[0:3]}")
         if len(msg) == 17:
             [version, _seq, _random, timestamp, protocol] = struct.unpack(
                 "!3sIIIH", msg[0:17]
@@ -281,53 +282,75 @@ class RoborockClient:
             return Status(status)
 
     async def get_dnd_timer(self, device_id: str) -> DNDTimer:
-        dnd_timer = await self.send_command(device_id, RoborockCommand.GET_DND_TIMER)
-        if isinstance(dnd_timer, dict):
-            return DNDTimer(dnd_timer)
+        try:
+            dnd_timer = await self.send_command(device_id, RoborockCommand.GET_DND_TIMER)
+            if isinstance(dnd_timer, dict):
+                return DNDTimer(dnd_timer)
+        except RoborockTimeout as e:
+            _LOGGER.error(e)
 
     async def get_clean_summary(self, device_id: str) -> CleanSummary:
-        clean_summary = await self.send_command(
-            device_id, RoborockCommand.GET_CLEAN_SUMMARY
-        )
-        if isinstance(clean_summary, dict):
-            return CleanSummary(clean_summary)
-        elif isinstance(clean_summary, bytes):
-            return CleanSummary({"clean_time": clean_summary})
+        try:
+            clean_summary = await self.send_command(
+                device_id, RoborockCommand.GET_CLEAN_SUMMARY
+            )
+            if isinstance(clean_summary, dict):
+                return CleanSummary(clean_summary)
+            elif isinstance(clean_summary, bytes):
+                return CleanSummary({"clean_time": clean_summary})
+        except RoborockTimeout as e:
+            _LOGGER.error(e)
 
     async def get_clean_record(self, device_id: str, record_id: int) -> CleanRecord:
-        clean_record = await self.send_command(
-            device_id, RoborockCommand.GET_CLEAN_RECORD, [record_id]
-        )
-        if isinstance(clean_record, dict):
-            return CleanRecord(clean_record)
+        try:
+            clean_record = await self.send_command(
+                device_id, RoborockCommand.GET_CLEAN_RECORD, [record_id]
+            )
+            if isinstance(clean_record, dict):
+                return CleanRecord(clean_record)
+        except RoborockTimeout as e:
+            _LOGGER.error(e)
 
     async def get_consumable(self, device_id: str) -> Consumable:
-        consumable = await self.send_command(device_id, RoborockCommand.GET_CONSUMABLE)
-        if isinstance(consumable, dict):
-            return Consumable(consumable)
+        try:
+            consumable = await self.send_command(device_id, RoborockCommand.GET_CONSUMABLE)
+            if isinstance(consumable, dict):
+                return Consumable(consumable)
+        except RoborockTimeout as e:
+            _LOGGER.error(e)
 
     async def get_washing_mode(self, device_id: str) -> RoborockDockWashingModeType:
-        washing_mode = await self.send_command(device_id, RoborockCommand.GET_WASH_TOWEL_MODE)
-        return WASH_MODE_MAP.get(washing_mode['wash_mode'])
+        try:
+            washing_mode = await self.send_command(device_id, RoborockCommand.GET_WASH_TOWEL_MODE)
+            return WASH_MODE_MAP.get(washing_mode['wash_mode'])
+        except RoborockTimeout as e:
+            _LOGGER.error(e)
 
     async def get_dust_collection_mode(self, device_id: str) -> RoborockDockDustCollectionType:
-        dust_collection = await self.send_command(device_id, RoborockCommand.GET_DUST_COLLECTION_MODE)
-        return DUST_COLLECTION_MAP.get(dust_collection['mode'])
+        try:
+            dust_collection = await self.send_command(device_id, RoborockCommand.GET_DUST_COLLECTION_MODE)
+            return DUST_COLLECTION_MAP.get(dust_collection['mode'])
+        except RoborockTimeout as e:
+            _LOGGER.error(e)
 
     async def get_mop_wash_mode(self, device_id: str) -> SmartWashParameters:
-        mop_wash_mode = await self.send_command(device_id, RoborockCommand.GET_SMART_WASH_PARAMS)
-        if isinstance(mop_wash_mode, dict):
-            return SmartWashParameters(mop_wash_mode)
+        try:
+            mop_wash_mode = await self.send_command(device_id, RoborockCommand.GET_SMART_WASH_PARAMS)
+            if isinstance(mop_wash_mode, dict):
+                return SmartWashParameters(mop_wash_mode)
+        except RoborockTimeout as e:
+            _LOGGER.error(e)
 
     async def get_dock_summary(self, device_id: str, dock_type: RoborockDockType) -> RoborockDockSummary:
-        collection_mode = await self.get_dust_collection_mode(device_id)
-        mop_wash = None
-        washing_mode = None
-        if dock_type == RoborockDockType.EMPTY_WASH_FILL_DOCK:
-            [mop_wash, washing_mode] = await asyncio.gather(
-                *[self.get_mop_wash_mode(device_id), self.get_washing_mode(device_id)])
+        try:
+            commands = [self.get_dust_collection_mode(device_id)]
+            if dock_type == RoborockDockType.EMPTY_WASH_FILL_DOCK:
+                commands += [self.get_mop_wash_mode(device_id), self.get_washing_mode(device_id)]
+            [collection_mode, mop_wash, washing_mode] = (list(await asyncio.gather(*commands)) + [None, None])[:3]
 
-        return RoborockDockSummary(collection_mode, washing_mode, mop_wash)
+            return RoborockDockSummary(collection_mode, washing_mode, mop_wash)
+        except RoborockTimeout as e:
+            _LOGGER.error(e)
 
     async def get_prop(self, device_id: str) -> RoborockDeviceProp:
         [status, dnd_timer, clean_summary, consumable] = await asyncio.gather(
@@ -338,17 +361,9 @@ class RoborockClient:
                 self.get_consumable(device_id),
             ]
         )
-        last_clean_record = None
-        # if clean_summary and clean_summary.records and len(clean_summary.records) > 0:
-        #     last_clean_record = await self.get_clean_record(
-        #         device_id, clean_summary.records[0]
-        #     )
-        dock_summary = None
-        if status and status.dock_type != RoborockDockType.NO_DOCK:
-            dock_summary = await self.get_dock_summary(device_id, status.dock_type)
         if any([status, dnd_timer, clean_summary, consumable]):
             return RoborockDeviceProp(
-                status, dnd_timer, clean_summary, consumable, last_clean_record, dock_summary
+                status, dnd_timer, clean_summary, consumable
             )
 
     async def get_multi_maps_list(self, device_id) -> MultiMapsList:

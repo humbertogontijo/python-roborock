@@ -29,6 +29,7 @@ class RoborockLocalClient(RoborockClient):
             device_id: RoborockSocketListener(ip, device_id, self.on_message)
             for device_id in device_localkey
         }
+        self._mutex = Lock()
 
     async def async_connect(self):
         await asyncio.gather(*[
@@ -39,27 +40,24 @@ class RoborockLocalClient(RoborockClient):
     async def send_command(
             self, device_id: str, method: RoborockCommand, params: list = None
     ):
-        secured = True if method in SPECIAL_COMMANDS else False
-        request_id, timestamp, payload = self._get_payload(method, params, secured)
-        _LOGGER.debug(f"id={request_id} Requesting method {method} with {params}")
-        prefix = secured_prefix if method in SPECIAL_COMMANDS else get_prefix
-        protocol = 4
-        msg = self._encode_msg(device_id, protocol, timestamp, payload, prefix)
-        _LOGGER.debug(f"Requesting with prefix {prefix} and payload {payload}")
-        # Send the command to the Roborock device
-        listener = self.device_listener.get(device_id)
-        await listener.send_message(msg, self.device_localkey.get(device_id))
-        (response, err) = await self._async_response(request_id, 4)
-        if err:
-            raise CommandVacuumError(method, err) from err
-        _LOGGER.debug(f"id={request_id} Response from {method}: {response}")
-        return response
+        async with self._mutex:
+            secured = True if method in SPECIAL_COMMANDS else False
+            request_id, timestamp, payload = self._get_payload(method, params, secured)
+            _LOGGER.debug(f"id={request_id} Requesting method {method} with {params}")
+            prefix = secured_prefix if method in SPECIAL_COMMANDS else get_prefix
+            protocol = 4
+            msg = self._encode_msg(device_id, protocol, timestamp, payload, prefix)
+            # Send the command to the Roborock device
+            listener = self.device_listener.get(device_id)
+            await listener.send_message(msg)
+            (response, err) = await self._async_response(request_id, 4)
+            if err:
+                raise CommandVacuumError(method, err) from err
+            _LOGGER.debug(f"id={request_id} Response from {method}: {response}")
+            return response
 
 class RoborockSocket(socket.socket):
     _closed = None
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
     @property
     def is_closed(self):
@@ -78,34 +76,37 @@ class RoborockSocketListener:
         self.on_message = on_message
         self.timeout = timeout
         self.is_connected = False
-        self._lock = Lock()
+        self._mutex = Lock()
 
     async def _main_coro(self):
         while not self.socket.is_closed:
             try:
                 message = await self.loop.sock_recv(self.socket, 4096)
-                accepted = await self.on_message(self.device_id, message)
-                if accepted:
-                    self._lock.release() if self._lock.locked() else None
+                try:
+                    await self.on_message(self.device_id, message)
+                except Exception as e:
+                    _LOGGER.exception(e)
             except Exception as e:
                 _LOGGER.exception(e)
-                self.is_connected = False
-        await self.connect()
+                self.socket.close()
 
     async def connect(self):
-        async with async_timeout.timeout(self.timeout):
-            await self.loop.sock_connect(self.socket, (self.ip, 58867))
-            self.is_connected = True
-        self.loop.create_task(self._main_coro())
+        async with self._mutex:
+            if not self.is_connected or self.socket.is_closed:
+                async with async_timeout.timeout(self.timeout):
+                    _LOGGER.info(f"Connecting to {self.ip}")
+                    await self.loop.sock_connect(self.socket, (self.ip, 58867))
+                    self.is_connected = True
+                self.loop.create_task(self._main_coro())
 
-    async def send_message(self, data: bytes, local_key: str):
+    async def send_message(self, data: bytes):
         response = {}
+        await self.connect()
         try:
-            async with async_timeout.timeout(self.timeout):
-                await self._lock.acquire()
-                await self.loop.sock_sendall(self.socket, data)
+            async with self._mutex:
+                async with async_timeout.timeout(self.timeout):
+                    await self.loop.sock_sendall(self.socket, data)
         except (asyncio.TimeoutError, asyncio.CancelledError):
-            self._lock.release() if self._lock.locked() else None
             raise RoborockTimeout(
                 f"Timeout after {self.timeout} seconds waiting for response"
             ) from None
