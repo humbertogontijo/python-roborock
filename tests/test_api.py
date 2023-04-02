@@ -52,7 +52,7 @@ async def test_request_code():
 async def test_get_home_data():
     rc = RoborockApiClient("sample@gmail.com")
     with patch("roborock.api.RoborockApiClient._get_base_url") as mock_url, patch(
-            "roborock.api.RoborockApiClient._get_header_client_id") as mock_header_client, patch(
+        "roborock.api.RoborockApiClient._get_header_client_id") as mock_header_client, patch(
         "roborock.api.PreparedRequest.request") as mock_prepared_request:
         mock_prepared_request.side_effect = [{'code': 200, 'msg': 'success', 'data': {"rrHomeId": 1}},
                                              {'code': 200, 'success': True, 'result': HOME_DATA_RAW}]
@@ -70,7 +70,8 @@ async def test_get_dust_collection_mode():
     rmc = RoborockMqttClient(UserData(USER_DATA), device_map)
     with patch("roborock.cloud_api.RoborockMqttClient.send_command") as command:
         command.return_value = {"mode": 1}
-        assert await rmc.get_dust_collection_mode(home_data.devices[0].duid) == RoborockDockDustCollectionType.LIGHT
+        dust = await rmc.get_dust_collection_mode(home_data.devices[0].duid)
+        assert dust.mode == RoborockDockDustCollectionType.LIGHT
 
 
 @pytest.mark.asyncio
@@ -92,4 +93,5 @@ async def test_get_washing_mode():
     rmc = RoborockMqttClient(UserData(USER_DATA), device_map)
     with patch("roborock.cloud_api.RoborockMqttClient.send_command") as command:
         command.return_value = {'wash_mode': 2}
-        assert await rmc.get_washing_mode(home_data.devices[0].duid) == RoborockDockWashingModeType.DEEP
+        washing_mode = await rmc.get_washing_mode(home_data.devices[0].duid)
+        assert washing_mode.wash_mode == RoborockDockWashingModeType.DEEP
