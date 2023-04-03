@@ -257,6 +257,12 @@ class RoborockBase(dict):
         if isinstance(data, dict):
             self.update(data)
 
+    def is_valid(self):
+        return set(self.keys()) == set([
+            f for f in dir(self)
+            if not callable(getattr(self,f)) and not f.startswith('__')
+        ])
+
     def as_dict(self):
         return self.__dict__
 
