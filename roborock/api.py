@@ -23,8 +23,8 @@ from Crypto.Util.Padding import pad, unpad
 from roborock.exceptions import (
     RoborockException, RoborockTimeout, VacuumError,
 )
-from .code_mappings import WASH_MODE_MAP, DUST_COLLECTION_MAP, RoborockDockType, \
-    RoborockDockDustCollectionType, RoborockDockWashingModeType, STATE_CODE_TO_STATUS
+from .code_mappings import RoborockDockType, \
+    STATE_CODE_TO_STATUS
 from .containers import (
     UserData,
     Status,
@@ -35,7 +35,7 @@ from .containers import (
     HomeData,
     MultiMapsList,
     SmartWashParameters,
-    RoborockDeviceInfo,
+    RoborockDeviceInfo, WashTowelMode, DustCollectionMode,
 
 )
 from .roborock_queue import RoborockQueue
@@ -76,17 +76,17 @@ class PreparedRequest:
         self.base_headers = base_headers or {}
 
     async def request(
-            self, method: str, url: str, params=None, data=None, headers=None
+        self, method: str, url: str, params=None, data=None, headers=None
     ) -> dict | list:
         _url = "/".join(s.strip("/") for s in [self.base_url, url])
         _headers = {**self.base_headers, **(headers or {})}
         async with aiohttp.ClientSession() as session:
             async with session.request(
-                    method,
-                    _url,
-                    params=params,
-                    data=data,
-                    headers=_headers,
+                method,
+                _url,
+                params=params,
+                data=data,
+                headers=_headers,
             ) as resp:
                 return await resp.json()
 
@@ -249,7 +249,7 @@ class RoborockClient:
             del self._waiting_queue[request_id]
 
     def _get_payload(
-            self, method: RoborockCommand, params: list = None, secured=False
+        self, method: RoborockCommand, params: list = None, secured=False
     ):
         timestamp = math.floor(time.time())
         request_id = self._id_counter
@@ -276,7 +276,7 @@ class RoborockClient:
         return request_id, timestamp, payload
 
     async def send_command(
-            self, device_id: str, method: RoborockCommand, params: list = None
+        self, device_id: str, method: RoborockCommand, params: list = None
     ):
         raise NotImplementedError
 
@@ -323,17 +323,19 @@ class RoborockClient:
         except RoborockTimeout as e:
             _LOGGER.error(e)
 
-    async def get_washing_mode(self, device_id: str) -> RoborockDockWashingModeType:
+    async def get_washing_mode(self, device_id: str) -> WashTowelMode:
         try:
             washing_mode = await self.send_command(device_id, RoborockCommand.GET_WASH_TOWEL_MODE)
-            return WASH_MODE_MAP.get(washing_mode['wash_mode'])
+            if isinstance(washing_mode, dict):
+                return WashTowelMode(washing_mode)
         except RoborockTimeout as e:
             _LOGGER.error(e)
 
-    async def get_dust_collection_mode(self, device_id: str) -> RoborockDockDustCollectionType:
+    async def get_dust_collection_mode(self, device_id: str) -> DustCollectionMode:
         try:
             dust_collection = await self.send_command(device_id, RoborockCommand.GET_DUST_COLLECTION_MODE)
-            return DUST_COLLECTION_MAP.get(dust_collection['mode'])
+            if isinstance(dust_collection, dict):
+                return DustCollectionMode(dust_collection)
         except RoborockTimeout as e:
             _LOGGER.error(e)
 

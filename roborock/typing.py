@@ -2,9 +2,8 @@ from __future__ import annotations
 
 from enum import Enum
 
-from .code_mappings import RoborockDockDustCollectionType, RoborockDockWashingModeType
 from .containers import Status, CleanSummary, Consumable, \
-    DNDTimer, CleanRecord, SmartWashParameters
+    DNDTimer, CleanRecord, SmartWashParameters, DustCollectionMode, WashTowelMode
 
 
 class RoborockDevicePropField(str, Enum):
@@ -90,11 +89,12 @@ class RoborockCommand(str, Enum):
 
 
 class RoborockDockSummary:
-    def __init__(self, dust_collection_mode: RoborockDockDustCollectionType,
-                 washing_mode_type: RoborockDockWashingModeType, mop_wash: SmartWashParameters) -> None:
-        self.dust_collection_mode = dust_collection_mode
-        self.washing_mode_type = washing_mode_type
-        self.mop_wash = mop_wash
+    def __init__(self, dust_collection_mode: DustCollectionMode,
+                 washing_mode_type: WashTowelMode, mop_wash: SmartWashParameters) -> None:
+        self.dust_collection_mode = dust_collection_mode.mode.value
+        self.washing_mode_type = washing_mode_type.wash_mode.value
+        self.mop_wash_interval = mop_wash.wash_interval
+        self.mop_wash_mode = mop_wash.smart_wash
 
 
 class RoborockDeviceProp:

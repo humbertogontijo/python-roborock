@@ -1,7 +1,8 @@
 from enum import Enum
 
 from .code_mappings import STATE_CODE_TO_STATUS, ERROR_CODE_TO_TEXT, FAN_SPEED_CODES, MOP_MODE_CODES, \
-    MOP_INTENSITY_CODES, DOCK_ERROR_TO_TEXT, DOCK_TYPE_MAP, RoborockDockType
+    MOP_INTENSITY_CODES, DOCK_ERROR_TO_TEXT, DOCK_TYPE_MAP, RoborockDockType, RoborockDockDustCollectionType, \
+    DUST_COLLECTION_MAP, WASH_MODE_MAP, RoborockDockWashingModeType
 
 
 class UserDataRRiotReferenceField(str, Enum):
@@ -225,8 +226,12 @@ class SmartWashField(str, Enum):
     WASH_INTERVAL = "wash_interval"
 
 
+class DustCollectionField(str, Enum):
+    MODE = "mode"
+
+
 class WashTowelField(str, Enum):
-    Wash_MODE = "wash_mode"
+    WASH_MODE = "wash_mode"
 
 
 class NetworkInfoField(str, Enum):
@@ -1023,6 +1028,20 @@ class SmartWashParameters(RoborockBase):
     @property
     def wash_interval(self) -> int:
         return self.get(SmartWashField.WASH_INTERVAL)
+
+
+class DustCollectionMode(RoborockBase):
+
+    @property
+    def mode(self) -> RoborockDockDustCollectionType:
+        return DUST_COLLECTION_MAP.get(self.get(DustCollectionField.MODE))
+
+
+class WashTowelMode(RoborockBase):
+
+    @property
+    def wash_mode(self) -> RoborockDockWashingModeType:
+        return WASH_MODE_MAP.get(self.get(WashTowelField.WASH_MODE))
 
 
 class NetworkInfo(RoborockBase):
