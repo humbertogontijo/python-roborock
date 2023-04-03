@@ -6,6 +6,9 @@ class RoborockException(BaseException):
 class RoborockTimeout(RoborockException):
     """Class for Roborock timeout exceptions."""
 
+class RoborockConnectionException(RoborockException):
+    """Class for Roborock connection exceptions."""
+
 class RoborockBackoffException(RoborockException):
     """Class for Roborock exceptions when many retries were made."""
 
