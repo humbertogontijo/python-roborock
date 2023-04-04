@@ -93,5 +93,5 @@ async def test_get_washing_mode():
     rmc = RoborockMqttClient(UserData(USER_DATA), device_map)
     with patch("roborock.cloud_api.RoborockMqttClient.send_command") as command:
         command.return_value = {'wash_mode': 2}
-        washing_mode = await rmc.get_washing_mode(home_data.devices[0].duid)
+        washing_mode = await rmc.get_wash_towel_mode(home_data.devices[0].duid)
         assert washing_mode.wash_mode == RoborockDockWashingModeType.DEEP
