@@ -81,7 +81,7 @@ async def test_get_mop_wash_mode():
     rmc = RoborockMqttClient(UserData(USER_DATA), device_map)
     with patch("roborock.cloud_api.RoborockMqttClient.send_command") as command:
         command.return_value = {'smart_wash': 0, 'wash_interval': 1500}
-        mop_wash = await rmc.get_mop_wash_mode(home_data.devices[0].duid)
+        mop_wash = await rmc.get_smart_wash_params(home_data.devices[0].duid)
         assert mop_wash.smart_wash == 0
         assert mop_wash.wash_interval == 1500
 

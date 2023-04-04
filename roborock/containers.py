@@ -1025,7 +1025,7 @@ class MultiMapsList(RoborockBase):
         return [MultiMapsListMapInfo(map_info) for map_info in self.get(MultiMapListField.MAP_INFO)]
 
 
-class SmartWashParameters(RoborockBase):
+class SmartWashParams(RoborockBase):
 
     @property
     def smart_wash(self) -> int:

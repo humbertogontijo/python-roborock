@@ -3,7 +3,7 @@ from __future__ import annotations
 from enum import Enum
 
 from .containers import Status, CleanSummary, Consumable, \
-    DNDTimer, CleanRecord, SmartWashParameters, DustCollectionMode, WashTowelMode
+    DNDTimer, CleanRecord, SmartWashParams, DustCollectionMode, WashTowelMode
 
 
 class RoborockDevicePropField(str, Enum):
@@ -22,32 +22,33 @@ class RoborockDockSummaryField(str, Enum):
 
 
 class RoborockCommand(str, Enum):
-    GET_MAP_V1 = "get_map_v1",
+    NOP = ""
+    GET_MAP_V1 = "get_map_v1"
     GET_STATUS = "get_status"
     GET_DND_TIMER = "get_dnd_timer"
     GET_CLEAN_SUMMARY = "get_clean_summary"
     GET_CLEAN_RECORD = "get_clean_record"
     GET_CONSUMABLE = "get_consumable"
-    GET_MULTI_MAPS_LIST = "get_multi_maps_list",
-    APP_START = "app_start",
-    APP_PAUSE = "app_pause",
-    APP_STOP = "app_stop",
-    APP_CHARGE = "app_charge",
-    APP_SPOT = "app_spot",
-    FIND_ME = "find_me",
-    RESUME_ZONED_CLEAN = "resume_zoned_clean",
-    RESUME_SEGMENT_CLEAN = "resume_segment_clean",
-    SET_CUSTOM_MODE = "set_custom_mode",
-    SET_MOP_MODE = "set_mop_mode",
-    SET_WATER_BOX_CUSTOM_MODE = "set_water_box_custom_mode",
-    RESET_CONSUMABLE = "reset_consumable",
-    LOAD_MULTI_MAP = "load_multi_map",
-    APP_RC_START = "app_rc_start",
-    APP_RC_END = "app_rc_end",
-    APP_RC_MOVE = "app_rc_move",
-    APP_GOTO_TARGET = "app_goto_target",
-    APP_SEGMENT_CLEAN = "app_segment_clean",
-    APP_ZONED_CLEAN = "app_zoned_clean",
+    GET_MULTI_MAPS_LIST = "get_multi_maps_list"
+    APP_START = "app_start"
+    APP_PAUSE = "app_pause"
+    APP_STOP = "app_stop"
+    APP_CHARGE = "app_charge"
+    APP_SPOT = "app_spot"
+    FIND_ME = "find_me"
+    RESUME_ZONED_CLEAN = "resume_zoned_clean"
+    RESUME_SEGMENT_CLEAN = "resume_segment_clean"
+    SET_CUSTOM_MODE = "set_custom_mode"
+    SET_MOP_MODE = "set_mop_mode"
+    SET_WATER_BOX_CUSTOM_MODE = "set_water_box_custom_mode"
+    RESET_CONSUMABLE = "reset_consumable"
+    LOAD_MULTI_MAP = "load_multi_map"
+    APP_RC_START = "app_rc_start"
+    APP_RC_END = "app_rc_end"
+    APP_RC_MOVE = "app_rc_move"
+    APP_GOTO_TARGET = "app_goto_target"
+    APP_SEGMENT_CLEAN = "app_segment_clean"
+    APP_ZONED_CLEAN = "app_zoned_clean"
     APP_GET_DRYER_SETTING = "app_get_dryer_setting"
     APP_SET_DRYER_SETTING = "app_set_dryer_setting"
     APP_START_WASH = "app_start_wash"
@@ -90,11 +91,10 @@ class RoborockCommand(str, Enum):
 
 class RoborockDockSummary:
     def __init__(self, dust_collection_mode: DustCollectionMode,
-                 washing_mode_type: WashTowelMode, mop_wash: SmartWashParameters) -> None:
-        self.dust_collection_mode = dust_collection_mode.mode.value
-        self.washing_mode_type = washing_mode_type.wash_mode.value
-        self.mop_wash_interval = mop_wash.wash_interval
-        self.mop_wash_mode = mop_wash.smart_wash
+                 wash_towel_mode: WashTowelMode, smart_wash_params: SmartWashParams) -> None:
+        self.dust_collection_mode = dust_collection_mode
+        self.wash_towel_mode = wash_towel_mode
+        self.smart_wash_params = smart_wash_params
 
 
 class RoborockDeviceProp:

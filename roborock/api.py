@@ -34,8 +34,10 @@ from .containers import (
     CleanRecord,
     HomeData,
     MultiMapsList,
-    SmartWashParameters,
-    RoborockDeviceInfo, WashTowelMode, DustCollectionMode,
+    SmartWashParams,
+    RoborockDeviceInfo,
+    WashTowelMode,
+    DustCollectionMode,
 
 )
 from .roborock_queue import RoborockQueue
@@ -110,41 +112,51 @@ class RoborockClient:
     async def async_disconnect(self) -> Any:
         raise NotImplementedError
 
-    def _decode_msg(self, msg: bytes, local_key: str) -> dict[str, Any]:
+    def _decode_msg(self, msg: bytes, local_key: str) -> list[dict[str, Any]]:
+        prefix = None
         if msg[4:7] == "1.0".encode():
+            prefix = int.from_bytes(msg[:4], 'big')
             msg = msg[4:]
         elif msg[0:3] != "1.0".encode():
             raise RoborockException(f"Unknown protocol version {msg[0:3]}")
-        if len(msg) == 17:
-            [version, request_id, _random, timestamp, protocol] = struct.unpack(
+        if len(msg) in [17, 21, 25]:
+            [version, request_id, random, timestamp, protocol] = struct.unpack(
                 "!3sIIIH", msg[0:17]
             )
-            return {
+            return [{
+                "prefix": prefix,
                 "version": version,
                 "request_id": request_id,
+                "random": random,
                 "timestamp": timestamp,
                 "protocol": protocol,
-            }
-        [version, request_id, _random, timestamp, protocol, payload_len] = struct.unpack(
-            "!3sIIIHH", msg[0:19]
+            }]
+        index = 0
+        [version, request_id, random, timestamp, protocol, payload_len] = struct.unpack(
+            "!3sIIIHH", msg[index:index + 19]
         )
-        extra_len = len(msg) - 23 - payload_len
-        [payload, expected_crc32, extra] = struct.unpack_from(f"!{payload_len}sI{extra_len}s", msg, 19)
-        if not extra_len:
-            crc32 = binascii.crc32(msg[0: 19 + payload_len])
+        [payload, expected_crc32] = struct.unpack_from(f"!{payload_len}sI", msg, index + 19)
+        if payload_len == 0:
+            index += 21
+        else:
+            crc32 = binascii.crc32(msg[index: index + 19 + payload_len])
+            index += 23 + payload_len
             if crc32 != expected_crc32:
                 raise RoborockException(f"Wrong CRC32 {crc32}, expected {expected_crc32}")
-
-        aes_key = md5bin(encode_timestamp(timestamp) + local_key + self._salt)
-        decipher = AES.new(aes_key, AES.MODE_ECB)
-        decrypted_payload = unpad(decipher.decrypt(payload), AES.block_size) if payload else extra
-        return {
+        decrypted_payload = None
+        if payload:
+            aes_key = md5bin(encode_timestamp(timestamp) + local_key + self._salt)
+            decipher = AES.new(aes_key, AES.MODE_ECB)
+            decrypted_payload = unpad(decipher.decrypt(payload), AES.block_size)
+        return [{
+            "prefix": prefix,
             "version": version,
             "request_id": request_id,
+            "random": random,
             "timestamp": timestamp,
             "protocol": protocol,
             "payload": decrypted_payload
-        }
+        }] + (self._decode_msg(msg[index:], local_key) if index < len(msg) else [])
 
     def _encode_msg(self, device_id, request_id, protocol, timestamp, payload, prefix=None) -> bytes:
         local_key = self.devices_info[device_id].device.local_key
@@ -171,67 +183,77 @@ class RoborockClient:
         msg += struct.pack("!I", crc32)
         return msg
 
-    async def on_message(self, device_id, msg) -> bool:
+    async def on_message(self, device_id, msg) -> None:
         try:
-            data = self._decode_msg(msg, self.devices_info[device_id].device.local_key)
-            protocol = data.get("protocol")
-            if protocol == 102 or protocol == 4:
-                payload = json.loads(data.get("payload").decode())
-                for data_point_number, data_point in payload.get("dps").items():
-                    if data_point_number == "102":
-                        data_point_response = json.loads(data_point)
-                        request_id = data_point_response.get("id")
+            messages = self._decode_msg(msg, self.devices_info[device_id].device.local_key)
+            for data in messages:
+                protocol = data.get("protocol")
+                if protocol == 102 or protocol == 4:
+                    payload = json.loads(data.get("payload").decode())
+                    for data_point_number, data_point in payload.get("dps").items():
+                        if data_point_number == "102":
+                            data_point_response = json.loads(data_point)
+                            request_id = data_point_response.get("id")
+                            queue = self._waiting_queue.get(request_id)
+                            if queue:
+                                if queue.protocol == protocol:
+                                    error = data_point_response.get("error")
+                                    if error:
+                                        await queue.async_put(
+                                            (
+                                                None,
+                                                VacuumError(
+                                                    error.get("code"), error.get("message")
+                                                ),
+                                            ),
+                                            timeout=QUEUE_TIMEOUT,
+                                        )
+                                    else:
+                                        result = data_point_response.get("result")
+                                        if isinstance(result, list) and len(result) == 1:
+                                            result = result[0]
+                                        await queue.async_put(
+                                            (result, None), timeout=QUEUE_TIMEOUT
+                                        )
+                            elif request_id < self._id_counter:
+                                _LOGGER.debug(
+                                    f"id={request_id} Ignoring response: {data_point_response}"
+                                )
+                        elif data_point_number == "121":
+                            status = STATE_CODE_TO_STATUS.get(data_point)
+                            _LOGGER.debug(f"Status updated to {status}")
+                            for listener in self._status_listeners:
+                                listener(device_id, status)
+                        else:
+                            _LOGGER.debug(
+                                f"Unknown data point number received {data_point_number} with {data_point}"
+                            )
+                elif protocol == 301:
+                    payload = data.get("payload")[0:24]
+                    [endpoint, _, request_id, _] = struct.unpack("<15sBH6s", payload)
+                    if endpoint.decode().startswith(self._endpoint):
+                        iv = bytes(AES.block_size)
+                        decipher = AES.new(self._nonce, AES.MODE_CBC, iv)
+                        decrypted = unpad(
+                            decipher.decrypt(data.get("payload")[24:]), AES.block_size
+                        )
+                        decrypted = gzip.decompress(decrypted)
                         queue = self._waiting_queue.get(request_id)
                         if queue:
-                            if queue.protocol == protocol:
-                                error = data_point_response.get("error")
-                                if error:
-                                    await queue.async_put(
-                                        (
-                                            None,
-                                            VacuumError(
-                                                error.get("code"), error.get("message")
-                                            ),
-                                        ),
-                                        timeout=QUEUE_TIMEOUT,
-                                    )
-                                else:
-                                    result = data_point_response.get("result")
-                                    if isinstance(result, list) and len(result) == 1:
-                                        result = result[0]
-                                    await queue.async_put(
-                                        (result, None), timeout=QUEUE_TIMEOUT
-                                    )
-                                    return True
-                        elif request_id < self._id_counter:
-                            _LOGGER.debug(
-                                f"id={request_id} Ignoring response: {data_point_response}"
-                            )
-                    elif data_point_number == "121":
-                        status = STATE_CODE_TO_STATUS.get(data_point)
-                        _LOGGER.debug(f"Status updated to {status}")
-                        for listener in self._status_listeners:
-                            listener(device_id, status)
-                    else:
-                        _LOGGER.debug(
-                            f"Unknown data point number received {data_point_number} with {data_point}"
-                        )
-            elif protocol == 301:
-                payload = data.get("payload")[0:24]
-                [endpoint, _, request_id, _] = struct.unpack("<15sBH6s", payload)
-                if endpoint.decode().startswith(self._endpoint):
-                    iv = bytes(AES.block_size)
-                    decipher = AES.new(self._nonce, AES.MODE_CBC, iv)
-                    decrypted = unpad(
-                        decipher.decrypt(data.get("payload")[24:]), AES.block_size
-                    )
-                    decrypted = gzip.decompress(decrypted)
+                            if isinstance(decrypted, list):
+                                decrypted = decrypted[0]
+                            await queue.async_put((decrypted, None), timeout=QUEUE_TIMEOUT)
+                elif data.get('request_id'):
+                    request_id = data.get('request_id')
                     queue = self._waiting_queue.get(request_id)
                     if queue:
-                        if isinstance(decrypted, list):
-                            decrypted = decrypted[0]
-                        await queue.async_put((decrypted, None), timeout=QUEUE_TIMEOUT)
-                        return True
+                        protocol = data.get("protocol")
+                        if queue.protocol == protocol:
+                            await queue.async_put((None, None), timeout=QUEUE_TIMEOUT)
+                        elif request_id < self._id_counter and protocol != 5:
+                            _LOGGER.debug(
+                                f"id={request_id} Ignoring response: {data}"
+                            )
         except Exception as ex:
             _LOGGER.exception(ex)
 
@@ -262,13 +284,13 @@ class RoborockClient:
         if secured:
             inner["security"] = {
                 "endpoint": self._endpoint,
-                "nonce": self._nonce.hex().upper(),
+                "nonce": self._nonce.hex().lower(),
             }
         payload = bytes(
             json.dumps(
                 {
-                    "t": timestamp,
                     "dps": {"101": json.dumps(inner, separators=(",", ":"))},
+                    "t": timestamp,
                 },
                 separators=(",", ":"),
             ).encode()
@@ -323,7 +345,7 @@ class RoborockClient:
         except RoborockTimeout as e:
             _LOGGER.error(e)
 
-    async def get_washing_mode(self, device_id: str) -> WashTowelMode:
+    async def get_wash_towel_mode(self, device_id: str) -> WashTowelMode:
         try:
             washing_mode = await self.send_command(device_id, RoborockCommand.GET_WASH_TOWEL_MODE)
             if isinstance(washing_mode, dict):
@@ -339,11 +361,11 @@ class RoborockClient:
         except RoborockTimeout as e:
             _LOGGER.error(e)
 
-    async def get_mop_wash_mode(self, device_id: str) -> SmartWashParameters:
+    async def get_smart_wash_params(self, device_id: str) -> SmartWashParams:
         try:
             mop_wash_mode = await self.send_command(device_id, RoborockCommand.GET_SMART_WASH_PARAMS)
             if isinstance(mop_wash_mode, dict):
-                return SmartWashParameters(mop_wash_mode)
+                return SmartWashParams(mop_wash_mode)
         except RoborockTimeout as e:
             _LOGGER.error(e)
 
@@ -351,10 +373,10 @@ class RoborockClient:
         try:
             commands = [self.get_dust_collection_mode(device_id)]
             if dock_type == RoborockDockType.EMPTY_WASH_FILL_DOCK:
-                commands += [self.get_mop_wash_mode(device_id), self.get_washing_mode(device_id)]
-            [collection_mode, mop_wash, washing_mode] = (list(await asyncio.gather(*commands)) + [None, None])[:3]
+                commands += [self.get_wash_towel_mode(device_id), self.get_smart_wash_params(device_id)]
+            [dust_collection_mode, wash_towel_mode, smart_wash_params] = (list(await asyncio.gather(*commands)) + [None, None])[:3]
 
-            return RoborockDockSummary(collection_mode, washing_mode, mop_wash)
+            return RoborockDockSummary(dust_collection_mode, wash_towel_mode, smart_wash_params)
         except RoborockTimeout as e:
             _LOGGER.error(e)
 
@@ -367,9 +389,17 @@ class RoborockClient:
                 self.get_consumable(device_id),
             ]
         )
+        last_clean_record = None
+        if clean_summary and clean_summary.records and len(clean_summary.records) > 0:
+            last_clean_record = await self.get_clean_record(
+                device_id, clean_summary.records[0]
+            )
+        dock_summary = None
+        if status and status.dock_type != RoborockDockType.NO_DOCK:
+            dock_summary = await self.get_dock_summary(device_id, status.dock_type)
         if any([status, dnd_timer, clean_summary, consumable]):
             return RoborockDeviceProp(
-                status, dnd_timer, clean_summary, consumable
+                status, dnd_timer, clean_summary, consumable, last_clean_record, dock_summary
             )
 
     async def get_multi_maps_list(self, device_id) -> MultiMapsList:
