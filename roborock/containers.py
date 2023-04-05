@@ -300,7 +300,7 @@ class NetworkInfo(RoborockBase):
 
 
 @dataclass
-class RoborockDeviceInfo:
+class RoborockDeviceInfo(RoborockBase):
     device: HomeDataDevice
 
 
