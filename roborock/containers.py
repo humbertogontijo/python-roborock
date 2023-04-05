@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from enum import Enum
 
 from .code_mappings import STATE_CODE_TO_STATUS, ERROR_CODE_TO_TEXT, FAN_SPEED_CODES, MOP_MODE_CODES, \
@@ -260,7 +261,7 @@ class RoborockBase(dict):
     def is_valid(self):
         return set(self.keys()) == set([
             f for f in dir(self)
-            if not callable(getattr(self,f)) and not f.startswith('__')
+            if not callable(getattr(self, f)) and not f.startswith('__')
         ])
 
     def as_dict(self):
@@ -1072,17 +1073,11 @@ class NetworkInfo(RoborockBase):
         return self.get(NetworkInfoField.RSSI)
 
 
-class RoborockDeviceInfo(RoborockBase):
-    @property
-    def device(self) -> HomeDataDevice:
-        return HomeDataDevice(self.get(RoborockDeviceInfoField.DEVICE))
-
-    @property
-    def product(self) -> HomeDataProduct:
-        return HomeDataProduct(self.get(RoborockDeviceInfoField.PRODUCT))
+@dataclass
+class RoborockDeviceInfo:
+    device: HomeDataDevice
 
 
+@dataclass
 class RoborockLocalDeviceInfo(RoborockDeviceInfo):
-    @property
-    def network_info(self) -> NetworkInfo:
-        return NetworkInfo(self.get(RoborockLocalDeviceInfoField.NETWORK_INFO))
+    network_info: NetworkInfo

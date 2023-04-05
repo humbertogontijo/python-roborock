@@ -20,8 +20,8 @@ from .containers import (
     UserData,
     RoborockDeviceInfo,
 )
-from .roborock_queue import RoborockQueue
 from .roborock_message import RoborockParser, md5bin, RoborockMessage
+from .roborock_queue import RoborockQueue
 from .typing import RoborockCommand
 from .util import run_in_executor
 
@@ -210,3 +210,6 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
         else:
             _LOGGER.debug(f"id={request_id} Response from {method}: {response}")
         return response
+
+    async def get_map_v1(self, device_id):
+        return await self.send_command(device_id, RoborockCommand.GET_MAP_V1)

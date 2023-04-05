@@ -318,9 +318,6 @@ class RoborockClient:
         except RoborockTimeout as e:
             _LOGGER.error(e)
 
-    async def get_map_v1(self, device_id):
-        return await self.send_command(device_id, RoborockCommand.GET_MAP_V1)
-
 
 class RoborockApiClient:
     def __init__(self, username: str, base_url=None) -> None:

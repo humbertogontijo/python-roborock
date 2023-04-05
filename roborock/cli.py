@@ -118,7 +118,7 @@ async def command(ctx, cmd, params):
     home_data = login_data.home_data
     device_map: dict[str, RoborockDeviceInfo] = {}
     for device in home_data.devices + home_data.received_devices:
-        device_map[device.duid] = RoborockDeviceInfo({"device": device})
+        device_map[device.duid] = RoborockDeviceInfo(device=device)
     mqtt_client = RoborockMqttClient(login_data.user_data, device_map)
     await mqtt_client.send_command(home_data.devices[0].duid, cmd, params)
     mqtt_client.__del__()
