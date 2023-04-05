@@ -38,6 +38,7 @@ from .containers import (
     RoborockDeviceInfo,
     WashTowelMode,
     DustCollectionMode,
+    NetworkInfo,
 
 )
 from .roborock_message import RoborockMessage
@@ -286,7 +287,7 @@ class RoborockClient:
         except RoborockTimeout as e:
             _LOGGER.error(e)
 
-    async def get_prop(self, device_id: str) -> RoborockDeviceProp:
+    async def get_prop(self, device_id: str) -> RoborockDeviceProp | None:
         [status, dnd_timer, clean_summary, consumable] = await asyncio.gather(
             *[
                 self.get_status(device_id),
@@ -307,6 +308,7 @@ class RoborockClient:
             return RoborockDeviceProp(
                 status, dnd_timer, clean_summary, consumable, last_clean_record, dock_summary
             )
+        return None
 
     async def get_multi_maps_list(self, device_id) -> MultiMapsList:
         try:
@@ -315,6 +317,14 @@ class RoborockClient:
             )
             if isinstance(multi_maps_list, dict):
                 return MultiMapsList(multi_maps_list)
+        except RoborockTimeout as e:
+            _LOGGER.error(e)
+
+    async def get_networking(self, device_id) -> NetworkInfo:
+        try:
+            networking_info = await self.send_command(device_id, RoborockCommand.GET_NETWORK_INFO)
+            if isinstance(networking_info, dict):
+                return NetworkInfo(networking_info)
         except RoborockTimeout as e:
             _LOGGER.error(e)
 
