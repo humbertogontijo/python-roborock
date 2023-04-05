@@ -10,8 +10,7 @@ from urllib.parse import urlparse
 
 import paho.mqtt.client as mqtt
 
-from roborock.api import md5hex, md5bin, RoborockClient, SPECIAL_COMMANDS
-from roborock.code_mappings import RoborockDockType
+from roborock.api import md5hex, RoborockClient, SPECIAL_COMMANDS
 from roborock.exceptions import (
     RoborockException,
     CommandVacuumError,
@@ -22,9 +21,8 @@ from .containers import (
     RoborockDeviceInfo,
 )
 from .roborock_queue import RoborockQueue
-from .typing import (
-    RoborockCommand, RoborockDeviceProp,
-)
+from .roborock_message import RoborockParser, md5bin, RoborockMessage
+from .typing import RoborockCommand
 from .util import run_in_executor
 
 _LOGGER = logging.getLogger(__name__)
@@ -96,7 +94,8 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
         async with self._mutex:
             self._last_device_msg_in = mqtt.time_func()
         device_id = msg.topic.split("/").pop()
-        await super().on_message(device_id, msg.payload)
+        messages, _ = RoborockParser.decode(msg.payload, self.devices_info[device_id].device.local_key)
+        await super().on_message(messages)
 
     @run_in_executor()
     async def on_disconnect(self, _client: mqtt.Client, _, rc, __=None) -> None:
@@ -193,7 +192,13 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
         _LOGGER.debug(f"id={request_id} Requesting method {method} with {params}")
         request_protocol = 101
         response_protocol = 301 if method in SPECIAL_COMMANDS else 102
-        msg = super()._encode_msg(device_id, request_id, request_protocol, timestamp, payload)
+        roborock_message = RoborockMessage(
+            timestamp=timestamp,
+            protocol=request_protocol,
+            payload=payload
+        )
+        local_key = self.devices_info[device_id].device.local_key
+        msg = RoborockParser.encode(roborock_message, local_key)
         self._send_msg_raw(device_id, msg)
         (response, err) = await self._async_response(request_id, response_protocol)
         if err:

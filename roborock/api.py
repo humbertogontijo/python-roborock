@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import asyncio
 import base64
-import binascii
 import gzip
 import hashlib
 import hmac
@@ -14,11 +13,12 @@ import math
 import secrets
 import struct
 import time
+from random import randint
 from typing import Any, Callable
 
 import aiohttp
 from Crypto.Cipher import AES
-from Crypto.Util.Padding import pad, unpad
+from Crypto.Util.Padding import unpad
 
 from roborock.exceptions import (
     RoborockException, RoborockTimeout, VacuumError,
@@ -40,6 +40,7 @@ from .containers import (
     DustCollectionMode,
 
 )
+from .roborock_message import RoborockMessage
 from .roborock_queue import RoborockQueue
 from .typing import (
     RoborockDeviceProp,
@@ -61,34 +62,23 @@ def md5hex(message: str) -> str:
     return md5.hexdigest()
 
 
-def md5bin(message: str) -> bytes:
-    md5 = hashlib.md5()
-    md5.update(message.encode())
-    return md5.digest()
-
-
-def encode_timestamp(_timestamp: int) -> str:
-    hex_value = f"{_timestamp:x}".zfill(8)
-    return "".join(list(map(lambda idx: hex_value[idx], [5, 6, 3, 7, 1, 2, 0, 4])))
-
-
 class PreparedRequest:
     def __init__(self, base_url: str, base_headers: dict = None) -> None:
         self.base_url = base_url
         self.base_headers = base_headers or {}
 
     async def request(
-        self, method: str, url: str, params=None, data=None, headers=None
+            self, method: str, url: str, params=None, data=None, headers=None
     ) -> dict | list:
         _url = "/".join(s.strip("/") for s in [self.base_url, url])
         _headers = {**self.base_headers, **(headers or {})}
         async with aiohttp.ClientSession() as session:
             async with session.request(
-                method,
-                _url,
-                params=params,
-                data=data,
-                headers=_headers,
+                    method,
+                    _url,
+                    params=params,
+                    data=data,
+                    headers=_headers,
             ) as resp:
                 return await resp.json()
 
@@ -97,99 +87,24 @@ class RoborockClient:
 
     def __init__(self, endpoint: str, devices_info: dict[str, RoborockDeviceInfo]) -> None:
         self.devices_info = devices_info
-        self._seq = 1
-        self._random = 4711
-        self._id_counter = 10000
         self._salt = "TXdfu$jyZ#TZHsg4"
         self._endpoint = endpoint
         self._nonce = secrets.token_bytes(16)
         self._waiting_queue: dict[int, RoborockQueue] = {}
-        self._status_listeners: list[Callable[[str, str], None]] = []
+        self._status_listeners: list[Callable[[int, str], None]] = []
 
-    def add_status_listener(self, callback: Callable[[str, str], None]):
+    def add_status_listener(self, callback: Callable[[int, str], None]):
         self._status_listeners.append(callback)
 
     async def async_disconnect(self) -> Any:
         raise NotImplementedError
 
-    def _decode_msg(self, msg: bytes, local_key: str) -> list[dict[str, Any]]:
-        prefix = None
-        if msg[4:7] == "1.0".encode():
-            prefix = int.from_bytes(msg[:4], 'big')
-            msg = msg[4:]
-        elif msg[0:3] != "1.0".encode():
-            raise RoborockException(f"Unknown protocol version {msg[0:3]}")
-        if len(msg) in [17, 21, 25]:
-            [version, request_id, random, timestamp, protocol] = struct.unpack(
-                "!3sIIIH", msg[0:17]
-            )
-            return [{
-                "prefix": prefix,
-                "version": version,
-                "request_id": request_id,
-                "random": random,
-                "timestamp": timestamp,
-                "protocol": protocol,
-            }]
-        index = 0
-        [version, request_id, random, timestamp, protocol, payload_len] = struct.unpack(
-            "!3sIIIHH", msg[index:index + 19]
-        )
-        [payload, expected_crc32] = struct.unpack_from(f"!{payload_len}sI", msg, index + 19)
-        if payload_len == 0:
-            index += 21
-        else:
-            crc32 = binascii.crc32(msg[index: index + 19 + payload_len])
-            index += 23 + payload_len
-            if crc32 != expected_crc32:
-                raise RoborockException(f"Wrong CRC32 {crc32}, expected {expected_crc32}")
-        decrypted_payload = None
-        if payload:
-            aes_key = md5bin(encode_timestamp(timestamp) + local_key + self._salt)
-            decipher = AES.new(aes_key, AES.MODE_ECB)
-            decrypted_payload = unpad(decipher.decrypt(payload), AES.block_size)
-        return [{
-            "prefix": prefix,
-            "version": version,
-            "request_id": request_id,
-            "random": random,
-            "timestamp": timestamp,
-            "protocol": protocol,
-            "payload": decrypted_payload
-        }] + (self._decode_msg(msg[index:], local_key) if index < len(msg) else [])
-
-    def _encode_msg(self, device_id, request_id, protocol, timestamp, payload, prefix=None) -> bytes:
-        local_key = self.devices_info[device_id].device.local_key
-        aes_key = md5bin(encode_timestamp(timestamp) + local_key + self._salt)
-        cipher = AES.new(aes_key, AES.MODE_ECB)
-        encrypted = cipher.encrypt(pad(payload, AES.block_size))
-        encrypted_len = len(encrypted)
-        values = [
-            "1.0".encode(),
-            request_id,
-            self._random,
-            timestamp,
-            protocol,
-            encrypted_len,
-            encrypted
-        ]
-        if prefix:
-            values = [prefix] + values
-        msg = struct.pack(
-            f"!{'I' if prefix else ''}3sIIIHH{encrypted_len}s",
-            *values
-        )
-        crc32 = binascii.crc32(msg[4:] if prefix else msg)
-        msg += struct.pack("!I", crc32)
-        return msg
-
-    async def on_message(self, device_id, msg) -> None:
+    async def on_message(self, messages: list[RoborockMessage]) -> None:
         try:
-            messages = self._decode_msg(msg, self.devices_info[device_id].device.local_key)
             for data in messages:
-                protocol = data.get("protocol")
+                protocol = data.protocol
                 if protocol == 102 or protocol == 4:
-                    payload = json.loads(data.get("payload").decode())
+                    payload = json.loads(data.payload.decode())
                     for data_point_number, data_point in payload.get("dps").items():
                         if data_point_number == "102":
                             data_point_response = json.loads(data_point)
@@ -215,27 +130,23 @@ class RoborockClient:
                                         await queue.async_put(
                                             (result, None), timeout=QUEUE_TIMEOUT
                                         )
-                            elif request_id < self._id_counter:
-                                _LOGGER.debug(
-                                    f"id={request_id} Ignoring response: {data_point_response}"
-                                )
                         elif data_point_number == "121":
                             status = STATE_CODE_TO_STATUS.get(data_point)
                             _LOGGER.debug(f"Status updated to {status}")
                             for listener in self._status_listeners:
-                                listener(device_id, status)
+                                listener(data.seq, status)
                         else:
                             _LOGGER.debug(
                                 f"Unknown data point number received {data_point_number} with {data_point}"
                             )
                 elif protocol == 301:
-                    payload = data.get("payload")[0:24]
+                    payload = data.payload[0:24]
                     [endpoint, _, request_id, _] = struct.unpack("<15sBH6s", payload)
                     if endpoint.decode().startswith(self._endpoint):
                         iv = bytes(AES.block_size)
                         decipher = AES.new(self._nonce, AES.MODE_CBC, iv)
                         decrypted = unpad(
-                            decipher.decrypt(data.get("payload")[24:]), AES.block_size
+                            decipher.decrypt(data.payload[24:]), AES.block_size
                         )
                         decrypted = gzip.decompress(decrypted)
                         queue = self._waiting_queue.get(request_id)
@@ -243,17 +154,6 @@ class RoborockClient:
                             if isinstance(decrypted, list):
                                 decrypted = decrypted[0]
                             await queue.async_put((decrypted, None), timeout=QUEUE_TIMEOUT)
-                elif data.get('request_id'):
-                    request_id = data.get('request_id')
-                    queue = self._waiting_queue.get(request_id)
-                    if queue:
-                        protocol = data.get("protocol")
-                        if queue.protocol == protocol:
-                            await queue.async_put((None, None), timeout=QUEUE_TIMEOUT)
-                        elif request_id < self._id_counter and protocol != 5:
-                            _LOGGER.debug(
-                                f"id={request_id} Ignoring response: {data}"
-                            )
         except Exception as ex:
             _LOGGER.exception(ex)
 
@@ -271,11 +171,10 @@ class RoborockClient:
             del self._waiting_queue[request_id]
 
     def _get_payload(
-        self, method: RoborockCommand, params: list = None, secured=False
+            self, method: RoborockCommand, params: list = None, secured=False
     ):
         timestamp = math.floor(time.time())
-        request_id = self._id_counter
-        self._id_counter += 1
+        request_id = randint(10000, 99999)
         inner = {
             "id": request_id,
             "method": method,
@@ -298,7 +197,7 @@ class RoborockClient:
         return request_id, timestamp, payload
 
     async def send_command(
-        self, device_id: str, method: RoborockCommand, params: list = None
+            self, device_id: str, method: RoborockCommand, params: list = None
     ):
         raise NotImplementedError
 
@@ -374,7 +273,14 @@ class RoborockClient:
             commands = [self.get_dust_collection_mode(device_id)]
             if dock_type == RoborockDockType.EMPTY_WASH_FILL_DOCK:
                 commands += [self.get_wash_towel_mode(device_id), self.get_smart_wash_params(device_id)]
-            [dust_collection_mode, wash_towel_mode, smart_wash_params] = (list(await asyncio.gather(*commands)) + [None, None])[:3]
+            [
+                dust_collection_mode,
+                wash_towel_mode,
+                smart_wash_params
+            ] = (
+                        list(await asyncio.gather(*commands))
+                        + [None, None]
+                )[:3]
 
             return RoborockDockSummary(dust_collection_mode, wash_towel_mode, smart_wash_params)
         except RoborockTimeout as e:

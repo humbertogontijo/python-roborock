@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from enum import Enum
 
 from .containers import Status, CleanSummary, Consumable, \
@@ -22,7 +23,7 @@ class RoborockDockSummaryField(str, Enum):
 
 
 class RoborockCommand(str, Enum):
-    NOP = ""
+    GET_PROP = "get_prop"
     GET_MAP_V1 = "get_map_v1"
     GET_STATUS = "get_status"
     GET_DND_TIMER = "get_dnd_timer"
@@ -84,9 +85,118 @@ class RoborockCommand(str, Enum):
     SET_CARPET_CLEAN_MODE = "set_carpet_clean_mode"
     UPD_SERVER_TIMER = "upd_server_timer"  # Server timer seems to be with schedules
     SET_SERVER_TIMER = "set_server_timer"
-    APP_GET_INIT_STATUS = "get_init_status"
     SET_APP_TIMEZONE = "set_app_timezone"
     GET_NETWORK_INFO = "get_network_info"
+    GET_IDENTIFY_FURNITURE_STATUS = "get_identify_furniture_status"
+    SET_CAMERA_STATUS = "set_camera_status"
+    SET_DND_TIMER = "set_dnd_timer"
+    GET_COLLISION_AVOID_STATUS = "get_collision_avoid_status"
+    CLOSE_VALLEY_ELECTRICITY_TIMER = "close_valley_electricity_timer"
+    GET_VALLEY_ELECTRICITY_TIMER = "get_valley_electricity_timer"
+    SET_CLEAN_MOTOR_MODE = "set_clean_motor_mode"
+    SET_LED_STATUS = "set_led_status"
+    GET_CAMERA_STATUS = "get_camera_status"
+    CLOSE_DND_TIMER = "close_dnd_timer"
+    GET_MULTI_MAP = "get_multi_map"
+    SET_COLLISION_AVOID_STATUS = "set_collision_avoid_status"
+    SET_IDENTIFY_GROUND_MATERIAL_STATUS = "set_identify_ground_material_status"
+    GET_IDENTIFY_GROUND_MATERIAL_STATUS = "get_identify_ground_material_status"
+    SET_VALLEY_ELECTRICITY_TIMER = "set_valley_electricity_timer"
+    SWITCH_WATER_MARK = "switch_water_mark"
+    SET_IDENTIFY_FURNITURE_STATUS = "set_identify_furniture_status"
+    GET_CLEAN_RECORD_MAP = "get_clean_record_map"
+
+
+@dataclass
+class CommandInfo:
+    prefix: bytes
+
+
+CommandInfoMap: dict[RoborockCommand, CommandInfo] = {
+    RoborockCommand.GET_PROP: CommandInfo(prefix=b'\x00\x00\x00\x87'),
+    RoborockCommand.GET_STATUS: CommandInfo(prefix=b'\x00\x00\x00\x77'),
+    RoborockCommand.SET_CUSTOM_MODE: CommandInfo(prefix=b'\x00\x00\x00\x87'),
+    RoborockCommand.GET_CHILD_LOCK_STATUS: CommandInfo(prefix=b'\x00\x00\x00\x87'),
+    RoborockCommand.GET_MULTI_MAPS_LIST: CommandInfo(prefix=b'\x00\x00\x00\x87'),
+    RoborockCommand.GET_IDENTIFY_FURNITURE_STATUS: CommandInfo(prefix=b'\x00\x00\x00\x87'),
+    RoborockCommand.SET_WATER_BOX_CUSTOM_MODE: CommandInfo(prefix=b'\x00\x00\x00\x87'),
+    RoborockCommand.GET_CLEAN_SEQUENCE: CommandInfo(prefix=b'\x00\x00\x00\x87'),
+    RoborockCommand.GET_CUSTOMIZE_CLEAN_MODE: CommandInfo(prefix=b'\x00\x00\x00\x87'),
+    RoborockCommand.GET_CARPET_CLEAN_MODE: CommandInfo(prefix=b'\x00\x00\x00\x87'),
+    RoborockCommand.SET_CAMERA_STATUS: CommandInfo(prefix=b'\x00\x00\x00\x87'),
+    RoborockCommand.SET_DND_TIMER: CommandInfo(prefix=b'\x00\x00\x00\x87'),
+    RoborockCommand.GET_FLOW_LED_STATUS: CommandInfo(prefix=b'\x00\x00\x00\x87'),
+    RoborockCommand.GET_COLLISION_AVOID_STATUS: CommandInfo(prefix=b'\x00\x00\x00\x87'),
+    RoborockCommand.CLOSE_VALLEY_ELECTRICITY_TIMER: CommandInfo(prefix=b'\x00\x00\x00\x87'),
+    RoborockCommand.SET_FLOW_LED_STATUS: CommandInfo(prefix=b'\x00\x00\x00\x87'),
+    RoborockCommand.GET_VALLEY_ELECTRICITY_TIMER: CommandInfo(prefix=b'\x00\x00\x00\x87'),
+    RoborockCommand.GET_CLEAN_RECORD: CommandInfo(prefix=b'\x00\x00\x00\x87'),
+    RoborockCommand.GET_MAP_V1: CommandInfo(prefix=b'\x00\x00\x00\xc7'),
+    RoborockCommand.SET_CLEAN_MOTOR_MODE: CommandInfo(prefix=b'\x00\x00\x00\xb7'),
+    RoborockCommand.GET_CONSUMABLE: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.GET_SERVER_TIMER: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.GET_SERIAL_NUMBER: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.GET_CURRENT_SOUND: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.SET_LED_STATUS: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.GET_CAMERA_STATUS: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.APP_PAUSE: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.GET_CLEAN_SUMMARY: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.GET_NETWORK_INFO: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.GET_LED_STATUS: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.CLOSE_DND_TIMER: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.APP_WAKEUP_ROBOT: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.SET_MOP_MODE: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.GET_DND_TIMER: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.GET_CARPET_MODE: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.GET_TIMEZONE: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.SET_CARPET_MODE: CommandInfo(prefix=b'\x00\x00\x00\xd7'),
+    RoborockCommand.GET_MULTI_MAP: CommandInfo(prefix=b'\x00\x00\x00\xd7'),
+    RoborockCommand.SET_COLLISION_AVOID_STATUS: CommandInfo(prefix=b'\x00\x00\x97'),
+    RoborockCommand.SET_CARPET_CLEAN_MODE: CommandInfo(prefix=b'\x00\x00\x97'),
+    RoborockCommand.SET_IDENTIFY_GROUND_MATERIAL_STATUS: CommandInfo(prefix=b'\x00\x00\x97'),
+    RoborockCommand.GET_IDENTIFY_GROUND_MATERIAL_STATUS: CommandInfo(prefix=b'\x00\x00\x97'),
+    RoborockCommand.SET_VALLEY_ELECTRICITY_TIMER: CommandInfo(prefix=b'\x00\x00\x97'),
+    RoborockCommand.SWITCH_WATER_MARK: CommandInfo(prefix=b'\x00\x00\x97'),
+    RoborockCommand.SET_IDENTIFY_FURNITURE_STATUS: CommandInfo(prefix=b'\x00\x00\x97'),
+    RoborockCommand.SET_CHILD_LOCK_STATUS: CommandInfo(prefix=b'\x00\x00\x97'),
+    RoborockCommand.GET_CLEAN_RECORD_MAP: CommandInfo(prefix=b'\x00\x00\xe7'),
+    RoborockCommand.APP_START: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.APP_STOP: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.APP_CHARGE: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.APP_SPOT: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.FIND_ME: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.RESUME_ZONED_CLEAN: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.RESUME_SEGMENT_CLEAN: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.RESET_CONSUMABLE: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.LOAD_MULTI_MAP: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.APP_RC_START: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.APP_RC_END: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.APP_RC_MOVE: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.APP_GOTO_TARGET: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.APP_SEGMENT_CLEAN: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.APP_ZONED_CLEAN: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.APP_START_WASH: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.APP_STOP_WASH: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.SET_FDS_ENDPOINT: CommandInfo(prefix=b'\x00\x00\x97'),
+    RoborockCommand.ENABLE_LOG_UPLOAD: CommandInfo(prefix=b'\x00\x00\x87'),
+    RoborockCommand.GET_SOUND_VOLUME: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.TEST_SOUND_VOLUME: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.UPD_SERVER_TIMER: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.SET_APP_TIMEZONE: CommandInfo(prefix=b'\x00\x00\x97'),
+    #TODO discover prefix for following commands
+    # RoborockCommand.APP_GET_DRYER_SETTING: CommandInfo(prefix=b'\x00\x00\x00w'),
+    # RoborockCommand.APP_SET_DRYER_SETTING: CommandInfo(prefix=b'\x00\x00\x00w'),
+    # RoborockCommand.GET_DUST_COLLECTION_MODE: CommandInfo(prefix=b'\x00\x00\x00w'),
+    # RoborockCommand.SET_DUST_COLLECTION_MODE: CommandInfo(prefix=b'\x00\x00\x00w'),
+    # RoborockCommand.GET_SMART_WASH_PARAMS: CommandInfo(prefix=b'\x00\x00\x00w'),
+    # RoborockCommand.SET_SMART_WASH_PARAMS: CommandInfo(prefix=b'\x00\x00\x00w'),
+    # RoborockCommand.GET_WASH_TOWEL_MODE: CommandInfo(prefix=b'\x00\x00\x00w'),
+    # RoborockCommand.SET_WASH_TOWEL_MODE: CommandInfo(prefix=b'\x00\x00\x00w'),
+    # RoborockCommand.START_WASH_THEN_CHARGE: CommandInfo(prefix=b'\x00\x00\x00w'),
+    # RoborockCommand.GET_SOUND_PROGRESS: CommandInfo(prefix=b'\x00\x00\x00w'),
+    # RoborockCommand.CHANGE_SOUND_VOLUME: CommandInfo(prefix=b'\x00\x00\x00w'),
+    # RoborockCommand.SET_SERVER_TIMER: CommandInfo(prefix=b'\x00\x00\x00w'),
+}
 
 
 class RoborockDockSummary:
