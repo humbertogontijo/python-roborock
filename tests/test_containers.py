@@ -1,5 +1,4 @@
-from roborock import UserData, HomeData, Consumable, Status, DNDTimer, CleanSummary, CleanRecord, RoborockDockTypeCode, \
-    RoborockErrorCode
+from roborock import UserData, HomeData, Consumable, Status, DNDTimer, CleanSummary, CleanRecord
 from .mock_data import USER_DATA, HOME_DATA_RAW, CONSUMABLE, STATUS, DND_TIMER, CLEAN_SUMMARY, CLEAN_RECORD
 
 
