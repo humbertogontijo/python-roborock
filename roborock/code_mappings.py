@@ -1,31 +1,22 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Any
 
 
-class RoborockDockType(str, Enum):
-    NO_DOCK = "No dock"
-    AUTO_EMPTY = "Roborock auto-empty dock"  # Dust collection
-    EMPTY_WASH_FILL_DOCK = "Roborock empty wash fill dock"
-    AUTO_EMPTY_PURE = "Roborock auto-empty pure dock"
-    UNKNOWN = "Unknown Dock - please submit an issue"
+class RoborockEnum(str, Enum):
+
+    @classmethod
+    def _missing_(cls, code: int):
+        return cls._member_map_.get(str(code))
 
 
-class RoborockDockDustCollectionType(str, Enum):
-    SMART = "smart"
-    LIGHT = "light"
-    BALANCED = "balanced"
-    MAX = "max"
+class RoborockCode:
+
+    def __new__(cls, name: str, data: dict):
+        return RoborockEnum(name, {str(key): value for key, value in data.items()})
 
 
-class RoborockDockWashingModeType(str, Enum):
-    LIGHT = "light"
-    BALANCED = "balanced"
-    DEEP = "deep"
-
-
-STATE_CODE_TO_STATUS: dict[int | Any, str | Any] = {
+RoborockStateCode = RoborockCode("RoborockStateCode", {
     1: "starting",
     2: "charger_disconnected",
     3: "idle",
@@ -49,39 +40,39 @@ STATE_CODE_TO_STATUS: dict[int | Any, str | Any] = {
     26: "going_to_wash_the_mop",  # on a46, #1435
     100: "charging_complete",
     101: "device_offline",
-}
+})
 
-ERROR_CODE_TO_TEXT = {
-    0: "None",
-    1: "LiDAR turret or laser blocked. Check for obstruction and retry.",
-    2: "Bumper stuck. Clean it and lightly tap to release it.",
-    3: "Wheels suspended. Move robot and restart.",
-    4: "Cliff sensor error. Clean cliff sensors, move robot away from drops and restart.",
-    5: "Main brush jammed. Clean main brush and bearings.",
-    6: "Side brush jammed. Remove and clean side brush.",
-    7: "Wheels jammed. Move the robot and restart.",
-    8: "Robot trapped. Clear obstacles surrounding robot.",
-    9: "No dustbin. Install dustbin and filter.",
-    12: "Low battery. Recharge and retry.",
-    13: "Charging error. Clean charging contacts and retry.",
-    14: "Battery error.",
-    15: "Wall sensor dirty. Clean wall sensor.",
-    16: "Robot tilted. Move to level ground and restart.",
-    17: "Side brush error. Reset robot.",
-    18: "Fan error. Reset robot.",
-    21: "Vertical bumper pressed. Move robot and retry.",
-    22: "Dock locator error. Clean and retry.",
-    23: "Could not return to dock. Clean dock location beacon and retry.",
-    24: "No-go zone or invisible wall detected. Move the robot.",
-    27: "VibraRise system jammed. Check for obstructions.",
-    28: "Robot on carpet. Move robot to floor and retry.",
-    29: "Filter blocked or wet. Clean, dry, and retry.",
-    30: "No-go zone or Invisible Wall detected. Move robot from this area.",
-    31: "Cannot cross carpet. Move robot across carpet and restart.",
-    32: "Internal error. Reset the robot.",
-}
+RoborockErrorCode = RoborockCode("RoborockErrorCode", {
+    0: "none",
+    1: "lidar_blocked",
+    2: "bumper_stuck",
+    3: "wheels_suspended",
+    4: "cliff_sensor_error",
+    5: "main_brush_jammed",
+    6: "side_brush_jammed",
+    7: "wheels_jammed",
+    8: "robot_trapped",
+    9: "no_dustbin",
+    12: "low_battery",
+    13: "charging_error",
+    14: "battery_error",
+    15: "wall_sensor_dirty",
+    16: "robot_tilted",
+    17: "side_brush_error",
+    18: "fan_error",
+    21: "vertical_bumper_pressed",
+    22: "dock_locator_error",
+    23: "return_to_dock_fail",
+    24: "no-go_zone_detected",
+    27: "vibrarise_jammed",
+    28: "robot_on_carpet",
+    29: "filter_blocked",
+    30: "invisible_wall_detected",
+    31: "cannot_cross_carpet",
+    32: "internal_error"
+})
 
-FAN_SPEED_CODES = {
+RoborockFanPowerCode = RoborockCode("RoborockFanPowerCode", {
     105: "off",
     101: "silent",
     102: "balanced",
@@ -89,43 +80,43 @@ FAN_SPEED_CODES = {
     104: "max",
     108: "max_plus",
     106: "custom",
-}
+})
 
-MOP_MODE_CODES = {
+RoborockMopModeCode = RoborockCode("RoborockMopModeCode", {
     300: "standard",
     301: "deep",
     303: "deep_plus",
     302: "custom",
-}
+})
 
-MOP_INTENSITY_CODES = {
+RoborockMopIntensityCode = RoborockCode("RoborockMopIntensityCode", {
     200: "off",
     201: "mild",
     202: "moderate",
     203: "intense",
     204: "custom",
-}
+})
 
-DOCK_ERROR_TO_TEXT = {
+RoborockDockErrorCode = RoborockCode("RoborockDockErrorCode", {
     0: "ok",
     38: 'water empty',
     39: 'waste water tank full',
-}
+})
 
-DOCK_TYPE_MAP = {
-    0: RoborockDockType.NO_DOCK,
-    3: RoborockDockType.EMPTY_WASH_FILL_DOCK,
-}
+RoborockDockTypeCode = RoborockCode("RoborockDockTypeCode", {
+    0: "no_dock",
+    3: "empty_wash_fill_dock",
+})
 
-DUST_COLLECTION_MAP = {
-    0: RoborockDockDustCollectionType.SMART,
-    1: RoborockDockDustCollectionType.LIGHT,
-    2: RoborockDockDustCollectionType.BALANCED,
-    4: RoborockDockDustCollectionType.MAX,
-}
+RoborockDockDustCollectionModeCode = RoborockCode("RoborockDockDustCollectionModeCode", {
+    0: "smart",
+    1: "light",
+    2: "balanced",
+    4: "max",
+})
 
-WASH_MODE_MAP = {
-    0: RoborockDockWashingModeType.LIGHT,
-    1: RoborockDockWashingModeType.BALANCED,
-    2: RoborockDockWashingModeType.DEEP,
-}
+RoborockDockWashTowelModeCode = RoborockCode("RoborockDockWashTowelModeCode", {
+    0: "light",
+    1: "balanced",
+    2: "deep",
+})

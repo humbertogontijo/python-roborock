@@ -35,25 +35,25 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
 
     def __init__(self, user_data: UserData, devices_info: dict[str, RoborockDeviceInfo]) -> None:
         rriot = user_data.rriot
-        endpoint = base64.b64encode(md5bin(rriot.endpoint)[8:14]).decode()
+        endpoint = base64.b64encode(md5bin(rriot.k)[8:14]).decode()
         RoborockClient.__init__(self, endpoint, devices_info)
         mqtt.Client.__init__(self, protocol=mqtt.MQTTv5)
-        self._mqtt_user = rriot.user
-        self._hashed_user = md5hex(self._mqtt_user + ":" + rriot.endpoint)[2:10]
-        url = urlparse(rriot.reference.mqtt)
+        self._mqtt_user = rriot.u
+        self._hashed_user = md5hex(self._mqtt_user + ":" + rriot.k)[2:10]
+        url = urlparse(rriot.r.m)
         self._mqtt_host = url.hostname
         self._mqtt_port = url.port
         self._mqtt_ssl = url.scheme == "ssl"
         if self._mqtt_ssl:
             super().tls_set()
-        self._mqtt_password = rriot.password
-        self._hashed_password = md5hex(self._mqtt_password + ":" + rriot.endpoint)[16:]
+        self._mqtt_password = rriot.s
+        self._hashed_password = md5hex(self._mqtt_password + ":" + rriot.k)[16:]
         super().username_pw_set(self._hashed_user, self._hashed_password)
         self._seq = 1
         self._random = 4711
         self._id_counter = 2
         self._salt = "TXdfu$jyZ#TZHsg4"
-        self._endpoint = base64.b64encode(md5bin(rriot.endpoint)[8:14]).decode()
+        self._endpoint = base64.b64encode(md5bin(rriot.k)[8:14]).decode()
         self._nonce = secrets.token_bytes(16)
         self._waiting_queue: dict[int, RoborockQueue] = {}
         self._mutex = Lock()

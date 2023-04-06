@@ -1,31 +1,32 @@
-from roborock import UserData, HomeData, Consumable, Status, DNDTimer, CleanSummary, CleanRecord, RoborockDockType
+from roborock import UserData, HomeData, Consumable, Status, DNDTimer, CleanSummary, CleanRecord, RoborockDockTypeCode, \
+    RoborockErrorCode
 from .mock_data import USER_DATA, HOME_DATA_RAW, CONSUMABLE, STATUS, DND_TIMER, CLEAN_SUMMARY, CLEAN_RECORD
 
 
 def test_user_data():
-    ud = UserData(USER_DATA)
+    ud = UserData.from_dict(USER_DATA)
     assert ud.uid == 123456
-    assert ud.token_type == "token_type"
+    assert ud.tokentype == "token_type"
     assert ud.token == "abc123"
-    assert ud.rr_uid == "abc123"
+    assert ud.rruid == "abc123"
     assert ud.region == "us"
     assert ud.country == "US"
-    assert ud.country_code == '1'
+    assert ud.countrycode == '1'
     assert ud.nickname == "user_nickname"
-    assert ud.rriot.user == "user123"
-    assert ud.rriot.password == "pass123"
-    assert ud.rriot.h_unknown == "unknown123"
-    assert ud.rriot.endpoint == "domain123"
-    assert ud.rriot.reference.region == "US"
-    assert ud.rriot.reference.api == "https://api-us.roborock.com"
-    assert ud.rriot.reference.mqtt == "ssl://mqtt-us.roborock.com:8883"
-    assert ud.rriot.reference.l_unknown == "https://wood-us.roborock.com"
+    assert ud.rriot.u == "user123"
+    assert ud.rriot.s == "pass123"
+    assert ud.rriot.h == "unknown123"
+    assert ud.rriot.k == "domain123"
+    assert ud.rriot.r.r == "US"
+    assert ud.rriot.r.a == "https://api-us.roborock.com"
+    assert ud.rriot.r.m == "ssl://mqtt-us.roborock.com:8883"
+    assert ud.rriot.r.l == "https://wood-us.roborock.com"
     assert ud.tuya_device_state == 2
-    assert ud.avatar_url == "https://files.roborock.com/iottest/default_avatar.png"
+    assert ud.avatarurl == "https://files.roborock.com/iottest/default_avatar.png"
 
 
 def test_home_data():
-    hd = HomeData(HOME_DATA_RAW)
+    hd = HomeData.from_dict(HOME_DATA_RAW)
     assert hd.id == 123456
     assert hd.name == "My Home"
     assert hd.lon is None
@@ -52,7 +53,7 @@ def test_home_data():
     assert device.duid == "abc123"
     assert device.name == "Roborock S7 MaxV"
     assert device.attribute is None
-    assert device.activetime == 1672364449
+    assert device.active_time == 1672364449
     assert device.local_key == "key123"
     assert device.runtime_env is None
     assert device.time_zone_id == "America/Los_Angeles"
@@ -80,7 +81,7 @@ def test_home_data():
 
 
 def test_consumable():
-    c = Consumable(CONSUMABLE)
+    c = Consumable.from_dict(CONSUMABLE)
     assert c.main_brush_work_time == 74382
     assert c.side_brush_work_time == 74383
     assert c.filter_work_time == 74384
@@ -92,14 +93,14 @@ def test_consumable():
 
 
 def test_status():
-    s = Status(STATUS)
+    s = Status.from_dict(STATUS)
     assert s.msg_ver == 2
     assert s.msg_seq == 458
     assert s.state == 8
     assert s.battery == 100
     assert s.clean_time == 1176
     assert s.clean_area == 20965000
-    assert s.error_code == 0
+    assert s.error_code == 'none'
     assert s.map_present == 1
     assert s.in_cleaning == 0
     assert s.in_returning == 0
@@ -110,7 +111,6 @@ def test_status():
     assert s.wash_phase == 0
     assert s.wash_ready == 0
     assert s.fan_power == 'balanced'
-    assert s.fan_power_code == 102
     assert s.dnd_enabled == 0
     assert s.map_status == 3
     assert s.is_locating == 0
@@ -124,17 +124,14 @@ def test_status():
     assert s.home_sec_enable_password == 0
     assert s.adbumper_status == [0, 0, 0]
     assert s.water_shortage_status == 0
-    assert s.dock_type_code == 3
-    assert s.dock_type == RoborockDockType.EMPTY_WASH_FILL_DOCK
+    assert s.dock_type == 'empty_wash_fill_dock'
     assert s.dust_collection_status == 0
     assert s.auto_dust_collection == 1
     assert s.avoid_count == 19
     assert s.mop_mode == 'standard'
-    assert s.mop_mode_code == 300
     assert s.debug_mode == 0
     assert s.collision_avoid_status == 1
     assert s.switch_map_mode == 0
-    assert s.dock_error_status_code == 0
     assert s.dock_error_status == "ok"
     assert s.charge_status == 1
     assert s.unsave_map_reason == 0
@@ -142,7 +139,7 @@ def test_status():
 
 
 def test_dnd_timer():
-    dnd = DNDTimer(DND_TIMER)
+    dnd = DNDTimer.from_dict(DND_TIMER)
     assert dnd.start_hour == 22
     assert dnd.start_minute == 0
     assert dnd.end_hour == 7
@@ -151,7 +148,7 @@ def test_dnd_timer():
 
 
 def test_clean_summary():
-    cs = CleanSummary(CLEAN_SUMMARY)
+    cs = CleanSummary.from_dict(CLEAN_SUMMARY)
     assert cs.clean_time == 74382
     assert cs.clean_area == 1159182500
     assert cs.clean_count == 31
@@ -161,7 +158,7 @@ def test_clean_summary():
 
 
 def test_clean_record():
-    cr = CleanRecord(CLEAN_RECORD)
+    cr = CleanRecord.from_dict(CLEAN_RECORD)
     assert cr.begin == 1672543330
     assert cr.end == 1672544638
     assert cr.duration == 1176
