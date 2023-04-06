@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import base64
 import logging
-import secrets
 import threading
+import uuid
 from asyncio import Lock
 from typing import Any
 from urllib.parse import urlparse
@@ -49,16 +49,12 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
         self._mqtt_password = rriot.s
         self._hashed_password = md5hex(self._mqtt_password + ":" + rriot.k)[16:]
         super().username_pw_set(self._hashed_user, self._hashed_password)
-        self._seq = 1
-        self._random = 4711
-        self._id_counter = 2
-        self._salt = "TXdfu$jyZ#TZHsg4"
         self._endpoint = base64.b64encode(md5bin(rriot.k)[8:14]).decode()
-        self._nonce = secrets.token_bytes(16)
         self._waiting_queue: dict[int, RoborockQueue] = {}
         self._mutex = Lock()
         self._last_device_msg_in = mqtt.time_func()
         self._last_disconnection = mqtt.time_func()
+        self.update_client_id()
 
     def __del__(self) -> None:
         self.sync_disconnect()
@@ -102,6 +98,8 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
         try:
             self._last_disconnection = mqtt.time_func()
             message = f"Roborock mqtt client disconnected (rc: {rc})"
+            if rc == mqtt.MQTT_ERR_PROTOCOL:
+                self.update_client_id()
             _LOGGER.warning(message)
             connection_queue = self._waiting_queue.get(1)
             if connection_queue:
@@ -110,6 +108,9 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
                 )
         except Exception as ex:
             _LOGGER.exception(ex)
+
+    def update_client_id(self):
+        self._client_id = mqtt.base62(uuid.uuid4().int, padding=22)
 
     @run_in_executor()
     async def _async_check_keepalive(self) -> None:

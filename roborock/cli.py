@@ -26,10 +26,10 @@ class RoborockContext:
             with open(self.roborock_file, 'r') as f:
                 data = json.load(f)
                 if data:
-                    self._login_data = LoginData(data)
+                    self._login_data = LoginData.from_dict(data)
 
     def update(self, login_data: LoginData):
-        data = json.dumps(login_data, default=vars)
+        data = json.dumps(login_data.as_dict(), default=vars)
         with open(self.roborock_file, 'w') as f:
             f.write(data)
         self.reload()

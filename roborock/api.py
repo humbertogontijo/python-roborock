@@ -87,7 +87,6 @@ class RoborockClient:
 
     def __init__(self, endpoint: str, devices_info: dict[str, RoborockDeviceInfo]) -> None:
         self.devices_info = devices_info
-        self._salt = "TXdfu$jyZ#TZHsg4"
         self._endpoint = endpoint
         self._nonce = secrets.token_bytes(16)
         self._waiting_queue: dict[int, RoborockQueue] = {}
