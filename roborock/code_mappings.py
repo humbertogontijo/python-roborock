@@ -14,7 +14,7 @@ class RoborockEnum(str, Enum):
 
     @classmethod
     def as_dict(cls):
-        return {i.name: i.value for i in cls}
+        return {int(i.name): i.value for i in cls}
 
     @classmethod
     def values(cls):

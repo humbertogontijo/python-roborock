@@ -160,7 +160,6 @@ class LoginData(RoborockBase):
 class Status(RoborockBase):
     msg_ver: Optional[int] = None
     msg_seq: Optional[int] = None
-    status: Optional[str] = None
     state: Optional[RoborockStateCode] = None
     battery: Optional[int] = None
     clean_time: Optional[int] = None
