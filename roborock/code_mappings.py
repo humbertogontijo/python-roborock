@@ -5,9 +5,28 @@ from enum import Enum
 
 class RoborockEnum(str, Enum):
 
+    def __str__(self):
+        return str(self.value)
+
     @classmethod
     def _missing_(cls, code: int):
         return cls._member_map_.get(str(code))
+
+    @classmethod
+    def as_dict(cls):
+        return {i.name: i.value for i in cls}
+
+    @classmethod
+    def values(cls):
+        return list(cls.as_dict().values())
+
+    @classmethod
+    def keys(cls):
+        return list(cls.as_dict().keys())
+
+    @classmethod
+    def items(cls):
+        return cls.as_dict().items()
 
 
 class RoborockCode:

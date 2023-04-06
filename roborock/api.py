@@ -262,7 +262,7 @@ class RoborockClient:
     async def get_dock_summary(self, device_id: str, dock_type: RoborockDockTypeCode) -> RoborockDockSummary:
         try:
             commands = [self.get_dust_collection_mode(device_id)]
-            if dock_type == RoborockDockTypeCode.EMPTY_WASH_FILL_DOCK:
+            if dock_type == RoborockDockTypeCode['3']:
                 commands += [self.get_wash_towel_mode(device_id), self.get_smart_wash_params(device_id)]
             [
                 dust_collection_mode,
@@ -292,7 +292,7 @@ class RoborockClient:
                 device_id, clean_summary.records[0]
             )
         dock_summary = None
-        if status and status.dock_type != RoborockDockTypeCode.NO_DOCK:
+        if status and status.dock_type != RoborockDockTypeCode['0']:
             dock_summary = await self.get_dock_summary(device_id, status.dock_type)
         if any([status, dnd_timer, clean_summary, consumable]):
             return RoborockDeviceProp(

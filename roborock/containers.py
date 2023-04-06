@@ -5,7 +5,8 @@ from typing import Any, Optional
 
 from dacite import from_dict, Config
 
-from roborock.code_mappings import RoborockDockWashTowelModeCode, RoborockDockTypeCode
+from roborock.code_mappings import RoborockDockWashTowelModeCode, RoborockDockTypeCode, RoborockMopIntensityCode, \
+    RoborockStateCode
 from .code_mappings import RoborockMopModeCode, RoborockDockErrorCode, \
     RoborockErrorCode, RoborockDockDustCollectionModeCode, RoborockFanPowerCode
 
@@ -21,11 +22,7 @@ def decamelize(d):
 
 
 @dataclass
-class RoborockBase(dict):
-    def __init__(self, data: dict[str, any]) -> None:
-        super().__init__()
-        if isinstance(data, dict):
-            self.update(data)
+class RoborockBase:
 
     @classmethod
     def from_dict(cls, data: dict[str, any]):
@@ -164,7 +161,7 @@ class Status(RoborockBase):
     msg_ver: Optional[int] = None
     msg_seq: Optional[int] = None
     status: Optional[str] = None
-    state: Optional[int] = None
+    state: Optional[RoborockStateCode] = None
     battery: Optional[int] = None
     clean_time: Optional[int] = None
     clean_area: Optional[int] = None
@@ -183,7 +180,7 @@ class Status(RoborockBase):
     map_status: Optional[int] = None
     is_locating: Optional[int] = None
     lock_status: Optional[int] = None
-    water_box_mode: Optional[int] = None
+    water_box_mode: Optional[RoborockMopIntensityCode] = None
     mop_intensity: Optional[str] = None
     water_box_carriage_status: Optional[int] = None
     mop_forbidden_enable: Optional[int] = None
@@ -285,12 +282,12 @@ class SmartWashParams(RoborockBase):
 
 @dataclass
 class DustCollectionMode(RoborockBase):
-    mode: RoborockDockDustCollectionModeCode
+    mode: Optional[RoborockDockDustCollectionModeCode] = None
 
 
 @dataclass
 class WashTowelMode(RoborockBase):
-    wash_mode: RoborockDockWashTowelModeCode
+    wash_mode: Optional[RoborockDockWashTowelModeCode] = None
 
 
 @dataclass
