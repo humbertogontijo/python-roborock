@@ -5,8 +5,6 @@ USER_EMAIL = "user@domain.com"
 BASE_URL = "https://usiot.roborock.com"
 
 USER_DATA = {
-    "tuyaname": "abc123",
-    "tuyapwd": "abc123",
     "uid": 123456,
     "tokentype": "token_type",
     "token": "abc123",

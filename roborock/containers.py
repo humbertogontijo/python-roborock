@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from enum import Enum
 from typing import Any, Optional
 
@@ -11,14 +13,19 @@ from .code_mappings import RoborockMopModeCode, RoborockDockErrorCode, \
     RoborockErrorCode, RoborockDockDustCollectionModeCode, RoborockFanPowerCode
 
 
-def to_snake(s):
+def camelize(s: str):
+    first, *others = s.split('_')
+    return ''.join([first.lower(), *map(str.title, others)])
+
+
+def decamelize(s: str):
     return re.sub('([A-Z]+)', '_\\1', s).lower()
 
 
-def decamelize(d):
+def decamelize_obj(d: dict | list):
     if isinstance(d, list):
-        return [decamelize(i) if isinstance(i, (dict, list)) else i for i in d]
-    return {to_snake(a): decamelize(b) if isinstance(b, (dict, list)) else b for a, b in d.items()}
+        return [decamelize_obj(i) if isinstance(i, (dict, list)) else i for i in d]
+    return {decamelize(a): decamelize_obj(b) if isinstance(b, (dict, list)) else b for a, b in d.items()}
 
 
 @dataclass
@@ -26,10 +33,12 @@ class RoborockBase:
 
     @classmethod
     def from_dict(cls, data: dict[str, any]):
-        return from_dict(cls, decamelize(data), config=Config(cast=[Enum]))
+        return from_dict(cls, decamelize_obj(data), config=Config(cast=[Enum]))
 
     def as_dict(self):
-        return self.__dict__
+        return asdict(self, dict_factory=lambda _fields: {
+            camelize(key): value for (key, value) in _fields if value is not None
+        })
 
 
 @dataclass
