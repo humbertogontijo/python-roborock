@@ -1,7 +1,6 @@
+from roborock import UserData, HomeData, Consumable, Status, DNDTimer, CleanSummary, CleanRecord, HomeDataProduct
 from roborock.code_mappings import RoborockStateCode, RoborockErrorCode, RoborockFanPowerCode, RoborockMopIntensityCode, \
     RoborockDockTypeCode, RoborockMopModeCode, RoborockDockErrorCode
-
-from roborock import UserData, HomeData, Consumable, Status, DNDTimer, CleanSummary, CleanRecord
 from .mock_data import USER_DATA, HOME_DATA_RAW, CONSUMABLE, STATUS, DND_TIMER, CLEAN_SUMMARY, CLEAN_RECORD
 
 
@@ -80,6 +79,14 @@ def test_home_data():
     assert device.silent_ota_switch
     assert hd.rooms[0].id == 2362048
     assert hd.rooms[0].name == "Example room 1"
+
+
+def test_serialize_and_unserialize():
+    hd = HomeData.from_dict(HOME_DATA_RAW)
+    hd_2 = hd.as_dict()
+    assert isinstance(hd_2["products"][0], dict)
+    hd_3 = HomeData.from_dict(hd_2)
+    assert isinstance(hd_3.products[0], HomeDataProduct)
 
 
 def test_consumable():

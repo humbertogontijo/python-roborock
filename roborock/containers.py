@@ -29,7 +29,19 @@ class RoborockBase:
         return from_dict(cls, decamelize(data), config=Config(cast=[Enum]))
 
     def as_dict(self):
-        return self.__dict__
+        dict = self.__dict__
+        for key, value in dict.items():
+            if isinstance(value, RoborockBase):
+                dict[key] = value.as_dict()
+            if isinstance(value, list):
+                new_list = []
+                for val in value:
+                    if isinstance(val, RoborockBase):
+                        new_list.append(val.as_dict())
+                    else:
+                        new_list.append(val)
+                dict[key] = new_list
+        return dict
 
 
 @dataclass
