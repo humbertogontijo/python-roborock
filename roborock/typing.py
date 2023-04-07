@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import typing
 from dataclasses import dataclass
 from enum import Enum
 
@@ -183,7 +184,7 @@ CommandInfoMap: dict[RoborockCommand, CommandInfo] = {
     RoborockCommand.TEST_SOUND_VOLUME: CommandInfo(prefix=b'\x00\x00\x00w'),
     RoborockCommand.UPD_SERVER_TIMER: CommandInfo(prefix=b'\x00\x00\x00w'),
     RoborockCommand.SET_APP_TIMEZONE: CommandInfo(prefix=b'\x00\x00\x97'),
-    #TODO discover prefix for following commands
+    # TODO discover prefix for following commands
     # RoborockCommand.APP_GET_DRYER_SETTING: CommandInfo(prefix=b'\x00\x00\x00w'),
     # RoborockCommand.APP_SET_DRYER_SETTING: CommandInfo(prefix=b'\x00\x00\x00w'),
     # RoborockCommand.GET_DUST_COLLECTION_MODE: CommandInfo(prefix=b'\x00\x00\x00w'),
@@ -208,8 +209,10 @@ class RoborockDockSummary:
 
 
 class RoborockDeviceProp:
-    def __init__(self, status: Status, dnd_timer: DNDTimer, clean_summary: CleanSummary, consumable: Consumable,
-                 last_clean_record: CleanRecord = None, dock_summary: RoborockDockSummary = None):
+    def __init__(self, status: typing.Optional[Status] = None, dnd_timer: typing.Optional[DNDTimer] = None,
+                 clean_summary: typing.Optional[CleanSummary] = None, consumable: typing.Optional[Consumable] = None,
+                 last_clean_record: typing.Optional[CleanRecord] = None,
+                 dock_summary: typing.Optional[RoborockDockSummary] = None):
         self.status = status
         self.dnd_timer = dnd_timer
         self.clean_summary = clean_summary
