@@ -208,17 +208,14 @@ class RoborockDockSummary:
         self.smart_wash_params = smart_wash_params
 
 
+@dataclass
 class RoborockDeviceProp:
-    def __init__(self, status: typing.Optional[Status] = None, dnd_timer: typing.Optional[DNDTimer] = None,
-                 clean_summary: typing.Optional[CleanSummary] = None, consumable: typing.Optional[Consumable] = None,
-                 last_clean_record: typing.Optional[CleanRecord] = None,
-                 dock_summary: typing.Optional[RoborockDockSummary] = None):
-        self.status = status
-        self.dnd_timer = dnd_timer
-        self.clean_summary = clean_summary
-        self.consumable = consumable
-        self.last_clean_record = last_clean_record
-        self.dock_summary = dock_summary
+    status: typing.Optional[Status] = None
+    dnd_timer: typing.Optional[DNDTimer] = None
+    clean_summary: typing.Optional[CleanSummary] = None
+    consumable: typing.Optional[Consumable] = None
+    last_clean_record: typing.Optional[CleanRecord] = None
+    dock_summary: typing.Optional[RoborockDockSummary] = None
 
     def update(self, device_prop: 'RoborockDeviceProp'):
         if device_prop.status:
