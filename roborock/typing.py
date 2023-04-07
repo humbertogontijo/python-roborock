@@ -115,7 +115,7 @@ class CommandInfo:
 CommandInfoMap: dict[RoborockCommand, CommandInfo] = {
     RoborockCommand.GET_PROP: CommandInfo(prefix=b'\x00\x00\x00\x87'),
     RoborockCommand.GET_STATUS: CommandInfo(prefix=b'\x00\x00\x00\x77'),
-    RoborockCommand.SET_CUSTOM_MODE: CommandInfo(prefix=b'\x00\x00\x00\x87'),
+    RoborockCommand.SET_CUSTOM_MODE: CommandInfo(prefix=b'\x00\x00\x00w'),
     RoborockCommand.GET_CHILD_LOCK_STATUS: CommandInfo(prefix=b'\x00\x00\x00\x87'),
     RoborockCommand.GET_MULTI_MAPS_LIST: CommandInfo(prefix=b'\x00\x00\x00\x87'),
     RoborockCommand.GET_IDENTIFY_FURNITURE_STATUS: CommandInfo(prefix=b'\x00\x00\x00\x87'),
