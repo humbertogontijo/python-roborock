@@ -106,6 +106,9 @@ class RoborockCommand(str, Enum):
     SWITCH_WATER_MARK = "switch_water_mark"
     SET_IDENTIFY_FURNITURE_STATUS = "set_identify_furniture_status"
     GET_CLEAN_RECORD_MAP = "get_clean_record_map"
+    GET_ROOM_MAPPING = "get_room_mapping"
+    NAME_SEGMENT = "name_segment"
+    SET_TIMEZONE = "set_timezone"
 
 
 @dataclass
@@ -167,14 +170,14 @@ CommandInfoMap: dict[RoborockCommand, CommandInfo] = {
     RoborockCommand.APP_SPOT: CommandInfo(prefix=b'\x00\x00\x00w'),
     RoborockCommand.FIND_ME: CommandInfo(prefix=b'\x00\x00\x00w'),
     RoborockCommand.RESUME_ZONED_CLEAN: CommandInfo(prefix=b'\x00\x00\x00w'),
-    RoborockCommand.RESUME_SEGMENT_CLEAN: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.RESUME_SEGMENT_CLEAN: CommandInfo(prefix=b'\x00\x00\x00\x87'),
     RoborockCommand.RESET_CONSUMABLE: CommandInfo(prefix=b'\x00\x00\x00w'),
     RoborockCommand.LOAD_MULTI_MAP: CommandInfo(prefix=b'\x00\x00\x00w'),
     RoborockCommand.APP_RC_START: CommandInfo(prefix=b'\x00\x00\x00w'),
     RoborockCommand.APP_RC_END: CommandInfo(prefix=b'\x00\x00\x00w'),
     RoborockCommand.APP_RC_MOVE: CommandInfo(prefix=b'\x00\x00\x00w'),
-    RoborockCommand.APP_GOTO_TARGET: CommandInfo(prefix=b'\x00\x00\x00w'),
-    RoborockCommand.APP_SEGMENT_CLEAN: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.APP_GOTO_TARGET: CommandInfo(prefix=b'\x00\x00\x00\x87'),
+    RoborockCommand.APP_SEGMENT_CLEAN: CommandInfo(prefix=b'\x00\x00\x00\xc7'),
     RoborockCommand.APP_ZONED_CLEAN: CommandInfo(prefix=b'\x00\x00\x00w'),
     RoborockCommand.APP_START_WASH: CommandInfo(prefix=b'\x00\x00\x00w'),
     RoborockCommand.APP_STOP_WASH: CommandInfo(prefix=b'\x00\x00\x00w'),
@@ -182,8 +185,14 @@ CommandInfoMap: dict[RoborockCommand, CommandInfo] = {
     RoborockCommand.ENABLE_LOG_UPLOAD: CommandInfo(prefix=b'\x00\x00\x87'),
     RoborockCommand.GET_SOUND_VOLUME: CommandInfo(prefix=b'\x00\x00\x00w'),
     RoborockCommand.TEST_SOUND_VOLUME: CommandInfo(prefix=b'\x00\x00\x00w'),
-    RoborockCommand.UPD_SERVER_TIMER: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.UPD_SERVER_TIMER: CommandInfo(prefix=b'\x00\x00\x00\x97'),
     RoborockCommand.SET_APP_TIMEZONE: CommandInfo(prefix=b'\x00\x00\x97'),
+    RoborockCommand.CHANGE_SOUND_VOLUME: CommandInfo(prefix=b'\x00\x00\x00\x87'),
+    RoborockCommand.GET_SOUND_PROGRESS: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.SET_SERVER_TIMER: CommandInfo(prefix=b'\x00\x00\x00\xc7'),
+    RoborockCommand.GET_ROOM_MAPPING: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.NAME_SEGMENT: CommandInfo(prefix=b'\x00\x00\x027'),
+    RoborockCommand.SET_TIMEZONE: CommandInfo(prefix=b'\x00\x00\x00\x97')
     # TODO discover prefix for following commands
     # RoborockCommand.APP_GET_DRYER_SETTING: CommandInfo(prefix=b'\x00\x00\x00w'),
     # RoborockCommand.APP_SET_DRYER_SETTING: CommandInfo(prefix=b'\x00\x00\x00w'),
@@ -194,9 +203,6 @@ CommandInfoMap: dict[RoborockCommand, CommandInfo] = {
     # RoborockCommand.GET_WASH_TOWEL_MODE: CommandInfo(prefix=b'\x00\x00\x00w'),
     # RoborockCommand.SET_WASH_TOWEL_MODE: CommandInfo(prefix=b'\x00\x00\x00w'),
     # RoborockCommand.START_WASH_THEN_CHARGE: CommandInfo(prefix=b'\x00\x00\x00w'),
-    # RoborockCommand.GET_SOUND_PROGRESS: CommandInfo(prefix=b'\x00\x00\x00w'),
-    # RoborockCommand.CHANGE_SOUND_VOLUME: CommandInfo(prefix=b'\x00\x00\x00w'),
-    # RoborockCommand.SET_SERVER_TIMER: CommandInfo(prefix=b'\x00\x00\x00w'),
 }
 
 
