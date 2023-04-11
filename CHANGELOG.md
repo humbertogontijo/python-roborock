@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.6.4 (2023-04-11)
+### Fix
+* Disconnect on timeout so next command can work ([`5ad397b`](https://github.com/humbertogontijo/python-roborock/commit/5ad397b3bbb4bc600888baba6c0cc15be9d17ef7))
+
 ## v0.6.3 (2023-04-11)
 ### Fix
 * Semantic_release ([`63b249d`](https://github.com/humbertogontijo/python-roborock/commit/63b249d65d3fc40b048320e6596aedc40f588bf9))
