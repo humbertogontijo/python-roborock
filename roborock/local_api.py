@@ -167,6 +167,7 @@ class RoborockSocketListener:
                 async with async_timeout.timeout(self.timeout):
                     await self.loop.sock_sendall(self.socket, data)
         except (asyncio.TimeoutError, asyncio.CancelledError):
+            await self.disconnect()
             raise RoborockTimeout(
                 f"Timeout after {self.timeout} seconds waiting for response"
             ) from None
