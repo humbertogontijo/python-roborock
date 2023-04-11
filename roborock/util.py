@@ -1,8 +1,9 @@
 import asyncio
 import functools
+from asyncio import AbstractEventLoop
 
 
-def get_running_loop_or_create_one():
+def get_running_loop_or_create_one() -> AbstractEventLoop:
     try:
         loop = asyncio.get_event_loop()
     except RuntimeError:

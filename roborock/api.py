@@ -14,7 +14,7 @@ import secrets
 import struct
 import time
 from random import randint
-from typing import Any, Callable
+from typing import Optional, Any, Callable, Coroutine, Mapping
 
 import aiohttp
 from Crypto.Cipher import AES
@@ -63,29 +63,29 @@ def md5hex(message: str) -> str:
 
 
 class PreparedRequest:
-    def __init__(self, base_url: str, base_headers: dict = None) -> None:
+    def __init__(self, base_url: str, base_headers: Optional[dict] = None) -> None:
         self.base_url = base_url
         self.base_headers = base_headers or {}
 
     async def request(
-            self, method: str, url: str, params=None, data=None, headers=None
-    ) -> dict | list:
+        self, method: str, url: str, params=None, data=None, headers=None
+    ) -> dict:
         _url = "/".join(s.strip("/") for s in [self.base_url, url])
         _headers = {**self.base_headers, **(headers or {})}
         async with aiohttp.ClientSession() as session:
             async with session.request(
-                    method,
-                    _url,
-                    params=params,
-                    data=data,
-                    headers=_headers,
+                method,
+                _url,
+                params=params,
+                data=data,
+                headers=_headers,
             ) as resp:
                 return await resp.json()
 
 
 class RoborockClient:
 
-    def __init__(self, endpoint: str, devices_info: dict[str, RoborockDeviceInfo]) -> None:
+    def __init__(self, endpoint: str, devices_info: Mapping[str, RoborockDeviceInfo]) -> None:
         self.devices_info = devices_info
         self._endpoint = endpoint
         self._nonce = secrets.token_bytes(16)
@@ -161,7 +161,7 @@ class RoborockClient:
             del self._waiting_queue[request_id]
 
     def _get_payload(
-            self, method: RoborockCommand, params: list = None, secured=False
+        self, method: RoborockCommand, params: Optional[list] = None, secured=False
     ):
         timestamp = math.floor(time.time())
         request_id = randint(10000, 99999)
@@ -187,24 +187,26 @@ class RoborockClient:
         return request_id, timestamp, payload
 
     async def send_command(
-            self, device_id: str, method: RoborockCommand, params: list = None
+        self, device_id: str, method: RoborockCommand, params: Optional[list] = None
     ):
         raise NotImplementedError
 
-    async def get_status(self, device_id: str) -> Status:
+    async def get_status(self, device_id: str) -> Status | None:
         status = await self.send_command(device_id, RoborockCommand.GET_STATUS)
         if isinstance(status, dict):
             return Status.from_dict(status)
+        return None
 
-    async def get_dnd_timer(self, device_id: str) -> DNDTimer:
+    async def get_dnd_timer(self, device_id: str) -> DNDTimer | None:
         try:
             dnd_timer = await self.send_command(device_id, RoborockCommand.GET_DND_TIMER)
             if isinstance(dnd_timer, dict):
                 return DNDTimer.from_dict(dnd_timer)
         except RoborockTimeout as e:
             _LOGGER.error(e)
+        return None
 
-    async def get_clean_summary(self, device_id: str) -> CleanSummary:
+    async def get_clean_summary(self, device_id: str) -> CleanSummary | None:
         try:
             clean_summary = await self.send_command(
                 device_id, RoborockCommand.GET_CLEAN_SUMMARY
@@ -215,8 +217,9 @@ class RoborockClient:
                 return CleanSummary(clean_time=int.from_bytes(clean_summary, 'big'))
         except RoborockTimeout as e:
             _LOGGER.error(e)
+        return None
 
-    async def get_clean_record(self, device_id: str, record_id: int) -> CleanRecord:
+    async def get_clean_record(self, device_id: str, record_id: int) -> CleanRecord | None:
         try:
             clean_record = await self.send_command(
                 device_id, RoborockCommand.GET_CLEAN_RECORD, [record_id]
@@ -225,42 +228,48 @@ class RoborockClient:
                 return CleanRecord.from_dict(clean_record)
         except RoborockTimeout as e:
             _LOGGER.error(e)
+        return None
 
-    async def get_consumable(self, device_id: str) -> Consumable:
+    async def get_consumable(self, device_id: str) -> Consumable | None:
         try:
             consumable = await self.send_command(device_id, RoborockCommand.GET_CONSUMABLE)
             if isinstance(consumable, dict):
                 return Consumable.from_dict(consumable)
         except RoborockTimeout as e:
             _LOGGER.error(e)
+        return None
 
-    async def get_wash_towel_mode(self, device_id: str) -> WashTowelMode:
+    async def get_wash_towel_mode(self, device_id: str) -> WashTowelMode | None:
         try:
             washing_mode = await self.send_command(device_id, RoborockCommand.GET_WASH_TOWEL_MODE)
             if isinstance(washing_mode, dict):
                 return WashTowelMode.from_dict(washing_mode)
         except RoborockTimeout as e:
             _LOGGER.error(e)
+        return None
 
-    async def get_dust_collection_mode(self, device_id: str) -> DustCollectionMode:
+    async def get_dust_collection_mode(self, device_id: str) -> DustCollectionMode | None:
         try:
             dust_collection = await self.send_command(device_id, RoborockCommand.GET_DUST_COLLECTION_MODE)
             if isinstance(dust_collection, dict):
                 return DustCollectionMode.from_dict(dust_collection)
         except RoborockTimeout as e:
             _LOGGER.error(e)
+        return None
 
-    async def get_smart_wash_params(self, device_id: str) -> SmartWashParams:
+    async def get_smart_wash_params(self, device_id: str) -> SmartWashParams | None:
         try:
             mop_wash_mode = await self.send_command(device_id, RoborockCommand.GET_SMART_WASH_PARAMS)
             if isinstance(mop_wash_mode, dict):
                 return SmartWashParams.from_dict(mop_wash_mode)
         except RoborockTimeout as e:
             _LOGGER.error(e)
+        return None
 
-    async def get_dock_summary(self, device_id: str, dock_type: RoborockDockTypeCode) -> RoborockDockSummary:
+    async def get_dock_summary(self, device_id: str, dock_type: RoborockDockTypeCode) -> RoborockDockSummary | None:
         try:
-            commands = [self.get_dust_collection_mode(device_id)]
+            commands: list[Coroutine[Any, Any, DustCollectionMode | WashTowelMode | SmartWashParams | None]] = [
+                self.get_dust_collection_mode(device_id)]
             if dock_type == RoborockDockTypeCode['3']:
                 commands += [self.get_wash_towel_mode(device_id), self.get_smart_wash_params(device_id)]
             [
@@ -268,13 +277,14 @@ class RoborockClient:
                 wash_towel_mode,
                 smart_wash_params
             ] = (
-                        list(await asyncio.gather(*commands))
-                        + [None, None]
+                    list(await asyncio.gather(*commands))
+                    + [None, None]
                 )[:3]
 
             return RoborockDockSummary(dust_collection_mode, wash_towel_mode, smart_wash_params)
         except RoborockTimeout as e:
             _LOGGER.error(e)
+        return None
 
     async def get_prop(self, device_id: str) -> RoborockDeviceProp | None:
         [status, dnd_timer, clean_summary, consumable] = await asyncio.gather(
@@ -299,7 +309,7 @@ class RoborockClient:
             )
         return None
 
-    async def get_multi_maps_list(self, device_id) -> MultiMapsList:
+    async def get_multi_maps_list(self, device_id) -> MultiMapsList | None:
         try:
             multi_maps_list = await self.send_command(
                 device_id, RoborockCommand.GET_MULTI_MAPS_LIST
@@ -308,14 +318,16 @@ class RoborockClient:
                 return MultiMapsList.from_dict(multi_maps_list)
         except RoborockTimeout as e:
             _LOGGER.error(e)
+        return None
 
-    async def get_networking(self, device_id) -> NetworkInfo:
+    async def get_networking(self, device_id) -> NetworkInfo | None:
         try:
             networking_info = await self.send_command(device_id, RoborockCommand.GET_NETWORK_INFO)
             if isinstance(networking_info, dict):
                 return NetworkInfo.from_dict(networking_info)
         except RoborockTimeout as e:
             _LOGGER.error(e)
+        return None
 
 
 class RoborockApiClient:
@@ -334,9 +346,14 @@ class RoborockApiClient:
                 "/api/v1/getUrlByEmail",
                 params={"email": self._username, "needtwostepauth": "false"},
             )
+            if response is None:
+                raise RoborockException("get url by email returned None")
             if response.get("code") != 200:
                 raise RoborockException(response.get("error"))
-            self.base_url = response.get("data").get("url")
+            response_data = response.get("data")
+            if response_data is None:
+                raise RoborockException("response does not have 'data'")
+            self.base_url = response_data.get("url")
         return self.base_url
 
     def _get_header_client_id(self):
@@ -358,7 +375,8 @@ class RoborockApiClient:
                 "type": "auth",
             },
         )
-
+        if code_response is None:
+            raise RoborockException("Failed to get a response from send email code")
         if code_response.get("code") != 200:
             raise RoborockException(code_response.get("msg"))
 
@@ -376,10 +394,14 @@ class RoborockApiClient:
                 "needtwostepauth": "false",
             },
         )
-
+        if login_response is None:
+            raise RoborockException("Login response is none")
         if login_response.get("code") != 200:
             raise RoborockException(login_response.get("msg"))
-        return UserData.from_dict(login_response.get("data"))
+        user_data = login_response.get("data")
+        if not isinstance(user_data, dict):
+            raise RoborockException("Got unexpected data type for user_data")
+        return UserData.from_dict(user_data)
 
     async def code_login(self, code) -> UserData:
         base_url = await self._get_base_url()
@@ -395,15 +417,21 @@ class RoborockApiClient:
                 "verifycodetype": "AUTH_EMAIL_CODE",
             },
         )
-
+        if login_response is None:
+            raise RoborockException("Login request response is None")
         if login_response.get("code") != 200:
             raise RoborockException(login_response.get("msg"))
-        return UserData.from_dict(login_response.get("data"))
+        user_data = login_response.get("data")
+        if not isinstance(user_data, dict):
+            raise RoborockException("Got unexpected data type for user_data")
+        return UserData.from_dict(user_data)
 
     async def get_home_data(self, user_data: UserData) -> HomeData:
         base_url = await self._get_base_url()
         header_clientid = self._get_header_client_id()
         rriot = user_data.rriot
+        if rriot is None:
+            raise RoborockException("rriot is none")
         home_id_request = PreparedRequest(
             base_url, {"header_clientid": header_clientid}
         )
@@ -412,9 +440,12 @@ class RoborockApiClient:
             "/api/v1/getHomeDetail",
             headers={"Authorization": user_data.token},
         )
+        if home_id_response is None:
+            raise RoborockException("home_id_response is None")
         if home_id_response.get("code") != 200:
             raise RoborockException(home_id_response.get("msg"))
-        home_id = home_id_response.get("data").get("rrHomeId")
+
+        home_id = home_id_response['data'].get("rrHomeId")
         timestamp = math.floor(time.time())
         nonce = secrets.token_urlsafe(6)
         prestr = ":".join(
@@ -431,6 +462,8 @@ class RoborockApiClient:
         mac = base64.b64encode(
             hmac.new(rriot.h.encode(), prestr.encode(), hashlib.sha256).digest()
         ).decode()
+        if rriot.r.a is None:
+            raise RoborockException("Missing field 'a' in rriot reference")
         home_request = PreparedRequest(
             rriot.r.a,
             {
@@ -442,4 +475,7 @@ class RoborockApiClient:
         if not home_response.get("success"):
             raise RoborockException(home_response)
         home_data = home_response.get("result")
-        return HomeData.from_dict(home_data)
+        if isinstance(home_data, dict):
+            return HomeData.from_dict(home_data)
+        else:
+            raise RoborockException("home_response result was an unexpected type")

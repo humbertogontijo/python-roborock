@@ -32,7 +32,7 @@ def decamelize_obj(d: dict | list):
 class RoborockBase:
 
     @classmethod
-    def from_dict(cls, data: dict[str, any]):
+    def from_dict(cls, data: dict[str, Any]):
         return from_dict(cls, decamelize_obj(data), config=Config(cast=[Enum]))
 
     def as_dict(self):
@@ -51,11 +51,11 @@ class Reference(RoborockBase):
 
 @dataclass
 class RRiot(RoborockBase):
-    u: Optional[str] = None
-    s: Optional[str] = None
-    h: Optional[str] = None
-    k: Optional[str] = None
-    r: Optional[Reference] = None
+    u: str
+    s: str
+    h: str
+    k: str
+    r: Reference
 
 
 @dataclass
