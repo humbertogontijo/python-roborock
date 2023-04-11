@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.6.2 (2023-04-11)
+### Fix
+* Error code nogo_zone_detected ([`722e4b5`](https://github.com/humbertogontijo/python-roborock/commit/722e4b5cfd0c4891adc506e9fe99740860027670))
+
 ## v0.6.1 (2023-04-10)
 ### Fix
 * Trigger release ([`f1ce0ed`](https://github.com/humbertogontijo/python-roborock/commit/f1ce0ed55a254bccd8567b48974ff74dd9ec8b25))
