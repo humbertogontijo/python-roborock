@@ -84,7 +84,7 @@ RoborockErrorCode = create_code_enum(
         21: "vertical_bumper_pressed",
         22: "dock_locator_error",
         23: "return_to_dock_fail",
-        24: "no-go_zone_detected",
+        24: "nogo_zone_detected",
         27: "vibrarise_jammed",
         28: "robot_on_carpet",
         29: "filter_blocked",
