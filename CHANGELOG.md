@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.6.3 (2023-04-11)
+### Fix
+* Semantic_release ([`63b249d`](https://github.com/humbertogontijo/python-roborock/commit/63b249d65d3fc40b048320e6596aedc40f588bf9))
+
 ## v0.6.2 (2023-04-11)
 ### Fix
 * Error code nogo_zone_detected ([`722e4b5`](https://github.com/humbertogontijo/python-roborock/commit/722e4b5cfd0c4891adc506e9fe99740860027670))
