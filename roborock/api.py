@@ -23,7 +23,7 @@ from Crypto.Util.Padding import unpad
 from roborock.exceptions import (
     RoborockException, RoborockTimeout, VacuumError,
 )
-from .code_mappings import RoborockDockTypeCode
+from .code_mappings import RoborockDockTypeCode, RoborockEnum
 from .containers import (
     UserData,
     Status,
@@ -266,7 +266,12 @@ class RoborockClient:
             _LOGGER.error(e)
         return None
 
-    async def get_dock_summary(self, device_id: str, dock_type: RoborockDockTypeCode) -> RoborockDockSummary | None:
+    async def get_dock_summary(self, device_id: str, dock_type: RoborockEnum) -> RoborockDockSummary | None:
+        """Gets the status summary from the dock with the methods available for a given dock.
+
+        :param dock_type: RoborockDockTypeCode"""
+        if RoborockDockTypeCode.name != "RoborockDockTypeCode":
+            raise RoborockException("Invalid enum given for dock type")
         try:
             commands: list[Coroutine[Any, Any, DustCollectionMode | WashTowelMode | SmartWashParams | None]] = [
                 self.get_dust_collection_mode(device_id)]

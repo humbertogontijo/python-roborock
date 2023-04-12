@@ -39,6 +39,10 @@ class RoborockEnum(str, Enum):
     def items(cls: Type[_StrEnumT]):
         return cls.as_dict().items()
 
+    @classmethod
+    def __getitem__(cls: Type[_StrEnumT], item):
+        return cls.__getitem__(item)
+
 
 def create_code_enum(name: str, data: dict) -> RoborockEnum:
     return RoborockEnum(name, {str(key): value for key, value in data.items()})
