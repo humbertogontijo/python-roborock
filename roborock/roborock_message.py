@@ -8,13 +8,12 @@ import struct
 import time
 from dataclasses import dataclass
 from random import randint
-from typing import Optional
 
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
-from roborock.typing import RoborockCommand
 
 from roborock.exceptions import RoborockException
+from roborock.typing import RoborockCommand
 
 
 def md5bin(message: str) -> bytes:
@@ -35,11 +34,11 @@ salt = "TXdfu$jyZ#TZHsg4"
 class RoborockMessage:
     protocol: int
     payload: bytes
-    seq: Optional[int] = randint(100000, 999999)
-    prefix: Optional[bytes] = b''
-    version: Optional[bytes] = b'1.0'
-    random: Optional[int] = randint(10000, 99999)
-    timestamp: Optional[int] = math.floor(time.time())
+    seq: int = randint(100000, 999999)
+    prefix: bytes = b''
+    version: bytes = b'1.0'
+    random: int = randint(10000, 99999)
+    timestamp: int = math.floor(time.time())
 
     def get_request_id(self) -> int | None:
         protocol = self.protocol
@@ -108,7 +107,7 @@ class RoborockParser:
 
     @staticmethod
     def decode(msg: bytes, local_key: str, index=0) -> tuple[list[RoborockMessage], bytes]:
-        prefix = None
+        prefix = b''
         original_index = index
         if len(msg) - index < 17:
             ## broken message
@@ -118,8 +117,7 @@ class RoborockParser:
             prefix = msg[index:index + 4]
             index += 4
         elif msg[index:index + 3] != "1.0".encode():
-            raise RoborockException(f"Unknown protocol version {msg[0:3]}")
-
+            raise RoborockException(f"Unknown protocol version {msg[0:3]!r}")
         if len(msg) - index in [17]:
             [version, request_id, random, timestamp, protocol] = struct.unpack_from(
                 "!3sIIIH", msg, index

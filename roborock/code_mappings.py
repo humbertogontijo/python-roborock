@@ -1,31 +1,47 @@
 from __future__ import annotations
 
 from enum import Enum
+from typing import TypeVar, Type, Any
+
+_StrEnumT = TypeVar("_StrEnumT", bound="RoborockEnum")
 
 
 class RoborockEnum(str, Enum):
+
+    def __new__(
+        cls: Type[_StrEnumT], value: str, *args: Any, **kwargs: Any
+    ) -> _StrEnumT:
+        """Create a new StrEnum instance."""
+        if not isinstance(value, str):
+            raise TypeError(f"{value!r} is not a string")
+        return super().__new__(cls, value, *args, **kwargs)
+
     def __str__(self):
         return str(self.value)
 
     @classmethod
-    def _missing_(cls, code: int):
+    def _missing_(cls: Type[_StrEnumT], code: object):
         return cls._member_map_.get(str(code))
 
     @classmethod
-    def as_dict(cls):
+    def as_dict(cls: Type[_StrEnumT]):
         return {int(i.name): i.value for i in cls}
 
     @classmethod
-    def values(cls):
+    def values(cls: Type[_StrEnumT]):
         return list(cls.as_dict().values())
 
     @classmethod
-    def keys(cls):
+    def keys(cls: Type[_StrEnumT]):
         return list(cls.as_dict().keys())
 
     @classmethod
-    def items(cls):
+    def items(cls: Type[_StrEnumT]):
         return cls.as_dict().items()
+
+    @classmethod
+    def __getitem__(cls: Type[_StrEnumT], item):
+        return cls.__getitem__(item)
 
 
 def create_code_enum(name: str, data: dict) -> RoborockEnum:
@@ -58,8 +74,7 @@ RoborockStateCode = create_code_enum(
         26: "going_to_wash_the_mop",  # on a46, #1435
         100: "charging_complete",
         101: "device_offline",
-    },
-)
+    })
 
 RoborockErrorCode = create_code_enum(
     "RoborockErrorCode",

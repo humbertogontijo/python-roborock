@@ -36,6 +36,8 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry.dev-dependencies]
 pytest-asyncio = "*"
 pytest = "*"
+pre-commit = "*"
+mypy = "*"
 
 [tool.semantic_release]
 branch = "main"

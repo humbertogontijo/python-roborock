@@ -32,7 +32,7 @@ def decamelize_obj(d: dict | list):
 class RoborockBase:
 
     @classmethod
-    def from_dict(cls, data: dict[str, any]):
+    def from_dict(cls, data: dict[str, Any]):
         return from_dict(cls, decamelize_obj(data), config=Config(cast=[Enum]))
 
     def as_dict(self):
@@ -51,11 +51,11 @@ class Reference(RoborockBase):
 
 @dataclass
 class RRiot(RoborockBase):
-    u: Optional[str] = None
-    s: Optional[str] = None
-    h: Optional[str] = None
-    k: Optional[str] = None
-    r: Optional[Reference] = None
+    u: str
+    s: str
+    h: str
+    k: str
+    r: Reference
 
 
 @dataclass
@@ -169,11 +169,11 @@ class LoginData(RoborockBase):
 class Status(RoborockBase):
     msg_ver: Optional[int] = None
     msg_seq: Optional[int] = None
-    state: Optional[RoborockStateCode] = None
+    state: Optional[RoborockStateCode] = None  # type: ignore[valid-type]
     battery: Optional[int] = None
     clean_time: Optional[int] = None
     clean_area: Optional[int] = None
-    error_code: Optional[RoborockErrorCode] = None
+    error_code: Optional[RoborockErrorCode] = None  # type: ignore[valid-type]
     map_present: Optional[int] = None
     in_cleaning: Optional[int] = None
     in_returning: Optional[int] = None
@@ -183,12 +183,12 @@ class Status(RoborockBase):
     back_type: Optional[int] = None
     wash_phase: Optional[int] = None
     wash_ready: Optional[int] = None
-    fan_power: Optional[RoborockFanPowerCode] = None
+    fan_power: Optional[RoborockFanPowerCode] = None  # type: ignore[valid-type]
     dnd_enabled: Optional[int] = None
     map_status: Optional[int] = None
     is_locating: Optional[int] = None
     lock_status: Optional[int] = None
-    water_box_mode: Optional[RoborockMopIntensityCode] = None
+    water_box_mode: Optional[RoborockMopIntensityCode] = None  # type: ignore[valid-type]
     mop_intensity: Optional[str] = None
     water_box_carriage_status: Optional[int] = None
     mop_forbidden_enable: Optional[int] = None
@@ -198,15 +198,15 @@ class Status(RoborockBase):
     home_sec_enable_password: Optional[int] = None
     adbumper_status: Optional[list[int]] = None
     water_shortage_status: Optional[int] = None
-    dock_type: Optional[RoborockDockTypeCode] = None
+    dock_type: Optional[RoborockDockTypeCode] = None  # type: ignore[valid-type]
     dust_collection_status: Optional[int] = None
     auto_dust_collection: Optional[int] = None
     avoid_count: Optional[int] = None
-    mop_mode: Optional[RoborockMopModeCode] = None
+    mop_mode: Optional[RoborockMopModeCode] = None  # type: ignore[valid-type]
     debug_mode: Optional[int] = None
     collision_avoid_status: Optional[int] = None
     switch_map_mode: Optional[int] = None
-    dock_error_status: Optional[RoborockDockErrorCode] = None
+    dock_error_status: Optional[RoborockDockErrorCode] = None  # type: ignore[valid-type]
     charge_status: Optional[int] = None
     unsave_map_reason: Optional[int] = None
     unsave_map_flag: Optional[int] = None
@@ -290,12 +290,12 @@ class SmartWashParams(RoborockBase):
 
 @dataclass
 class DustCollectionMode(RoborockBase):
-    mode: Optional[RoborockDockDustCollectionModeCode] = None
+    mode: Optional[RoborockDockDustCollectionModeCode] = None  # type: ignore[valid-type]
 
 
 @dataclass
 class WashTowelMode(RoborockBase):
-    wash_mode: Optional[RoborockDockWashTowelModeCode] = None
+    wash_mode: Optional[RoborockDockWashTowelModeCode] = None  # type: ignore[valid-type]
 
 
 @dataclass

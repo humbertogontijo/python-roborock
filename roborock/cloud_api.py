@@ -5,7 +5,7 @@ import logging
 import threading
 import uuid
 from asyncio import Lock
-from typing import Any
+from typing import Optional, Any, Mapping
 from urllib.parse import urlparse
 
 import paho.mqtt.client as mqtt
@@ -33,14 +33,18 @@ MQTT_KEEPALIVE = 60
 class RoborockMqttClient(RoborockClient, mqtt.Client):
     _thread: threading.Thread
 
-    def __init__(self, user_data: UserData, devices_info: dict[str, RoborockDeviceInfo]) -> None:
+    def __init__(self, user_data: UserData, devices_info: Mapping[str, RoborockDeviceInfo]) -> None:
         rriot = user_data.rriot
+        if rriot is None:
+            raise RoborockException("Got no rriot data from user_data")
         endpoint = base64.b64encode(md5bin(rriot.k)[8:14]).decode()
         RoborockClient.__init__(self, endpoint, devices_info)
         mqtt.Client.__init__(self, protocol=mqtt.MQTTv5)
         self._mqtt_user = rriot.u
         self._hashed_user = md5hex(self._mqtt_user + ":" + rriot.k)[2:10]
         url = urlparse(rriot.r.m)
+        if not isinstance(url.hostname, str):
+            raise RoborockException("Url parsing returned an invalid hostname")
         self._mqtt_host = url.hostname
         self._mqtt_port = url.port
         self._mqtt_ssl = url.scheme == "ssl"
@@ -116,12 +120,15 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
     async def _async_check_keepalive(self) -> None:
         async with self._mutex:
             now = mqtt.time_func()
-            if now - self._last_disconnection > self._keepalive ** 2 and now - self._last_device_msg_in > self._keepalive:
+            # noinspection PyUnresolvedReferences
+            if now - self._last_disconnection > self._keepalive ** 2 and now - self._last_device_msg_in > self._keepalive:  # type: ignore[attr-defined]
+
                 self._ping_t = self._last_device_msg_in
 
     def _check_keepalive(self) -> None:
         self._async_check_keepalive()
-        super()._check_keepalive()
+        # noinspection PyUnresolvedReferences
+        super()._check_keepalive()  # type: ignore[misc]
 
     def sync_stop_loop(self) -> None:
         if self._thread:
@@ -147,6 +154,8 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
         rc = mqtt.MQTT_ERR_AGAIN
         self.sync_start_loop()
         if not self.is_connected():
+            if self._mqtt_port is None or self._mqtt_host is None:
+                raise RoborockException("Mqtt information was not entered. Cannot connect.")
             _LOGGER.info("Connecting to mqtt")
             rc = super().connect(
                 host=self._mqtt_host,
@@ -186,7 +195,7 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
             raise RoborockException(f"Failed to publish (rc: {info.rc})")
 
     async def send_command(
-            self, device_id: str, method: RoborockCommand, params: list = None
+        self, device_id: str, method: RoborockCommand, params: Optional[list] = None
     ):
         await self.validate_connection()
         request_id, timestamp, payload = super()._get_payload(method, params, True)

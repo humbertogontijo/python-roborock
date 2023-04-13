@@ -1,0 +1,16 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+default_stages: [ commit ]
+
+
+repos:
+    -   repo: https://github.com/python-poetry/poetry
+        rev: 1.3.2
+        hooks:
+            -   id: poetry-check
+    -   repo: https://github.com/pre-commit/mirrors-mypy
+        rev: v0.931
+        hooks:
+            -   id: mypy
+                exclude: cli.py
+                additional_dependencies: [ "types-paho-mqtt" ]

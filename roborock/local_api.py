@@ -4,7 +4,7 @@ import asyncio
 import logging
 import socket
 from asyncio import Lock
-from typing import Callable, Coroutine
+from typing import Optional, Callable, Awaitable, Any, Mapping
 
 import async_timeout
 
@@ -20,7 +20,7 @@ _LOGGER = logging.getLogger(__name__)
 
 class RoborockLocalClient(RoborockClient):
 
-    def __init__(self, devices_info: dict[str, RoborockLocalDeviceInfo]):
+    def __init__(self, devices_info: Mapping[str, RoborockLocalDeviceInfo]):
         super().__init__("abc", devices_info)
         self.loop = get_running_loop_or_create_one()
         self.device_listener: dict[str, RoborockSocketListener] = {
@@ -45,7 +45,7 @@ class RoborockLocalClient(RoborockClient):
         await asyncio.gather(*[listener.disconnect() for listener in self.device_listener.values()])
 
     def build_roborock_message(
-            self, method: RoborockCommand, params: list = None
+        self, method: RoborockCommand, params: Optional[list] = None
     ) -> RoborockMessage:
         secured = True if method in SPECIAL_COMMANDS else False
         request_id, timestamp, payload = self._get_payload(method, params, secured)
@@ -53,7 +53,10 @@ class RoborockLocalClient(RoborockClient):
         command_info = CommandInfoMap.get(method)
         if not command_info:
             raise RoborockException(f"Request {method} have unknown prefix. Can't execute in offline mode")
-        prefix = CommandInfoMap.get(method).prefix
+        command = CommandInfoMap.get(method)
+        if command is None:
+            raise RoborockException(f"No prefix found for {method}")
+        prefix = command.prefix
         request_protocol = 4
         return RoborockMessage(
             prefix=prefix,
@@ -63,7 +66,7 @@ class RoborockLocalClient(RoborockClient):
         )
 
     async def send_command(
-            self, device_id: str, method: RoborockCommand, params: list = None
+        self, device_id: str, method: RoborockCommand, params: Optional[list] = None
     ):
         roborock_message = self.build_roborock_message(method, params)
         response = (await self.send_message(device_id, roborock_message))[0]
@@ -83,7 +86,7 @@ class RoborockLocalClient(RoborockClient):
             return response
 
     async def send_message(
-            self, device_id: str, roborock_messages: list[RoborockMessage] | RoborockMessage
+        self, device_id: str, roborock_messages: list[RoborockMessage] | RoborockMessage
     ):
         if isinstance(roborock_messages, RoborockMessage):
             roborock_messages = [roborock_messages]
@@ -91,6 +94,8 @@ class RoborockLocalClient(RoborockClient):
         msg = RoborockParser.encode(roborock_messages, local_key)
         # Send the command to the Roborock device
         listener = self.device_listener.get(device_id)
+        if listener is None:
+            raise RoborockException(f"No device listener for {device_id}")
         _LOGGER.debug(f"Requesting device with {roborock_messages}")
         await listener.send_message(msg)
 
@@ -110,7 +115,7 @@ class RoborockSocket(socket.socket):
 class RoborockSocketListener:
     roborock_port = 58867
 
-    def __init__(self, ip: str, local_key: str, on_message: Callable[[list[RoborockMessage]], Coroutine[None] | None],
+    def __init__(self, ip: str, local_key: str, on_message: Callable[[list[RoborockMessage]], Awaitable[Any]],
                  timeout: float | int = 4):
         self.ip = ip
         self.local_key = local_key
@@ -159,8 +164,7 @@ class RoborockSocketListener:
         self.socket.close()
         self.is_connected = False
 
-    async def send_message(self, data: bytes):
-        response = {}
+    async def send_message(self, data: bytes) -> None:
         await self.connect()
         try:
             async with self._mutex:
@@ -174,4 +178,3 @@ class RoborockSocketListener:
         except BrokenPipeError as e:
             _LOGGER.exception(e)
             await self.disconnect()
-        return response
