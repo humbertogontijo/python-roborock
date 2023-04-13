@@ -4,22 +4,21 @@ import asyncio
 import logging
 import socket
 from asyncio import Lock
-from typing import Optional, Callable, Awaitable, Any, Mapping
+from typing import Any, Awaitable, Callable, Mapping, Optional
 
 import async_timeout
 
-from roborock.api import RoborockClient, SPECIAL_COMMANDS
+from roborock.api import SPECIAL_COMMANDS, RoborockClient
 from roborock.containers import RoborockLocalDeviceInfo
-from roborock.exceptions import RoborockTimeout, CommandVacuumError, RoborockConnectionException, RoborockException
-from roborock.roborock_message import RoborockParser, RoborockMessage
-from roborock.typing import RoborockCommand, CommandInfoMap
+from roborock.exceptions import CommandVacuumError, RoborockConnectionException, RoborockException, RoborockTimeout
+from roborock.roborock_message import RoborockMessage, RoborockParser
+from roborock.typing import CommandInfoMap, RoborockCommand
 from roborock.util import get_running_loop_or_create_one
 
 _LOGGER = logging.getLogger(__name__)
 
 
 class RoborockLocalClient(RoborockClient):
-
     def __init__(self, devices_info: Mapping[str, RoborockLocalDeviceInfo]):
         super().__init__("abc", devices_info)
         self.loop = get_running_loop_or_create_one()
@@ -27,7 +26,7 @@ class RoborockLocalClient(RoborockClient):
             device_id: RoborockSocketListener(
                 device_info.network_info.ip,
                 device_info.device.local_key,
-                self.on_message
+                self.on_message,
             )
             for device_id, device_info in devices_info.items()
         }
@@ -36,17 +35,12 @@ class RoborockLocalClient(RoborockClient):
         self._executing = False
 
     async def async_connect(self):
-        await asyncio.gather(*[
-            listener.connect()
-            for listener in self.device_listener.values()
-        ])
+        await asyncio.gather(*[listener.connect() for listener in self.device_listener.values()])
 
     async def async_disconnect(self) -> None:
         await asyncio.gather(*[listener.disconnect() for listener in self.device_listener.values()])
 
-    def build_roborock_message(
-        self, method: RoborockCommand, params: Optional[list] = None
-    ) -> RoborockMessage:
+    def build_roborock_message(self, method: RoborockCommand, params: Optional[list] = None) -> RoborockMessage:
         secured = True if method in SPECIAL_COMMANDS else False
         request_id, timestamp, payload = self._get_payload(method, params, secured)
         _LOGGER.debug(f"id={request_id} Requesting method {method} with {params}")
@@ -62,12 +56,10 @@ class RoborockLocalClient(RoborockClient):
             prefix=prefix,
             timestamp=timestamp,
             protocol=request_protocol,
-            payload=payload
+            payload=payload,
         )
 
-    async def send_command(
-        self, device_id: str, method: RoborockCommand, params: Optional[list] = None
-    ):
+    async def send_command(self, device_id: str, method: RoborockCommand, params: Optional[list] = None):
         roborock_message = self.build_roborock_message(method, params)
         response = (await self.send_message(device_id, roborock_message))[0]
         if isinstance(response, BaseException):
@@ -85,9 +77,7 @@ class RoborockLocalClient(RoborockClient):
             _LOGGER.debug(f"id={request_id} Response from {roborock_message.get_method()}: {response}")
             return response
 
-    async def send_message(
-        self, device_id: str, roborock_messages: list[RoborockMessage] | RoborockMessage
-    ):
+    async def send_message(self, device_id: str, roborock_messages: list[RoborockMessage] | RoborockMessage):
         if isinstance(roborock_messages, RoborockMessage):
             roborock_messages = [roborock_messages]
         local_key = self.devices_info[device_id].device.local_key
@@ -101,7 +91,8 @@ class RoborockLocalClient(RoborockClient):
 
         return await asyncio.gather(
             *[self.async_local_response(roborock_message) for roborock_message in roborock_messages],
-            return_exceptions=True)
+            return_exceptions=True,
+        )
 
 
 class RoborockSocket(socket.socket):
@@ -115,8 +106,13 @@ class RoborockSocket(socket.socket):
 class RoborockSocketListener:
     roborock_port = 58867
 
-    def __init__(self, ip: str, local_key: str, on_message: Callable[[list[RoborockMessage]], Awaitable[Any]],
-                 timeout: float | int = 4):
+    def __init__(
+        self,
+        ip: str,
+        local_key: str,
+        on_message: Callable[[list[RoborockMessage]], Awaitable[Any]],
+        timeout: float | int = 4,
+    ):
         self.ip = ip
         self.local_key = local_key
         self.socket = RoborockSocket(socket.AF_INET, socket.SOCK_STREAM)
@@ -126,7 +122,7 @@ class RoborockSocketListener:
         self.timeout = timeout
         self.is_connected = False
         self._mutex = Lock()
-        self.remaining = b''
+        self.remaining = b""
 
     async def _main_coro(self):
         while not self.socket.is_closed:
@@ -135,7 +131,7 @@ class RoborockSocketListener:
                 try:
                     if self.remaining:
                         message = self.remaining + message
-                        self.remaining = b''
+                        self.remaining = b""
                     (parser_msg, remaining) = RoborockParser.decode(message, self.local_key)
                     self.remaining = remaining
                     await self.on_message(parser_msg)
@@ -172,9 +168,7 @@ class RoborockSocketListener:
                     await self.loop.sock_sendall(self.socket, data)
         except (asyncio.TimeoutError, asyncio.CancelledError):
             await self.disconnect()
-            raise RoborockTimeout(
-                f"Timeout after {self.timeout} seconds waiting for response"
-            ) from None
+            raise RoborockTimeout(f"Timeout after {self.timeout} seconds waiting for response") from None
         except BrokenPipeError as e:
             _LOGGER.exception(e)
             await self.disconnect()

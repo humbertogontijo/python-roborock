@@ -1,7 +1,8 @@
 import pytest
 
-from roborock import RoborockMqttClient, UserData, HomeData
-from tests.mock_data import USER_DATA, HOME_DATA_RAW
+from roborock import HomeData, UserData
+from roborock.cloud_api import RoborockMqttClient
+from tests.mock_data import HOME_DATA_RAW, USER_DATA
 
 
 @pytest.fixture(name="mqtt_client")
