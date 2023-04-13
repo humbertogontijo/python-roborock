@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import logging
 from pathlib import Path
@@ -16,7 +18,7 @@ _LOGGER = logging.getLogger(__name__)
 
 class RoborockContext:
     roborock_file = Path("~/.roborock").expanduser()
-    _login_data: LoginData = None
+    _login_data: LoginData | None = None
 
     def __init__(self):
         self.reload()

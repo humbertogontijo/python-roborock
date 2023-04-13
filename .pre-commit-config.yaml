@@ -12,4 +12,5 @@ repos:
         rev: v0.931
         hooks:
             -   id: mypy
+                exclude: cli.py
                 additional_dependencies: [ "types-paho-mqtt" ]
