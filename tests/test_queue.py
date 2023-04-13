@@ -20,7 +20,7 @@ async def test_put():
 async def test_get_timeout():
     rq = RoborockQueue(1)
     with pytest.raises(asyncio.TimeoutError):
-        await rq.async_get(.01)
+        await rq.async_get(0.01)
 
 
 @pytest.mark.asyncio

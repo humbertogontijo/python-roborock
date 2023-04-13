@@ -38,8 +38,23 @@ pytest-asyncio = "*"
 pytest = "*"
 pre-commit = "*"
 mypy = "*"
+ruff = "*"
+isort = "*"
+black = "*"
+codespell = "*"
 
 [tool.semantic_release]
 branch = "main"
 version_toml = "pyproject.toml:tool.poetry.version"
 build_command = "pip install poetry && poetry build"
+
+[tool.ruff]
+ignore = ["F403", "E741"]
+line-length = 120
+
+[tool.black]
+line-length = 120
+
+[tool.isort]
+profile = "black"
+line_length = 120

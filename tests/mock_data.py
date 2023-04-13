@@ -333,11 +333,9 @@ STATUS = {
 }
 
 BASE_URL_REQUEST = {
-    'code': 200,
-    'msg': 'success',
-    'data': {
-        'url': 'https://sample.com'
-    }
+    "code": 200,
+    "msg": "success",
+    "data": {"url": "https://sample.com"},
 }
 
-GET_CODE_RESPONSE = {'code': 200, 'msg': 'success', 'data': None}
+GET_CODE_RESPONSE = {"code": 200, "msg": "success", "data": None}

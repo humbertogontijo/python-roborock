@@ -1,25 +1,35 @@
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from enum import Enum
 from typing import Any, Optional
 
-from dacite import from_dict, Config
+from dacite import Config, from_dict
 
-from roborock.code_mappings import RoborockDockWashTowelModeCode, RoborockDockTypeCode, RoborockMopIntensityCode, \
-    RoborockStateCode
-from .code_mappings import RoborockMopModeCode, RoborockDockErrorCode, \
-    RoborockErrorCode, RoborockDockDustCollectionModeCode, RoborockFanPowerCode
+from roborock.code_mappings import (
+    RoborockDockTypeCode,
+    RoborockDockWashTowelModeCode,
+    RoborockMopIntensityCode,
+    RoborockStateCode,
+)
+
+from .code_mappings import (
+    RoborockDockDustCollectionModeCode,
+    RoborockDockErrorCode,
+    RoborockErrorCode,
+    RoborockFanPowerCode,
+    RoborockMopModeCode,
+)
 
 
 def camelize(s: str):
-    first, *others = s.split('_')
-    return ''.join([first.lower(), *map(str.title, others)])
+    first, *others = s.split("_")
+    return "".join([first.lower(), *map(str.title, others)])
 
 
 def decamelize(s: str):
-    return re.sub('([A-Z]+)', '_\\1', s).lower()
+    return re.sub("([A-Z]+)", "_\\1", s).lower()
 
 
 def decamelize_obj(d: dict | list):
@@ -30,15 +40,15 @@ def decamelize_obj(d: dict | list):
 
 @dataclass
 class RoborockBase:
-
     @classmethod
     def from_dict(cls, data: dict[str, Any]):
         return from_dict(cls, decamelize_obj(data), config=Config(cast=[Enum]))
 
     def as_dict(self):
-        return asdict(self, dict_factory=lambda _fields: {
-            camelize(key): value for (key, value) in _fields if value is not None
-        })
+        return asdict(
+            self,
+            dict_factory=lambda _fields: {camelize(key): value for (key, value) in _fields if value is not None},
+        )
 
 
 @dataclass
