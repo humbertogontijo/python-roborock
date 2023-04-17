@@ -213,8 +213,8 @@ class RoborockClient:
             )
             if isinstance(clean_summary, dict):
                 return CleanSummary.from_dict(clean_summary)
-            elif isinstance(clean_summary, bytes):
-                return CleanSummary(clean_time=int.from_bytes(clean_summary, 'big'))
+            elif isinstance(clean_summary, int):
+                return CleanSummary(clean_time=clean_summary)
         except RoborockTimeout as e:
             _LOGGER.error(e)
         return None

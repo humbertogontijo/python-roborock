@@ -176,5 +176,5 @@ class RoborockSocketListener:
                 f"Timeout after {self.timeout} seconds waiting for response"
             ) from None
         except BrokenPipeError as e:
-            _LOGGER.exception(e)
             await self.disconnect()
+            raise RoborockException(e) from e
