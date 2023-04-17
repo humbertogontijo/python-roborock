@@ -1,16 +1,13 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import TypeVar, Type, Any
+from typing import Any, Type, TypeVar
 
 _StrEnumT = TypeVar("_StrEnumT", bound="RoborockEnum")
 
 
 class RoborockEnum(str, Enum):
-
-    def __new__(
-        cls: Type[_StrEnumT], value: str, *args: Any, **kwargs: Any
-    ) -> _StrEnumT:
+    def __new__(cls: Type[_StrEnumT], value: str, *args: Any, **kwargs: Any) -> _StrEnumT:
         """Create a new StrEnum instance."""
         if not isinstance(value, str):
             raise TypeError(f"{value!r} is not a string")
@@ -74,7 +71,8 @@ RoborockStateCode = create_code_enum(
         26: "going_to_wash_the_mop",  # on a46, #1435
         100: "charging_complete",
         101: "device_offline",
-    })
+    },
+)
 
 RoborockErrorCode = create_code_enum(
     "RoborockErrorCode",

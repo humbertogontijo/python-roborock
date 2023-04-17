@@ -25,14 +25,14 @@ class RoborockContext:
 
     def reload(self):
         if self.roborock_file.is_file():
-            with open(self.roborock_file, 'r') as f:
+            with open(self.roborock_file, "r") as f:
                 data = json.load(f)
                 if data:
                     self._login_data = LoginData.from_dict(data)
 
     def update(self, login_data: LoginData):
         data = json.dumps(login_data.as_dict(), default=vars)
-        with open(self.roborock_file, 'w') as f:
+        with open(self.roborock_file, "w") as f:
             f.write(data)
         self.reload()
 
@@ -50,9 +50,7 @@ class RoborockContext:
 @click.group()
 @click.pass_context
 def cli(ctx, debug: int):
-    logging_config: Dict[str, Any] = {
-        "level": logging.DEBUG if debug > 0 else logging.INFO
-    }
+    logging_config: Dict[str, Any] = {"level": logging.DEBUG if debug > 0 else logging.INFO}
     logging.basicConfig(**logging_config)  # type: ignore
     ctx.obj = RoborockContext()
 
@@ -83,7 +81,8 @@ async def _discover(ctx):
     home_data = await client.get_home_data(login_data.user_data)
     context.update(LoginData({**login_data, "home_data": home_data}))
     click.echo(
-        f"Discovered devices {', '.join([device.name for device in home_data.devices + home_data.received_devices])}")
+        f"Discovered devices {', '.join([device.name for device in home_data.devices + home_data.received_devices])}"
+    )
 
 
 @click.command()

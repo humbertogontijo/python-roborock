@@ -19,7 +19,7 @@ Install this via pip (or your favourite package manager):
 ## Functionality
 
 This package can encrypt and decrypt the following commands:
-    
+
 - GET_CLEAN_RECORD
 - GET_CONSUMABLE
 - GET_MULTI_MAPS_LIST
@@ -30,7 +30,7 @@ This package can encrypt and decrypt the following commands:
 - APP_SPOT
 - FIND_ME
 - RESUME_ZONED_CLEAN
-- RESUME_SEGMENT_CLEAN 
+- RESUME_SEGMENT_CLEAN
 - SET_CUSTOM_MODE
 - SET_MOP_MODE
 - SET_WATER_BOX_CUSTOM_MODE
@@ -81,10 +81,6 @@ This package can encrypt and decrypt the following commands:
 - SET_APP_TIMEZONE
 - GET_NETWORK_INFO
 
-
-
 ## Credits
 
 Thanks @rovo89 for https://gist.github.com/rovo89/dff47ed19fca0dfdda77503e66c2b7c7 And thanks @PiotrMachowski for https://github.com/PiotrMachowski/Home-Assistant-custom-components-Xiaomi-Cloud-Map-Extractor
-
-
