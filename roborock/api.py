@@ -21,7 +21,6 @@ from Crypto.Cipher import AES
 from Crypto.Util.Padding import unpad
 
 from roborock.exceptions import RoborockException, RoborockTimeout, VacuumError
-
 from .code_mappings import RoborockDockTypeCode, RoborockEnum
 from .containers import (
     CleanRecord,
@@ -38,8 +37,8 @@ from .containers import (
     UserData,
     WashTowelMode,
 )
-from .roborock_message import RoborockMessage
 from .roborock_future import RoborockFuture
+from .roborock_message import RoborockMessage
 from .typing import RoborockCommand, RoborockDeviceProp, RoborockDockSummary
 
 _LOGGER = logging.getLogger(__name__)

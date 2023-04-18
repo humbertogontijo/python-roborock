@@ -4,7 +4,7 @@ import asyncio
 import logging
 import socket
 from asyncio import Lock
-from typing import Any, Awaitable, Callable, Mapping, Optional
+from typing import Callable, Mapping, Optional
 
 import async_timeout
 
