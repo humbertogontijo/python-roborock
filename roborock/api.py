@@ -39,12 +39,11 @@ from .containers import (
     WashTowelMode,
 )
 from .roborock_message import RoborockMessage
-from .roborock_queue import RoborockQueue
+from .roborock_future import RoborockFuture
 from .typing import RoborockCommand, RoborockDeviceProp, RoborockDockSummary
 
 _LOGGER = logging.getLogger(__name__)
 QUEUE_TIMEOUT = 4
-MQTT_KEEPALIVE = 60
 SPECIAL_COMMANDS = [
     RoborockCommand.GET_MAP_V1,
 ]
@@ -80,7 +79,7 @@ class RoborockClient:
         self.devices_info = devices_info
         self._endpoint = endpoint
         self._nonce = secrets.token_bytes(16)
-        self._waiting_queue: dict[int, RoborockQueue] = {}
+        self._waiting_queue: dict[int, RoborockFuture] = {}
         self._status_listeners: list[Callable[[int, str], None]] = []
 
     def add_status_listener(self, callback: Callable[[int, str], None]):
@@ -89,7 +88,7 @@ class RoborockClient:
     async def async_disconnect(self) -> Any:
         raise NotImplementedError
 
-    async def on_message(self, messages: list[RoborockMessage]) -> None:
+    def on_message(self, messages: list[RoborockMessage]) -> None:
         try:
             for data in messages:
                 protocol = data.protocol
@@ -104,21 +103,20 @@ class RoborockClient:
                                 if queue.protocol == protocol:
                                     error = data_point_response.get("error")
                                     if error:
-                                        await queue.async_put(
+                                        queue.resolve(
                                             (
                                                 None,
                                                 VacuumError(
                                                     error.get("code"),
                                                     error.get("message"),
                                                 ),
-                                            ),
-                                            timeout=QUEUE_TIMEOUT,
+                                            )
                                         )
                                     else:
                                         result = data_point_response.get("result")
                                         if isinstance(result, list) and len(result) == 1:
                                             result = result[0]
-                                        await queue.async_put((result, None), timeout=QUEUE_TIMEOUT)
+                                        queue.resolve((result, None))
                 elif protocol == 301:
                     payload = data.payload[0:24]
                     [endpoint, _, request_id, _] = struct.unpack("<15sBH6s", payload)
@@ -131,13 +129,13 @@ class RoborockClient:
                         if queue:
                             if isinstance(decrypted, list):
                                 decrypted = decrypted[0]
-                            await queue.async_put((decrypted, None), timeout=QUEUE_TIMEOUT)
+                            queue.resolve((decrypted, None))
         except Exception as ex:
             _LOGGER.exception(ex)
 
     async def _async_response(self, request_id: int, protocol_id: int = 0) -> tuple[Any, VacuumError | None]:
         try:
-            queue = RoborockQueue(protocol_id)
+            queue = RoborockFuture(protocol_id)
             self._waiting_queue[request_id] = queue
             (response, err) = await queue.async_get(QUEUE_TIMEOUT)
             return response, err

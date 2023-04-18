@@ -12,19 +12,6 @@ def get_running_loop_or_create_one() -> AbstractEventLoop:
     return loop
 
 
-def run_in_executor():
-    loop = get_running_loop_or_create_one()
-
-    def decorator(func):
-        @functools.wraps(func)
-        def wrapped(*args, **kwargs):
-            return asyncio.run_coroutine_threadsafe(coro=func(*args, **kwargs), loop=loop)
-
-        return wrapped
-
-    return decorator
-
-
 def run_sync():
     loop = get_running_loop_or_create_one()
 

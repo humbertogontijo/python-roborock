@@ -110,7 +110,7 @@ class RoborockSocketListener:
         self,
         ip: str,
         local_key: str,
-        on_message: Callable[[list[RoborockMessage]], Awaitable[Any]],
+        on_message: Callable[[list[RoborockMessage]], None],
         timeout: float | int = 4,
     ):
         self.ip = ip
@@ -134,7 +134,7 @@ class RoborockSocketListener:
                         self.remaining = b""
                     (parser_msg, remaining) = RoborockParser.decode(message, self.local_key)
                     self.remaining = remaining
-                    await self.on_message(parser_msg)
+                    self.on_message(parser_msg)
                 except Exception as e:
                     _LOGGER.exception(e)
             except BrokenPipeError as e:

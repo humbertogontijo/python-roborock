@@ -2,29 +2,22 @@ import asyncio
 
 import pytest
 
-from roborock.roborock_queue import RoborockQueue
+from roborock.roborock_future import RoborockFuture
 
 
 def test_can_create():
-    RoborockQueue(1)
+    RoborockFuture(1)
 
 
 @pytest.mark.asyncio
 async def test_put():
-    rq = RoborockQueue(1)
-    await rq.async_put(("test", None), 1)
-    assert await rq.get() == ("test", None)
+    rq = RoborockFuture(1)
+    rq.resolve(("test", None))
+    assert await rq.async_get(1) == ("test", None)
 
 
 @pytest.mark.asyncio
 async def test_get_timeout():
-    rq = RoborockQueue(1)
+    rq = RoborockFuture(1)
     with pytest.raises(asyncio.TimeoutError):
         await rq.async_get(0.01)
-
-
-@pytest.mark.asyncio
-async def test_get():
-    rq = RoborockQueue(1)
-    await rq.async_put(("test", None), 1)
-    assert await rq.async_get(1) == ("test", None)
