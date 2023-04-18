@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.6.6 (2023-04-17)
+### Fix
+* Clean_summary for older devices ([`0a0c9e7`](https://github.com/humbertogontijo/python-roborock/commit/0a0c9e7c965c183df971e11bd597319c68c8f646))
+
 ## v0.6.5 (2023-04-13)
 ### Fix
 * Exclude changelog.md from pre-commit ([#36](https://github.com/humbertogontijo/python-roborock/issues/36)) ([`b12c7a2`](https://github.com/humbertogontijo/python-roborock/commit/b12c7a229dfdbe0af182d6a120548100b0ca4140))
