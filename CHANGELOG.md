@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.6.8 (2023-04-18)
+### Fix
+* Lint ([`20bf54b`](https://github.com/humbertogontijo/python-roborock/commit/20bf54b0a1834065584bdcb469a3123700c68f1d))
+
 ## v0.6.7 (2023-04-18)
 ### Fix
 * Using asyncio future instead of queue ([`1ea5430`](https://github.com/humbertogontijo/python-roborock/commit/1ea5430197620dbd2dc87949e4326f24601f4ba8))
