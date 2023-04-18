@@ -104,13 +104,13 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
         self._client_id = mqtt.base62(uuid.uuid4().int, padding=22)
 
     def _async_check_keepalive(self) -> None:
-            now = mqtt.time_func()
-            # noinspection PyUnresolvedReferences
-            if (
-                now - self._last_disconnection > self._keepalive**2  # type: ignore[attr-defined]
-                and now - self._last_device_msg_in > self._keepalive  # type: ignore[attr-defined]
-            ):
-                self._ping_t = self._last_device_msg_in
+        now = mqtt.time_func()
+        # noinspection PyUnresolvedReferences
+        if (
+            now - self._last_disconnection > self._keepalive**2  # type: ignore[attr-defined]
+            and now - self._last_device_msg_in > self._keepalive  # type: ignore[attr-defined]
+        ):
+            self._ping_t = self._last_device_msg_in
 
     def _check_keepalive(self) -> None:
         self._async_check_keepalive()
