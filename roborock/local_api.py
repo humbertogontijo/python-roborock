@@ -8,12 +8,12 @@ from typing import Callable, Mapping, Optional
 
 import async_timeout
 
-from roborock.api import SPECIAL_COMMANDS, RoborockClient
-from roborock.containers import RoborockLocalDeviceInfo
-from roborock.exceptions import CommandVacuumError, RoborockConnectionException, RoborockException, RoborockTimeout
-from roborock.roborock_message import RoborockMessage, RoborockParser
-from roborock.typing import CommandInfoMap, RoborockCommand
-from roborock.util import get_running_loop_or_create_one
+from .api import SPECIAL_COMMANDS, RoborockClient
+from .containers import RoborockLocalDeviceInfo
+from .exceptions import CommandVacuumError, RoborockConnectionException, RoborockException, RoborockTimeout
+from .roborock_message import RoborockMessage, RoborockParser
+from .typing import CommandInfoMap, RoborockCommand
+from .util import get_running_loop_or_create_one
 
 _LOGGER = logging.getLogger(__name__)
 
