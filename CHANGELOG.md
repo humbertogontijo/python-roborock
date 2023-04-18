@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.6.7 (2023-04-18)
+### Fix
+* Using asyncio future instead of queue ([`1ea5430`](https://github.com/humbertogontijo/python-roborock/commit/1ea5430197620dbd2dc87949e4326f24601f4ba8))
+
 ## v0.6.6 (2023-04-17)
 ### Fix
 * Clean_summary for older devices ([`0a0c9e7`](https://github.com/humbertogontijo/python-roborock/commit/0a0c9e7c965c183df971e11bd597319c68c8f646))
