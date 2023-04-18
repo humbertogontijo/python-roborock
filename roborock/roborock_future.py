@@ -11,7 +11,7 @@ from .exceptions import VacuumError
 class RoborockFuture:
     def __init__(self, protocol: int):
         self.protocol = protocol
-        self.fut = Future()
+        self.fut: Future = Future()
         self.loop = self.fut.get_loop()
 
     def resolve(self, item: tuple[Any, VacuumError | None]) -> None:
