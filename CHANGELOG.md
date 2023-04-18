@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.6.9 (2023-04-18)
+### Fix
+* Lint ([`8499522`](https://github.com/humbertogontijo/python-roborock/commit/8499522e5fb44abad20af1cfb7a677ca4e03639f))
+
 ## v0.6.8 (2023-04-18)
 ### Fix
 * Lint ([`20bf54b`](https://github.com/humbertogontijo/python-roborock/commit/20bf54b0a1834065584bdcb469a3123700c68f1d))
