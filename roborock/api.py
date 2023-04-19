@@ -245,8 +245,6 @@ class RoborockClient:
         """Gets the status summary from the dock with the methods available for a given dock.
 
         :param dock_type: RoborockDockTypeCode"""
-        if RoborockDockTypeCode.name != "RoborockDockTypeCode":
-            raise RoborockException("Invalid enum given for dock type")
         try:
             commands: list[
                 Coroutine[
