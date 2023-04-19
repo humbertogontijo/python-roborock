@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.6.12 (2023-04-19)
+### Fix
+* Removed enum type check ([#37](https://github.com/humbertogontijo/python-roborock/issues/37)) ([`585238e`](https://github.com/humbertogontijo/python-roborock/commit/585238e505e685e14d867b19819815e7c3e19634))
+
 ## v0.6.11 (2023-04-18)
 ### Fix
 * Lint ([`b0d8996`](https://github.com/humbertogontijo/python-roborock/commit/b0d8996d46c2a52f87a8c01eb50fd6aa7bd98ed8))
