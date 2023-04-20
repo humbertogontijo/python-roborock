@@ -280,7 +280,7 @@ class RoborockClient:
         if clean_summary and clean_summary.records and len(clean_summary.records) > 0:
             last_clean_record = await self.get_clean_record(device_id, clean_summary.records[0])
         dock_summary = None
-        if status and status.dock_type != RoborockDockTypeCode["0"]:
+        if status and status.dock_type is not None and status.dock_type != RoborockDockTypeCode["0"]:
             dock_summary = await self.get_dock_summary(device_id, status.dock_type)
         if any([status, dnd_timer, clean_summary, consumable]):
             return RoborockDeviceProp(
