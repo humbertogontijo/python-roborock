@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.6.13 (2023-04-20)
+### Fix
+* Check dock_type is not none ([#38](https://github.com/humbertogontijo/python-roborock/issues/38)) ([`84c95e3`](https://github.com/humbertogontijo/python-roborock/commit/84c95e3b3bebd940b9cc6cc06b73c1770605c765))
+
 ## v0.6.12 (2023-04-19)
 ### Fix
 * Removed enum type check ([#37](https://github.com/humbertogontijo/python-roborock/issues/37)) ([`585238e`](https://github.com/humbertogontijo/python-roborock/commit/585238e505e685e14d867b19819815e7c3e19634))
