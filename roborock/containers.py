@@ -47,9 +47,11 @@ def decamelize_obj(d: dict | list, ignore_keys: list[str]):
 
 @dataclass
 class RoborockBase:
+    _ignore_keys = [] # type: ignore
+
     @classmethod
     def from_dict(cls, data: dict[str, Any]):
-        ignore_keys = cls._ignore_keys if hasattr(cls, "_ignore_keys") else []
+        ignore_keys = cls._ignore_keys
         return from_dict(cls, decamelize_obj(data, ignore_keys), config=Config(cast=[Enum]))
 
     def as_dict(self) -> dict:
