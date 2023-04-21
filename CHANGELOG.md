@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.6.15 (2023-04-21)
+### Fix
+* Get_clean_summary ([`ee81538`](https://github.com/humbertogontijo/python-roborock/commit/ee815380a8b70efbac65627fdd69fdf0bb75420e))
+
 ## v0.6.14 (2023-04-21)
 ### Fix
 * Linting ([`fdb4484`](https://github.com/humbertogontijo/python-roborock/commit/fdb44840741cd6872f7defea70e8f118a9803099))
