@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import typing
+from typing import Optional
 from dataclasses import dataclass
 from enum import Enum
 
@@ -117,6 +117,12 @@ class RoborockCommand(str, Enum):
     GET_ROOM_MAPPING = "get_room_mapping"
     NAME_SEGMENT = "name_segment"
     SET_TIMEZONE = "set_timezone"
+    GET_HOMESEC_CONNECT_STATUS = "get_homesec_connect_status"
+    START_CAMERA_PREVIEW = "start_camera_preview"
+    GET_TURN_SERVER = "get_turn_server"
+    GET_DEVICE_ICE = "get_device_ice"
+    START_VOICE_CHAT = "start_voice_chat"
+    SEND_SDP_TO_ROBOT = "send_sdp_to_robot"
 
 
 @dataclass
@@ -200,7 +206,11 @@ CommandInfoMap: dict[RoborockCommand, CommandInfo] = {
     RoborockCommand.SET_SERVER_TIMER: CommandInfo(prefix=b"\x00\x00\x00\xc7"),
     RoborockCommand.GET_ROOM_MAPPING: CommandInfo(prefix=b"\x00\x00\x00w"),
     RoborockCommand.NAME_SEGMENT: CommandInfo(prefix=b"\x00\x00\x027"),
-    RoborockCommand.SET_TIMEZONE: CommandInfo(prefix=b"\x00\x00\x00\x97")
+    RoborockCommand.SET_TIMEZONE: CommandInfo(prefix=b"\x00\x00\x00\x97"),
+    RoborockCommand.GET_HOMESEC_CONNECT_STATUS: CommandInfo(prefix=b"\x00\x00\x00\x87"),
+    RoborockCommand.START_CAMERA_PREVIEW: CommandInfo(prefix=b"\x00\x00\x00\x87"),
+    RoborockCommand.GET_TURN_SERVER: CommandInfo(prefix=b"\x00\x00\x00\x77"),
+    RoborockCommand.GET_DEVICE_ICE: CommandInfo(prefix=b"\x00\x00\x00\x77"),
     # TODO discover prefix for following commands
     # RoborockCommand.APP_GET_DRYER_SETTING: CommandInfo(prefix=b'\x00\x00\x00w'),
     # RoborockCommand.APP_SET_DRYER_SETTING: CommandInfo(prefix=b'\x00\x00\x00w'),
@@ -214,26 +224,21 @@ CommandInfoMap: dict[RoborockCommand, CommandInfo] = {
 }
 
 
+@dataclass
 class RoborockDockSummary:
-    def __init__(
-        self,
-        dust_collection_mode: DustCollectionMode,
-        wash_towel_mode: WashTowelMode,
-        smart_wash_params: SmartWashParams,
-    ) -> None:
-        self.dust_collection_mode = dust_collection_mode
-        self.wash_towel_mode = wash_towel_mode
-        self.smart_wash_params = smart_wash_params
+    dust_collection_mode: Optional[DustCollectionMode] = None
+    wash_towel_mode: Optional[WashTowelMode] = None
+    smart_wash_params: Optional[SmartWashParams] = None
 
 
 @dataclass
 class RoborockDeviceProp:
-    status: typing.Optional[Status] = None
-    dnd_timer: typing.Optional[DNDTimer] = None
-    clean_summary: typing.Optional[CleanSummary] = None
-    consumable: typing.Optional[Consumable] = None
-    last_clean_record: typing.Optional[CleanRecord] = None
-    dock_summary: typing.Optional[RoborockDockSummary] = None
+    status: Optional[Status] = None
+    dnd_timer: Optional[DNDTimer] = None
+    clean_summary: Optional[CleanSummary] = None
+    consumable: Optional[Consumable] = None
+    last_clean_record: Optional[CleanRecord] = None
+    dock_summary: Optional[RoborockDockSummary] = None
 
     def update(self, device_prop: "RoborockDeviceProp"):
         if device_prop.status:

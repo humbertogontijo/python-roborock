@@ -60,7 +60,7 @@ class RoborockMessage:
                     return data_point_response.get("method")
         return None
 
-    def get_params(self) -> list | None:
+    def get_params(self) -> list | dict | None:
         protocol = self.protocol
         if protocol in [4, 101, 102]:
             payload = json.loads(self.payload.decode())
