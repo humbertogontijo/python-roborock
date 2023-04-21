@@ -38,8 +38,10 @@ def decamelize_obj(d: dict | list, ignore_keys: list[str]):
     if isinstance(d, list):
         return [decamelize_obj(i, ignore_keys) if isinstance(i, (dict, list)) else i for i in d]
     return {
-        (decamelize(a) if not a in ignore_keys else a): decamelize_obj(b, ignore_keys)
-        if isinstance(b, (dict, list)) else b for a, b in d.items()
+        (decamelize(a) if a not in ignore_keys else a): decamelize_obj(b, ignore_keys)
+        if isinstance(b, (dict, list))
+        else b
+        for a, b in d.items()
     }
 
 
@@ -47,7 +49,7 @@ def decamelize_obj(d: dict | list, ignore_keys: list[str]):
 class RoborockBase:
     @classmethod
     def from_dict(cls, data: dict[str, Any]):
-        ignore_keys = cls._ignore_keys if hasattr(cls, '_ignore_keys') else []
+        ignore_keys = cls._ignore_keys if hasattr(cls, "_ignore_keys") else []
         return from_dict(cls, decamelize_obj(data, ignore_keys), config=Config(cast=[Enum]))
 
     def as_dict(self) -> dict:
