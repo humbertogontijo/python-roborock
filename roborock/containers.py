@@ -25,6 +25,8 @@ from .code_mappings import (
 
 def camelize(s: str):
     first, *others = s.split("_")
+    if len(others) == 0:
+        return s
     return "".join([first.lower(), *map(str.title, others)])
 
 
@@ -32,19 +34,23 @@ def decamelize(s: str):
     return re.sub("([A-Z]+)", "_\\1", s).lower()
 
 
-def decamelize_obj(d: dict | list):
+def decamelize_obj(d: dict | list, ignore_keys: list[str]):
     if isinstance(d, list):
-        return [decamelize_obj(i) if isinstance(i, (dict, list)) else i for i in d]
-    return {decamelize(a): decamelize_obj(b) if isinstance(b, (dict, list)) else b for a, b in d.items()}
+        return [decamelize_obj(i, ignore_keys) if isinstance(i, (dict, list)) else i for i in d]
+    return {
+        (decamelize(a) if not a in ignore_keys else a): decamelize_obj(b, ignore_keys)
+        if isinstance(b, (dict, list)) else b for a, b in d.items()
+    }
 
 
 @dataclass
 class RoborockBase:
     @classmethod
     def from_dict(cls, data: dict[str, Any]):
-        return from_dict(cls, decamelize_obj(data), config=Config(cast=[Enum]))
+        ignore_keys = cls._ignore_keys if hasattr(cls, '_ignore_keys') else []
+        return from_dict(cls, decamelize_obj(data, ignore_keys), config=Config(cast=[Enum]))
 
-    def as_dict(self):
+    def as_dict(self) -> dict:
         return asdict(
             self,
             dict_factory=lambda _fields: {camelize(key): value for (key, value) in _fields if value is not None},
@@ -277,7 +283,9 @@ class MultiMapsListMapInfoBakMaps(RoborockBase):
 
 @dataclass
 class MultiMapsListMapInfo(RoborockBase):
-    mapflag: Optional[Any] = None
+    _ignore_keys = ["mapFlag"]
+
+    mapFlag: Optional[Any] = None
     add_time: Optional[Any] = None
     length: Optional[Any] = None
     name: Optional[Any] = None
@@ -286,6 +294,8 @@ class MultiMapsListMapInfo(RoborockBase):
 
 @dataclass
 class MultiMapsList(RoborockBase):
+    _ignore_keys = ["mapFlag"]
+
     max_multi_map: Optional[int] = None
     max_bak_map: Optional[int] = None
     multi_map_count: Optional[int] = None
