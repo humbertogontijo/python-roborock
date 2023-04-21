@@ -190,8 +190,8 @@ class RoborockClient:
             clean_summary = await self.send_command(device_id, RoborockCommand.GET_CLEAN_SUMMARY)
             if isinstance(clean_summary, dict):
                 return CleanSummary.from_dict(clean_summary)
-            elif isinstance(clean_summary, int):
-                return CleanSummary(clean_time=clean_summary)
+            elif isinstance(clean_summary, list):
+                return CleanSummary(clean_time=clean_summary[0], clean_area=clean_summary[1], clean_count=clean_summary[2], records=clean_summary[3])
         except RoborockTimeout as e:
             _LOGGER.error(e)
         return None
