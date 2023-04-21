@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v0.6.14 (2023-04-21)
+### Fix
+* Linting ([`fdb4484`](https://github.com/humbertogontijo/python-roborock/commit/fdb44840741cd6872f7defea70e8f118a9803099))
+* Get_multi_map_list ([`cfaeb41`](https://github.com/humbertogontijo/python-roborock/commit/cfaeb419e188510ade5bc1506214c9b3d2afeb18))
+
 ## v0.6.13 (2023-04-20)
 ### Fix
 * Check dock_type is not none ([#38](https://github.com/humbertogontijo/python-roborock/issues/38)) ([`84c95e3`](https://github.com/humbertogontijo/python-roborock/commit/84c95e3b3bebd940b9cc6cc06b73c1770605c765))
