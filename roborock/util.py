@@ -7,8 +7,10 @@ from typing import TypeVar
 
 T = TypeVar("T")
 
+
 def unpack_list(value: list[T], size: int) -> list[T | None]:
     return (value + [None] * size)[:size]
+
 
 def get_running_loop_or_create_one() -> AbstractEventLoop:
     try:

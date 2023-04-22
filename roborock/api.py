@@ -194,10 +194,7 @@ class RoborockClient:
             elif isinstance(clean_summary, list):
                 clean_time, clean_area, clean_count, records = unpack_list(clean_summary, 4)
                 return CleanSummary(
-                    clean_time=clean_time,
-                    clean_area=clean_area,
-                    clean_count=clean_count,
-                    records=records
+                    clean_time=clean_time, clean_area=clean_area, clean_count=clean_count, records=records
                 )
             elif isinstance(clean_summary, int):
                 return CleanSummary(clean_time=clean_summary)
@@ -268,7 +265,9 @@ class RoborockClient:
                     self.get_wash_towel_mode(device_id),
                     self.get_smart_wash_params(device_id),
                 ]
-            [dust_collection_mode, wash_towel_mode, smart_wash_params] = unpack_list(list(await asyncio.gather(*commands)), 3)
+            [dust_collection_mode, wash_towel_mode, smart_wash_params] = unpack_list(
+                list(await asyncio.gather(*commands)), 3
+            )
 
             return RoborockDockSummary(dust_collection_mode, wash_towel_mode, smart_wash_params)
         except RoborockTimeout as e:

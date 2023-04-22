@@ -35,6 +35,8 @@ def decamelize(s: str):
 
 
 def decamelize_obj(d: dict | list, ignore_keys: list[str]):
+    if isinstance(d, RoborockBase):
+        d = d.as_dict()
     if isinstance(d, list):
         return [decamelize_obj(i, ignore_keys) if isinstance(i, (dict, list)) else i for i in d]
     return {

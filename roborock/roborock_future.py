@@ -18,5 +18,8 @@ class RoborockFuture:
         self.loop.call_soon_threadsafe(self.fut.set_result, item)
 
     async def async_get(self, timeout: float | int) -> tuple[Any, VacuumError | None]:
-        async with async_timeout.timeout(timeout):
-            return await self.fut
+        try:
+            async with async_timeout.timeout(timeout):
+                return await self.fut
+        finally:
+            self.fut.cancel()

@@ -5,7 +5,7 @@ import logging
 import threading
 import uuid
 from asyncio import Lock
-from typing import Any, Mapping, Optional
+from typing import Mapping, Optional
 from urllib.parse import urlparse
 
 import paho.mqtt.client as mqtt
@@ -137,34 +137,30 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
         return rc == mqtt.MQTT_ERR_SUCCESS
 
     def sync_connect(self) -> bool:
-        rc = mqtt.MQTT_ERR_AGAIN
         self.sync_start_loop()
         if not self.is_connected():
             if self._mqtt_port is None or self._mqtt_host is None:
                 raise RoborockException("Mqtt information was not entered. Cannot connect.")
             _LOGGER.info("Connecting to mqtt")
-            rc = super().connect(host=self._mqtt_host, port=self._mqtt_port, keepalive=MQTT_KEEPALIVE)
-            if rc != mqtt.MQTT_ERR_SUCCESS:
-                raise RoborockException(f"Failed to connect (rc:{rc})")
-        return rc == mqtt.MQTT_ERR_SUCCESS
+            super().connect_async(host=self._mqtt_host, port=self._mqtt_port, keepalive=MQTT_KEEPALIVE)
+            return True
+        return False
 
-    async def async_disconnect(self) -> Any:
+    async def async_disconnect(self) -> None:
         async with self._mutex:
             disconnecting = self.sync_disconnect()
             if disconnecting:
-                (response, err) = await self._async_response(DISCONNECT_REQUEST_ID)
+                (_, err) = await self._async_response(DISCONNECT_REQUEST_ID)
                 if err:
                     raise RoborockException(err) from err
-                return response
 
-    async def async_connect(self) -> Any:
+    async def async_connect(self) -> None:
         async with self._mutex:
             connecting = self.sync_connect()
             if connecting:
-                (response, err) = await self._async_response(CONNECT_REQUEST_ID)
+                (_, err) = await self._async_response(CONNECT_REQUEST_ID)
                 if err:
                     raise RoborockException(err) from err
-                return response
 
     async def validate_connection(self) -> None:
         await self.async_connect()
@@ -194,4 +190,8 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
         return response
 
     async def get_map_v1(self, device_id):
-        return await self.send_command(device_id, RoborockCommand.GET_MAP_V1)
+        try:
+            return await self.send_command(device_id, RoborockCommand.GET_MAP_V1)
+        except RoborockException as e:
+            _LOGGER.error(e)
+        return None
