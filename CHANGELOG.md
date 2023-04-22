@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.6.16 (2023-04-22)
+### Fix
+* Improving local integration ([`7657617`](https://github.com/humbertogontijo/python-roborock/commit/7657617901d807908e5fd5c364700851b5108ab4))
+
 ## v0.6.15 (2023-04-21)
 ### Fix
 * Get_clean_summary ([`ee81538`](https://github.com/humbertogontijo/python-roborock/commit/ee815380a8b70efbac65627fdd69fdf0bb75420e))
