@@ -154,7 +154,11 @@ RoborockDockTypeCode = create_code_enum(
     "RoborockDockTypeCode",
     {
         0: "no_dock",
+        1: "unknown",
+        2: "unknown",
         3: "empty_wash_fill_dock",
+        4: "unknown",
+        5: "auto_empty_dock_pure"
     },
 )
 
