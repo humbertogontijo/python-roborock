@@ -8,7 +8,7 @@ from typing import Callable, Mapping, Optional
 
 import async_timeout
 
-from .api import SPECIAL_COMMANDS, RoborockClient, QUEUE_TIMEOUT
+from .api import QUEUE_TIMEOUT, SPECIAL_COMMANDS, RoborockClient
 from .containers import RoborockLocalDeviceInfo, RoomMapping
 from .exceptions import CommandVacuumError, RoborockConnectionException, RoborockException
 from .roborock_message import RoborockMessage, RoborockParser
@@ -99,7 +99,7 @@ class RoborockLocalClient(RoborockClient):
         mapping = await self.send_command(device_id, RoborockCommand.GET_ROOM_MAPPING)
         if isinstance(mapping, list):
             return [RoomMapping(room[0], room[1]) for room in mapping]
-
+        return []
 
 
 class RoborockSocket(socket.socket):

@@ -342,6 +342,7 @@ class RoborockDeviceInfo(RoborockBase):
 class RoborockLocalDeviceInfo(RoborockDeviceInfo):
     network_info: NetworkInfo
 
+
 @dataclass
 class RoomMapping(RoborockBase):
     segment_id: int
