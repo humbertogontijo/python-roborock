@@ -322,7 +322,7 @@ class RoborockClient:
         mapping = await self.send_command(device_id, RoborockCommand.GET_ROOM_MAPPING)
         if isinstance(mapping, list):
             return [
-                RoomMapping(segment_id=segment_id, iot_id=segment_id)  # type: ignore
+                RoomMapping(segment_id=segment_id, iot_id=iot_id)  # type: ignore
                 for segment_id, iot_id in [unpack_list(room, 2) for room in mapping]
             ]
         return []
