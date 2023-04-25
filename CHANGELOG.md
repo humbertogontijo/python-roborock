@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.7.0 (2023-04-25)
+### Feature
+* Add room mapping ([#41](https://github.com/humbertogontijo/python-roborock/issues/41)) ([`aa3e6e4`](https://github.com/humbertogontijo/python-roborock/commit/aa3e6e442fbbb679c4eca68840c4d19f9c659fde))
+
 ## v0.6.17 (2023-04-25)
 ### Fix
 * Removing non-needed classes ([`6ceedad`](https://github.com/humbertogontijo/python-roborock/commit/6ceedadf09c20c743c994b07489887e344cd3061))
