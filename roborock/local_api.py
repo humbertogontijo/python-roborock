@@ -9,7 +9,7 @@ from typing import Callable, Mapping, Optional
 import async_timeout
 
 from .api import SPECIAL_COMMANDS, RoborockClient, QUEUE_TIMEOUT
-from .containers import RoborockLocalDeviceInfo
+from .containers import RoborockLocalDeviceInfo, RoomMapping
 from .exceptions import CommandVacuumError, RoborockConnectionException, RoborockException
 from .roborock_message import RoborockMessage, RoborockParser
 from .typing import CommandInfoMap, RoborockCommand
@@ -93,6 +93,13 @@ class RoborockLocalClient(RoborockClient):
             *[self.async_local_response(roborock_message) for roborock_message in roborock_messages],
             return_exceptions=True,
         )
+
+    async def get_room_mapping(self, device_id: str) -> list[RoomMapping]:
+        """Gets the mapping from segment id -> iot id. Only works on local api."""
+        mapping = await self.send_command(device_id, RoborockCommand.GET_ROOM_MAPPING)
+        if isinstance(mapping, list):
+            return [RoomMapping(room[0], room[1]) for room in mapping]
+
 
 
 class RoborockSocket(socket.socket):
