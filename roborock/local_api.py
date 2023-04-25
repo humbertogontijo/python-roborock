@@ -94,6 +94,7 @@ class RoborockLocalClient(RoborockClient):
             return_exceptions=True,
         )
 
+
 class RoborockSocket(socket.socket):
     _closed = None
 

@@ -31,11 +31,11 @@ from .containers import (
     MultiMapsList,
     NetworkInfo,
     RoborockDeviceInfo,
+    RoomMapping,
     SmartWashParams,
     Status,
     UserData,
     WashTowelMode,
-    RoomMapping,
 )
 from .exceptions import RoborockException, RoborockTimeout, VacuumError
 from .roborock_future import RoborockFuture
@@ -325,7 +325,6 @@ class RoborockClient:
         if isinstance(mapping, list):
             return [RoomMapping(room[0], room[1]) for room in mapping]
         return []
-
 
 
 class RoborockApiClient:
