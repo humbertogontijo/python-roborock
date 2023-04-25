@@ -323,7 +323,10 @@ class RoborockClient:
         """Gets the mapping from segment id -> iot id. Only works on local api."""
         mapping = await self.send_command(device_id, RoborockCommand.GET_ROOM_MAPPING)
         if isinstance(mapping, list):
-            return [RoomMapping(room[0], room[1]) for room in mapping]
+            return [
+                RoomMapping(segment_id, iot_id)
+                for segment_id, iot_id in [unpack_list(room, 2) for room in mapping]
+            ]
         return []
 
 
