@@ -39,7 +39,7 @@ from .containers import (
 from .exceptions import RoborockException, RoborockTimeout, VacuumError
 from .roborock_future import RoborockFuture
 from .roborock_message import RoborockMessage
-from .typing import RoborockCommand, RoborockDeviceProp, RoborockDockSummary
+from .typing import RoborockCommand, DeviceProp, DockSummary
 from .util import unpack_list
 
 _LOGGER = logging.getLogger(__name__)
@@ -196,8 +196,6 @@ class RoborockClient:
                 return CleanSummary(
                     clean_time=clean_time, clean_area=clean_area, clean_count=clean_count, records=records
                 )
-            elif isinstance(clean_summary, int):
-                return CleanSummary(clean_time=clean_summary)
         except RoborockTimeout as e:
             _LOGGER.error(e)
         return None
@@ -247,7 +245,7 @@ class RoborockClient:
             _LOGGER.error(e)
         return None
 
-    async def get_dock_summary(self, device_id: str, dock_type: RoborockEnum) -> RoborockDockSummary | None:
+    async def get_dock_summary(self, device_id: str, dock_type: RoborockEnum) -> DockSummary | None:
         """Gets the status summary from the dock with the methods available for a given dock.
 
         :param device_id: Device id
@@ -269,18 +267,19 @@ class RoborockClient:
                 list(await asyncio.gather(*commands)), 3
             )
 
-            return RoborockDockSummary(dust_collection_mode, wash_towel_mode, smart_wash_params)
+            return DockSummary(dust_collection_mode, wash_towel_mode, smart_wash_params)
         except RoborockTimeout as e:
             _LOGGER.error(e)
         return None
 
-    async def get_prop(self, device_id: str) -> RoborockDeviceProp | None:
-        [status, dnd_timer, clean_summary, consumable] = await asyncio.gather(
+    async def get_prop(self, device_id: str) -> DeviceProp | None:
+        [status, dnd_timer, clean_summary, consumable, multi_maps_list] = await asyncio.gather(
             *[
                 self.get_status(device_id),
                 self.get_dnd_timer(device_id),
                 self.get_clean_summary(device_id),
                 self.get_consumable(device_id),
+                self.get_multi_maps_list(device_id)
             ]
         )
         last_clean_record = None
@@ -290,13 +289,14 @@ class RoborockClient:
         if status and status.dock_type is not None and status.dock_type != RoborockDockTypeCode["0"]:
             dock_summary = await self.get_dock_summary(device_id, status.dock_type)
         if any([status, dnd_timer, clean_summary, consumable]):
-            return RoborockDeviceProp(
+            return DeviceProp(
                 status,
                 dnd_timer,
                 clean_summary,
                 consumable,
                 last_clean_record,
                 dock_summary,
+                multi_maps_list
             )
         return None
 

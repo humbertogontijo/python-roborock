@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from typing import Optional
 from dataclasses import dataclass
 from enum import Enum
+from typing import Optional
 
 from .containers import (
     CleanRecord,
@@ -13,6 +13,7 @@ from .containers import (
     SmartWashParams,
     Status,
     WashTowelMode,
+    MultiMapsList,
 )
 
 
@@ -225,31 +226,18 @@ CommandInfoMap: dict[RoborockCommand, CommandInfo] = {
 
 
 @dataclass
-class RoborockDockSummary:
+class DockSummary:
     dust_collection_mode: Optional[DustCollectionMode] = None
     wash_towel_mode: Optional[WashTowelMode] = None
     smart_wash_params: Optional[SmartWashParams] = None
 
 
 @dataclass
-class RoborockDeviceProp:
+class DeviceProp:
     status: Optional[Status] = None
     dnd_timer: Optional[DNDTimer] = None
     clean_summary: Optional[CleanSummary] = None
     consumable: Optional[Consumable] = None
     last_clean_record: Optional[CleanRecord] = None
-    dock_summary: Optional[RoborockDockSummary] = None
-
-    def update(self, device_prop: "RoborockDeviceProp"):
-        if device_prop.status:
-            self.status = device_prop.status
-        if device_prop.dnd_timer:
-            self.dnd_timer = device_prop.dnd_timer
-        if device_prop.clean_summary:
-            self.clean_summary = device_prop.clean_summary
-        if device_prop.consumable:
-            self.consumable = device_prop.consumable
-        if device_prop.last_clean_record:
-            self.last_clean_record = device_prop.last_clean_record
-        if device_prop.dock_summary:
-            self.dock_summary = device_prop.dock_summary
+    dock_summary: Optional[DockSummary] = None
+    multi_maps_list: Optional[MultiMapsList] = None
