@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.7.1 (2023-04-25)
+### Fix
+* Command prefixes ([`156ac51`](https://github.com/humbertogontijo/python-roborock/commit/156ac5182d1a97c93ab16696099c8c099a19155d))
+
 ## v0.7.0 (2023-04-25)
 ### Feature
 * Add room mapping ([#41](https://github.com/humbertogontijo/python-roborock/issues/41)) ([`aa3e6e4`](https://github.com/humbertogontijo/python-roborock/commit/aa3e6e442fbbb679c4eca68840c4d19f9c659fde))
