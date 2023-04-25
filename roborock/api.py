@@ -40,7 +40,7 @@ from .containers import (
 from .exceptions import RoborockException, RoborockTimeout, VacuumError
 from .roborock_future import RoborockFuture
 from .roborock_message import RoborockMessage
-from .typing import RoborockCommand, DeviceProp, DockSummary
+from .typing import DeviceProp, DockSummary, RoborockCommand
 from .util import unpack_list
 
 _LOGGER = logging.getLogger(__name__)
@@ -279,7 +279,7 @@ class RoborockClient:
                 self.get_status(device_id),
                 self.get_dnd_timer(device_id),
                 self.get_clean_summary(device_id),
-                self.get_consumable(device_id)
+                self.get_consumable(device_id),
             ]
         )
         last_clean_record = None

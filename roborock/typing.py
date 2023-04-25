@@ -13,7 +13,6 @@ from .containers import (
     SmartWashParams,
     Status,
     WashTowelMode,
-    MultiMapsList,
 )
 
 
