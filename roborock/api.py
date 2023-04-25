@@ -35,6 +35,7 @@ from .containers import (
     Status,
     UserData,
     WashTowelMode,
+    RoomMapping,
 )
 from .exceptions import RoborockException, RoborockTimeout, VacuumError
 from .roborock_future import RoborockFuture
@@ -317,6 +318,14 @@ class RoborockClient:
         except RoborockTimeout as e:
             _LOGGER.error(e)
         return None
+
+    async def get_room_mapping(self, device_id: str) -> list[RoomMapping]:
+        """Gets the mapping from segment id -> iot id. Only works on local api."""
+        mapping = await self.send_command(device_id, RoborockCommand.GET_ROOM_MAPPING)
+        if isinstance(mapping, list):
+            return [RoomMapping(room[0], room[1]) for room in mapping]
+        return []
+
 
 
 class RoborockApiClient:
