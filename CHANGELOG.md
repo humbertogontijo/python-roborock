@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.7.3 (2023-04-25)
+### Fix
+* Added missing docks ([#40](https://github.com/humbertogontijo/python-roborock/issues/40)) ([`65a6cc4`](https://github.com/humbertogontijo/python-roborock/commit/65a6cc4fd19a30bc78f2c34b407d3d88e3aac2b1))
+
 ## v0.7.2 (2023-04-25)
 ### Fix
 * Command prefixes ([`e792728`](https://github.com/humbertogontijo/python-roborock/commit/e7927288cc3059a1eced1a65b31f84190718aaf2))
