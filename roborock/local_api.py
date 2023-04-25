@@ -105,6 +105,7 @@ class RoborockSocket(socket.socket):
 
 class RoborockSocketListener(asyncio.Protocol):
     roborock_port = 58867
+    transport: Transport
 
     def __init__(
         self,
@@ -119,7 +120,6 @@ class RoborockSocketListener(asyncio.Protocol):
         self.on_message = on_message
         self.timeout = timeout
         self.remaining = b""
-        self.transport: Transport | None = None
 
     def data_received(self, message):
         if self.remaining:

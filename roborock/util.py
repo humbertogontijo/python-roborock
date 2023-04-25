@@ -3,12 +3,12 @@ from __future__ import annotations
 import asyncio
 import functools
 from asyncio import AbstractEventLoop
-from typing import TypeVar
+from typing import Optional, TypeVar
 
 T = TypeVar("T")
 
 
-def unpack_list(value: list[T], size: int) -> list[T | None]:
+def unpack_list(value: list[T], size: int) -> list[Optional[T]]:
     return (value + [None] * size)[:size]
 
 
