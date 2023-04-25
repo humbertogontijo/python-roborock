@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import socket
-from asyncio import Transport, BaseTransport
+from asyncio import Transport
 from typing import Callable, Mapping, Optional
 
 import async_timeout
