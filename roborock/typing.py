@@ -17,21 +17,6 @@ from .containers import (
 )
 
 
-class RoborockDevicePropField(str, Enum):
-    STATUS = "status"
-    DND_TIMER = "dnd_timer"
-    CLEAN_SUMMARY = "clean_summary"
-    CONSUMABLE = "consumable"
-    LAST_CLEAN_RECORD = "last_clean_record"
-    DOCK_SUMMARY = "dock_summary"
-
-
-class RoborockDockSummaryField(str, Enum):
-    DUST_COLLECTION_MODE = "dust_collection_mode"
-    WASHING_MODE_TYPE = "washing_mode_type"
-    MOP_WASH = "mop_wash"
-
-
 class RoborockCommand(str, Enum):
     GET_PROP = "get_prop"
     GET_MAP_V1 = "get_map_v1"
