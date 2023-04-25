@@ -79,6 +79,8 @@ class RoborockParser:
 
         msg = b""
         for roborock_message in roborock_messages:
+            if len(roborock_message.prefix) not in [0, 4]:
+                raise RoborockException("Invalid prefix")
             aes_key = md5bin(encode_timestamp(roborock_message.timestamp) + local_key + salt)
             cipher = AES.new(aes_key, AES.MODE_ECB)
             payload = roborock_message.payload
