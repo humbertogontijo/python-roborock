@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.7.5 (2023-04-25)
+### Fix
+* Adding missing prefixes ([`66b1833`](https://github.com/humbertogontijo/python-roborock/commit/66b183385c96dd7ee395bff143f2d64ef8fb927a))
+
 ## v0.7.4 (2023-04-25)
 ### Fix
 * Get_room_mapping ([`459119b`](https://github.com/humbertogontijo/python-roborock/commit/459119bee90513451bf10a1abeeccb75f3daa539))
