@@ -31,6 +31,7 @@ from .containers import (
     MultiMapsList,
     NetworkInfo,
     RoborockDeviceInfo,
+    RoomMapping,
     SmartWashParams,
     Status,
     UserData,
@@ -317,6 +318,16 @@ class RoborockClient:
         except RoborockTimeout as e:
             _LOGGER.error(e)
         return None
+
+    async def get_room_mapping(self, device_id: str) -> list[RoomMapping]:
+        """Gets the mapping from segment id -> iot id. Only works on local api."""
+        mapping = await self.send_command(device_id, RoborockCommand.GET_ROOM_MAPPING)
+        if isinstance(mapping, list):
+            return [
+                RoomMapping(segment_id, iot_id)
+                for segment_id, iot_id in [unpack_list(room, 2) for room in mapping]
+            ]
+        return []
 
 
 class RoborockApiClient:

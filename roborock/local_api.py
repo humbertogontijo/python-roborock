@@ -8,7 +8,7 @@ from typing import Callable, Mapping, Optional
 
 import async_timeout
 
-from .api import SPECIAL_COMMANDS, RoborockClient, QUEUE_TIMEOUT
+from .api import QUEUE_TIMEOUT, SPECIAL_COMMANDS, RoborockClient
 from .containers import RoborockLocalDeviceInfo
 from .exceptions import CommandVacuumError, RoborockConnectionException, RoborockException
 from .roborock_message import RoborockMessage, RoborockParser

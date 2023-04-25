@@ -341,3 +341,9 @@ class RoborockDeviceInfo(RoborockBase):
 @dataclass
 class RoborockLocalDeviceInfo(RoborockDeviceInfo):
     network_info: NetworkInfo
+
+
+@dataclass
+class RoomMapping(RoborockBase):
+    segment_id: int
+    iot_id: str
