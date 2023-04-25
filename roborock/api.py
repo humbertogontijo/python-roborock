@@ -274,13 +274,12 @@ class RoborockClient:
         return None
 
     async def get_prop(self, device_id: str) -> DeviceProp | None:
-        [status, dnd_timer, clean_summary, consumable, multi_maps_list] = await asyncio.gather(
+        [status, dnd_timer, clean_summary, consumable] = await asyncio.gather(
             *[
                 self.get_status(device_id),
                 self.get_dnd_timer(device_id),
                 self.get_clean_summary(device_id),
-                self.get_consumable(device_id),
-                self.get_multi_maps_list(device_id)
+                self.get_consumable(device_id)
             ]
         )
         last_clean_record = None
@@ -297,7 +296,6 @@ class RoborockClient:
                 consumable,
                 last_clean_record,
                 dock_summary,
-                multi_maps_list
             )
         return None
 
@@ -324,7 +322,7 @@ class RoborockClient:
         mapping = await self.send_command(device_id, RoborockCommand.GET_ROOM_MAPPING)
         if isinstance(mapping, list):
             return [
-                RoomMapping(segment_id, iot_id)
+                RoomMapping(segment_id=segment_id, iot_id=segment_id)  # type: ignore
                 for segment_id, iot_id in [unpack_list(room, 2) for room in mapping]
             ]
         return []
@@ -463,8 +461,7 @@ class RoborockApiClient:
         home_request = PreparedRequest(
             rriot.r.a,
             {
-                "Authorization": f'Hawk id="{rriot.u}", s="{rriot.s}", ts="{timestamp}", nonce="{nonce}", '
-                f'mac="{mac}"',
+                "Authorization": f'Hawk id="{rriot.u}", s="{rriot.s}", ts="{timestamp}", nonce="{nonce}", mac="{mac}"',
             },
         )
         home_response = await home_request.request("get", "/user/homes/" + str(home_id))

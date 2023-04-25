@@ -120,7 +120,7 @@ CommandInfoMap: dict[RoborockCommand, CommandInfo] = {
     RoborockCommand.GET_STATUS: CommandInfo(prefix=b"\x00\x00\x00\x77"),
     RoborockCommand.SET_CUSTOM_MODE: CommandInfo(prefix=b"\x00\x00\x00w"),
     RoborockCommand.GET_CHILD_LOCK_STATUS: CommandInfo(prefix=b"\x00\x00\x00\x87"),
-    RoborockCommand.GET_MULTI_MAPS_LIST: CommandInfo(prefix=b"\x00\x00\x00\xd7"),
+    RoborockCommand.GET_MULTI_MAPS_LIST: CommandInfo(prefix=b"\x00\x00\x00\x87"),
     RoborockCommand.GET_IDENTIFY_FURNITURE_STATUS: CommandInfo(prefix=b"\x00\x00\x00\x87"),
     RoborockCommand.SET_WATER_BOX_CUSTOM_MODE: CommandInfo(prefix=b"\x00\x00\x00\x87"),
     RoborockCommand.GET_CLEAN_SEQUENCE: CommandInfo(prefix=b"\x00\x00\x00\x87"),
@@ -223,4 +223,3 @@ class DeviceProp:
     consumable: Optional[Consumable] = None
     last_clean_record: Optional[CleanRecord] = None
     dock_summary: Optional[DockSummary] = None
-    multi_maps_list: Optional[MultiMapsList] = None
