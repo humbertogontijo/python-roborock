@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v0.6.17 (2023-04-25)
+### Fix
+* Removing non-needed classes ([`6ceedad`](https://github.com/humbertogontijo/python-roborock/commit/6ceedadf09c20c743c994b07489887e344cd3061))
+* Adding multi_maps_list to device props ([`7ac0485`](https://github.com/humbertogontijo/python-roborock/commit/7ac0485c4a5bb43350c51331323c6773ff1c54fc))
+
 ## v0.6.16 (2023-04-22)
 ### Fix
 * Improving local integration ([`7657617`](https://github.com/humbertogontijo/python-roborock/commit/7657617901d807908e5fd5c364700851b5108ab4))
