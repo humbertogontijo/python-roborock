@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.7.2 (2023-04-25)
+### Fix
+* Command prefixes ([`e792728`](https://github.com/humbertogontijo/python-roborock/commit/e7927288cc3059a1eced1a65b31f84190718aaf2))
+
 ## v0.7.1 (2023-04-25)
 ### Fix
 * Command prefixes ([`156ac51`](https://github.com/humbertogontijo/python-roborock/commit/156ac5182d1a97c93ab16696099c8c099a19155d))
