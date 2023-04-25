@@ -9,7 +9,7 @@ T = TypeVar("T")
 
 
 def unpack_list(value: list[T], size: int) -> list[Optional[T]]:
-    return (value + [None] * size)[:size]
+    return (value + [None] * size)[:size]  # type: ignore
 
 
 def get_running_loop_or_create_one() -> AbstractEventLoop:
