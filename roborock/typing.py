@@ -194,16 +194,15 @@ CommandInfoMap: dict[RoborockCommand, CommandInfo] = {
     RoborockCommand.START_CAMERA_PREVIEW: CommandInfo(prefix=b"\x00\x00\x00\x87"),
     RoborockCommand.GET_TURN_SERVER: CommandInfo(prefix=b"\x00\x00\x00\x77"),
     RoborockCommand.GET_DEVICE_ICE: CommandInfo(prefix=b"\x00\x00\x00\x77"),
-    # TODO discover prefix for following commands
-    # RoborockCommand.APP_GET_DRYER_SETTING: CommandInfo(prefix=b'\x00\x00\x00w'),
-    # RoborockCommand.APP_SET_DRYER_SETTING: CommandInfo(prefix=b'\x00\x00\x00w'),
-    # RoborockCommand.GET_DUST_COLLECTION_MODE: CommandInfo(prefix=b'\x00\x00\x00w'),
-    # RoborockCommand.SET_DUST_COLLECTION_MODE: CommandInfo(prefix=b'\x00\x00\x00w'),
-    # RoborockCommand.GET_SMART_WASH_PARAMS: CommandInfo(prefix=b'\x00\x00\x00w'),
-    # RoborockCommand.SET_SMART_WASH_PARAMS: CommandInfo(prefix=b'\x00\x00\x00w'),
-    # RoborockCommand.GET_WASH_TOWEL_MODE: CommandInfo(prefix=b'\x00\x00\x00w'),
-    # RoborockCommand.SET_WASH_TOWEL_MODE: CommandInfo(prefix=b'\x00\x00\x00w'),
-    # RoborockCommand.START_WASH_THEN_CHARGE: CommandInfo(prefix=b'\x00\x00\x00w'),
+    RoborockCommand.GET_DUST_COLLECTION_MODE: CommandInfo(prefix=b"\x00\x00\x00\x87"),
+    RoborockCommand.APP_GET_DRYER_SETTING: CommandInfo(prefix=b"\x00\x00\x00\x87"),
+    RoborockCommand.APP_SET_DRYER_SETTING: CommandInfo(prefix=b"\x00\x00\x00\x87"),
+    RoborockCommand.SET_DUST_COLLECTION_MODE: CommandInfo(prefix=b"\x00\x00\x00\x87"),
+    RoborockCommand.GET_SMART_WASH_PARAMS: CommandInfo(prefix=b"\x00\x00\x00\x87"),
+    RoborockCommand.SET_SMART_WASH_PARAMS: CommandInfo(prefix=b"\x00\x00\x00\x87"),
+    RoborockCommand.GET_WASH_TOWEL_MODE: CommandInfo(prefix=b"\x00\x00\x00\x87"),
+    RoborockCommand.SET_WASH_TOWEL_MODE: CommandInfo(prefix=b"\x00\x00\x00\x87"),
+    RoborockCommand.START_WASH_THEN_CHARGE: CommandInfo(prefix=b"\x00\x00\x00\x87"),
 }
 
 

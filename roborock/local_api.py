@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import socket
-from asyncio import Transport
+from asyncio import Transport, BaseTransport
 from typing import Callable, Mapping, Optional
 
 import async_timeout
@@ -105,7 +105,6 @@ class RoborockSocket(socket.socket):
 
 class RoborockSocketListener(asyncio.Protocol):
     roborock_port = 58867
-    transport: Transport
 
     def __init__(
         self,
@@ -120,6 +119,7 @@ class RoborockSocketListener(asyncio.Protocol):
         self.on_message = on_message
         self.timeout = timeout
         self.remaining = b""
+        self.transport: Transport | None = None
 
     def data_received(self, message):
         if self.remaining:
@@ -140,7 +140,7 @@ class RoborockSocketListener(asyncio.Protocol):
             if not self.is_connected():
                 async with async_timeout.timeout(self.timeout):
                     _LOGGER.info(f"Connecting to {self.ip}")
-                    self.transport, _ = await self.loop.create_connection(lambda: self, self.ip, 58867)
+                    self.transport, _ = await self.loop.create_connection(lambda: self, self.ip, 58867)  # type: ignore
         except Exception as e:
             raise RoborockConnectionException(f"Failed connecting to {self.ip}") from e
 
