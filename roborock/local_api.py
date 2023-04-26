@@ -61,10 +61,7 @@ class RoborockLocalClient(RoborockClient):
 
     async def send_command(self, device_id: str, method: RoborockCommand, params: Optional[list] = None):
         roborock_message = self.build_roborock_message(method, params)
-        response = (await self.send_message(device_id, roborock_message))[0]
-        if isinstance(response, BaseException):
-            raise response
-        return response
+        return (await self.send_message(device_id, roborock_message))[0]
 
     async def async_local_response(self, roborock_message: RoborockMessage):
         request_id = roborock_message.get_request_id()
@@ -89,10 +86,15 @@ class RoborockLocalClient(RoborockClient):
         _LOGGER.debug(f"Requesting device with {roborock_messages}")
         await listener.send_message(msg)
 
-        return await asyncio.gather(
+        responses = await asyncio.gather(
             *[self.async_local_response(roborock_message) for roborock_message in roborock_messages],
             return_exceptions=True,
         )
+        exception = next((response for response in responses if isinstance(response, BaseException)), None)
+        if exception:
+            listener.disconnect()
+            raise exception
+        return responses
 
 
 class RoborockSocket(socket.socket):
@@ -130,7 +132,7 @@ class RoborockSocketListener(asyncio.Protocol):
         self.on_message(parser_msg)
 
     def connection_lost(self, exc):
-        print("The server closed the connection")
+        _LOGGER.debug("The server closed the connection")
 
     def is_connected(self):
         return self.transport and self.transport.is_reading()
