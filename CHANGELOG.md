@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.7.8 (2023-04-26)
+### Fix
+* Local api failing to send message ([`4cc38fe`](https://github.com/humbertogontijo/python-roborock/commit/4cc38fe13df487296efda2a1e962c238e3d69168))
+
 ## v0.7.7 (2023-04-26)
 ### Fix
 * Local api recover after command fail ([`cb11f14`](https://github.com/humbertogontijo/python-roborock/commit/cb11f14d7b771b31c77dafe6435bcd52527c16a8))
