@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import socket
-from asyncio import Transport
+from asyncio import Transport, Lock
 from typing import Callable, Mapping, Optional
 
 import async_timeout
@@ -122,6 +122,7 @@ class RoborockSocketListener(asyncio.Protocol):
         self.timeout = timeout
         self.remaining = b""
         self.transport: Transport | None = None
+        self._mutex = Lock()
 
     def data_received(self, message):
         if self.remaining:
@@ -151,10 +152,11 @@ class RoborockSocketListener(asyncio.Protocol):
             self.transport.close()
 
     async def send_message(self, data: bytes) -> None:
-        await self.connect()
-        try:
-            if not self.transport:
-                raise RoborockException("Can not send message without connection")
-            self.transport.write(data)
-        except Exception as e:
-            raise RoborockException(e) from e
+        async with self._mutex:
+            await self.connect()
+            try:
+                if not self.transport:
+                    raise RoborockException("Can not send message without connection")
+                self.transport.write(data)
+            except Exception as e:
+                raise RoborockException(e) from e
