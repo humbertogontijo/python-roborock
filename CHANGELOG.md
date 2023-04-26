@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.7.7 (2023-04-26)
+### Fix
+* Local api recover after command fail ([`cb11f14`](https://github.com/humbertogontijo/python-roborock/commit/cb11f14d7b771b31c77dafe6435bcd52527c16a8))
+
 ## v0.7.6 (2023-04-26)
 ### Fix
 * Reset_consumable command prefix ([`a1a8c06`](https://github.com/humbertogontijo/python-roborock/commit/a1a8c06d369e33e4ebd42cf6f563b9727d0ce24e))
