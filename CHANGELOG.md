@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.7.6 (2023-04-26)
+### Fix
+* Reset_consumable command prefix ([`a1a8c06`](https://github.com/humbertogontijo/python-roborock/commit/a1a8c06d369e33e4ebd42cf6f563b9727d0ce24e))
+
 ## v0.7.5 (2023-04-25)
 ### Fix
 * Adding missing prefixes ([`66b1833`](https://github.com/humbertogontijo/python-roborock/commit/66b183385c96dd7ee395bff143f2d64ef8fb927a))
