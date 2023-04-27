@@ -4,57 +4,39 @@ import asyncio
 import logging
 import socket
 from asyncio import Lock, Transport
-from typing import Optional
+from typing import Callable, Mapping, Optional
 
 import async_timeout
 
-from roborock.util import get_running_loop_or_create_one
 from .api import QUEUE_TIMEOUT, SPECIAL_COMMANDS, RoborockClient
 from .containers import RoborockLocalDeviceInfo
 from .exceptions import CommandVacuumError, RoborockConnectionException, RoborockException
 from .roborock_message import RoborockMessage, RoborockParser
 from .typing import CommandInfoMap, RoborockCommand
+from .util import get_running_loop_or_create_one
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class RoborockLocalClient(RoborockClient, asyncio.Protocol):
-    def __init__(self, device_info: RoborockLocalDeviceInfo):
-        super().__init__("abc", device_info)
+class RoborockLocalClient(RoborockClient):
+    def __init__(self, devices_info: Mapping[str, RoborockLocalDeviceInfo]):
+        super().__init__("abc", devices_info)
         self.loop = get_running_loop_or_create_one()
-        self.ip = device_info.network_info.ip
+        self.device_listener: dict[str, RoborockSocketListener] = {
+            device_id: RoborockSocketListener(
+                device_info.network_info.ip, device_info.device.local_key, self.on_message, self.on_disconnect
+            )
+            for device_id, device_info in devices_info.items()
+        }
         self._batch_structs: list[RoborockMessage] = []
         self._executing = False
-        self.remaining = b""
-        self.transport: Transport | None = None
-        self._mutex = Lock()
-
-    def data_received(self, message):
-        if self.remaining:
-            message = self.remaining + message
-            self.remaining = b""
-        (parser_msg, remaining) = RoborockParser.decode(message, self.device_info.device.local_key)
-        self.remaining = remaining
-        self.on_message(parser_msg)
-
-    def connection_lost(self, exc: Optional[Exception]):
-        self.on_disconnect(exc)
-
-    def is_connected(self):
-        return self.transport and self.transport.is_reading()
 
     async def async_connect(self) -> None:
-        try:
-            if not self.is_connected():
-                async with async_timeout.timeout(QUEUE_TIMEOUT):
-                    _LOGGER.info(f"Connecting to {self.ip}")
-                    self.transport, _ = await self.loop.create_connection(lambda: self, self.ip, 58867)  # type: ignore
-        except Exception as e:
-            raise RoborockConnectionException(f"Failed connecting to {self.ip}") from e
+        await asyncio.gather(*[listener.connect() for listener in self.device_listener.values()])
 
     async def async_disconnect(self) -> None:
-        if self.transport:
-            self.transport.close()
+        for listener in self.device_listener.values():
+            listener.disconnect()
 
     def build_roborock_message(self, method: RoborockCommand, params: Optional[list] = None) -> RoborockMessage:
         secured = True if method in SPECIAL_COMMANDS else False
@@ -75,9 +57,9 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
             payload=payload,
         )
 
-    async def send_command(self, method: RoborockCommand, params: Optional[list] = None):
+    async def send_command(self, device_id: str, method: RoborockCommand, params: Optional[list] = None):
         roborock_message = self.build_roborock_message(method, params)
-        return (await self.send_message(roborock_message))[0]
+        return (await self.send_message(device_id, roborock_message))[0]
 
     async def async_local_response(self, roborock_message: RoborockMessage):
         request_id = roborock_message.get_request_id()
@@ -90,37 +72,30 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
             _LOGGER.debug(f"id={request_id} Response from {roborock_message.get_method()}: {response}")
             return response
 
-    def _send_msg_raw(self, data: bytes):
-        try:
-            if not self.transport:
-                raise RoborockException("Can not send message without connection")
-            self.transport.write(data)
-        except Exception as e:
-            raise RoborockException(e) from e
+    async def send_message(self, device_id: str, roborock_messages: list[RoborockMessage] | RoborockMessage):
+        if isinstance(roborock_messages, RoborockMessage):
+            roborock_messages = [roborock_messages]
+        local_key = self.devices_info[device_id].device.local_key
+        msg = RoborockParser.encode(roborock_messages, local_key)
+        # Send the command to the Roborock device
+        listener = self.device_listener.get(device_id)
+        if listener is None:
+            raise RoborockException(f"No device listener for {device_id}")
+        if not self.should_keepalive():
+            listener.disconnect()
 
-    async def send_message(self, roborock_messages: list[RoborockMessage] | RoborockMessage):
-        async with self._mutex:
-            await self.async_connect()
-            if isinstance(roborock_messages, RoborockMessage):
-                roborock_messages = [roborock_messages]
-            local_key = self.device_info.device.local_key
-            msg = RoborockParser.encode(roborock_messages, local_key)
-            # Send the command to the Roborock device
-            if not self.should_keepalive():
-                await self.async_disconnect()
+        _LOGGER.debug(f"Requesting device with {roborock_messages}")
+        await listener.send_message(msg)
 
-            _LOGGER.debug(f"Requesting device with {roborock_messages}")
-            self._send_msg_raw(msg)
-
-            responses = await asyncio.gather(
-                *[self.async_local_response(roborock_message) for roborock_message in roborock_messages],
-                return_exceptions=True,
-            )
-            exception = next((response for response in responses if isinstance(response, BaseException)), None)
-            if exception:
-                await self.async_disconnect()
-                raise exception
-            return responses
+        responses = await asyncio.gather(
+            *[self.async_local_response(roborock_message) for roborock_message in roborock_messages],
+            return_exceptions=True,
+        )
+        exception = next((response for response in responses if isinstance(response, BaseException)), None)
+        if exception:
+            listener.disconnect()
+            raise exception
+        return responses
 
 
 class RoborockSocket(socket.socket):
@@ -129,3 +104,62 @@ class RoborockSocket(socket.socket):
     @property
     def is_closed(self):
         return self._closed
+
+
+class RoborockSocketListener(asyncio.Protocol):
+    roborock_port = 58867
+
+    def __init__(
+        self,
+        ip: str,
+        local_key: str,
+        on_message: Callable[[list[RoborockMessage]], None],
+        on_disconnect: Callable[[Optional[Exception]], None],
+        timeout: float | int = QUEUE_TIMEOUT,
+    ):
+        self.ip = ip
+        self.local_key = local_key
+        self.loop = get_running_loop_or_create_one()
+        self.on_message = on_message
+        self.on_disconnect = on_disconnect
+        self.timeout = timeout
+        self.remaining = b""
+        self.transport: Transport | None = None
+        self._mutex = Lock()
+
+    def data_received(self, message):
+        if self.remaining:
+            message = self.remaining + message
+            self.remaining = b""
+        (parser_msg, remaining) = RoborockParser.decode(message, self.local_key)
+        self.remaining = remaining
+        self.on_message(parser_msg)
+
+    def connection_lost(self, exc: Optional[Exception]):
+        self.on_disconnect(exc)
+
+    def is_connected(self):
+        return self.transport and self.transport.is_reading()
+
+    async def connect(self):
+        try:
+            if not self.is_connected():
+                async with async_timeout.timeout(self.timeout):
+                    _LOGGER.info(f"Connecting to {self.ip}")
+                    self.transport, _ = await self.loop.create_connection(lambda: self, self.ip, 58867)  # type: ignore
+        except Exception as e:
+            raise RoborockConnectionException(f"Failed connecting to {self.ip}") from e
+
+    def disconnect(self):
+        if self.transport:
+            self.transport.close()
+
+    async def send_message(self, data: bytes) -> None:
+        async with self._mutex:
+            await self.connect()
+            try:
+                if not self.transport:
+                    raise RoborockException("Can not send message without connection")
+                self.transport.write(data)
+            except Exception as e:
+                raise RoborockException(e) from e
