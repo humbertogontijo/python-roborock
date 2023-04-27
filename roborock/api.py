@@ -52,6 +52,7 @@ from .typing import DeviceProp, DockSummary, RoborockCommand
 from .util import unpack_list
 
 _LOGGER = logging.getLogger(__name__)
+KEEPALIVE = 60
 QUEUE_TIMEOUT = 4
 SPECIAL_COMMANDS = [
     RoborockCommand.GET_MAP_V1,
@@ -89,16 +90,25 @@ class RoborockClient:
         self._endpoint = endpoint
         self._nonce = secrets.token_bytes(16)
         self._waiting_queue: dict[int, RoborockFuture] = {}
-        self._status_listeners: list[Callable[[int, str], None]] = []
+        self._last_device_msg_in = self.time_func()
+        self._last_disconnection = self.time_func()
+        self.keep_alive = KEEPALIVE
 
-    def add_status_listener(self, callback: Callable[[int, str], None]):
-        self._status_listeners.append(callback)
+    @property
+    def time_func(self) -> Callable[[], float]:
+        try:
+            # Use monotonic clock if available
+            time_func = time.monotonic
+        except AttributeError:
+            time_func = time.time
+        return time_func
 
     async def async_disconnect(self) -> Any:
         raise NotImplementedError
 
     def on_message(self, messages: list[RoborockMessage]) -> None:
         try:
+            self._last_device_msg_in = self.time_func()
             for data in messages:
                 protocol = data.protocol
                 if protocol == 102 or protocol == 4:
@@ -141,6 +151,19 @@ class RoborockClient:
                             queue.resolve((decrypted, None))
         except Exception as ex:
             _LOGGER.exception(ex)
+
+    def on_disconnect(self, exc: Optional[Exception]) -> None:
+        self._last_disconnection = self.time_func()
+        _LOGGER.warning("Roborock client disconnected")
+        if exc is not None:
+            _LOGGER.warning(exc)
+
+    def should_keepalive(self) -> bool:
+        now = self.time_func()
+        # noinspection PyUnresolvedReferences
+        if now - self._last_disconnection > self.keep_alive**2 and now - self._last_device_msg_in > self.keep_alive:
+            return False
+        return True
 
     async def _async_response(self, request_id: int, protocol_id: int = 0) -> tuple[Any, VacuumError | None]:
         try:

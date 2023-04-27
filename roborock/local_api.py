@@ -24,9 +24,7 @@ class RoborockLocalClient(RoborockClient):
         self.loop = get_running_loop_or_create_one()
         self.device_listener: dict[str, RoborockSocketListener] = {
             device_id: RoborockSocketListener(
-                device_info.network_info.ip,
-                device_info.device.local_key,
-                self.on_message,
+                device_info.network_info.ip, device_info.device.local_key, self.on_message, self.on_disconnect
             )
             for device_id, device_info in devices_info.items()
         }
@@ -83,6 +81,9 @@ class RoborockLocalClient(RoborockClient):
         listener = self.device_listener.get(device_id)
         if listener is None:
             raise RoborockException(f"No device listener for {device_id}")
+        if not self.should_keepalive():
+            listener.disconnect()
+
         _LOGGER.debug(f"Requesting device with {roborock_messages}")
         await listener.send_message(msg)
 
@@ -113,12 +114,14 @@ class RoborockSocketListener(asyncio.Protocol):
         ip: str,
         local_key: str,
         on_message: Callable[[list[RoborockMessage]], None],
+        on_disconnect: Callable[[Optional[Exception]], None],
         timeout: float | int = QUEUE_TIMEOUT,
     ):
         self.ip = ip
         self.local_key = local_key
         self.loop = get_running_loop_or_create_one()
         self.on_message = on_message
+        self.on_disconnect = on_disconnect
         self.timeout = timeout
         self.remaining = b""
         self.transport: Transport | None = None
@@ -132,8 +135,8 @@ class RoborockSocketListener(asyncio.Protocol):
         self.remaining = remaining
         self.on_message(parser_msg)
 
-    def connection_lost(self, exc):
-        _LOGGER.debug("The server closed the connection")
+    def connection_lost(self, exc: Optional[Exception]):
+        self.on_disconnect(exc)
 
     def is_connected(self):
         return self.transport and self.transport.is_reading()

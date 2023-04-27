@@ -10,7 +10,7 @@ from urllib.parse import urlparse
 
 import paho.mqtt.client as mqtt
 
-from .api import SPECIAL_COMMANDS, RoborockClient, md5hex
+from .api import SPECIAL_COMMANDS, RoborockClient, md5hex, KEEPALIVE
 from .containers import RoborockDeviceInfo, UserData
 from .exceptions import CommandVacuumError, RoborockException, VacuumError
 from .roborock_future import RoborockFuture
@@ -18,7 +18,6 @@ from .roborock_message import RoborockMessage, RoborockParser, md5bin
 from .typing import RoborockCommand
 
 _LOGGER = logging.getLogger(__name__)
-MQTT_KEEPALIVE = 60
 CONNECT_REQUEST_ID = 0
 DISCONNECT_REQUEST_ID = 1
 
@@ -49,8 +48,6 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
         self._endpoint = base64.b64encode(md5bin(rriot.k)[8:14]).decode()
         self._waiting_queue: dict[int, RoborockFuture] = {}
         self._mutex = Lock()
-        self._last_device_msg_in = mqtt.time_func()
-        self._last_disconnection = mqtt.time_func()
         self.update_client_id()
 
     def __del__(self) -> None:
@@ -80,7 +77,6 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
 
     def on_message(self, *args, **kwargs) -> None:
         _, __, msg = args
-        self._last_device_msg_in = mqtt.time_func()
         device_id = msg.topic.split("/").pop()
         messages, _ = RoborockParser.decode(msg.payload, self.devices_info[device_id].device.local_key)
         super().on_message(messages)
@@ -88,11 +84,9 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
     def on_disconnect(self, *args, **kwargs) -> None:
         try:
             _, __, rc, ___ = args
-            self._last_disconnection = mqtt.time_func()
-            message = f"Roborock mqtt client disconnected (rc: {rc})"
+            super().on_disconnect(RoborockException(f"(rc: {rc})"))
             if rc == mqtt.MQTT_ERR_PROTOCOL:
                 self.update_client_id()
-            _LOGGER.warning(message)
             connection_queue = self._waiting_queue.get(DISCONNECT_REQUEST_ID)
             if connection_queue:
                 connection_queue.resolve((True, None))
@@ -102,18 +96,10 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
     def update_client_id(self):
         self._client_id = mqtt.base62(uuid.uuid4().int, padding=22)
 
-    def _async_check_keepalive(self) -> None:
-        now = mqtt.time_func()
-        # noinspection PyUnresolvedReferences
-        if (
-            now - self._last_disconnection > self._keepalive**2  # type: ignore[attr-defined]
-            and now - self._last_device_msg_in > self._keepalive  # type: ignore[attr-defined]
-        ):
-            self._ping_t = self._last_device_msg_in
-
     def _check_keepalive(self) -> None:
-        self._async_check_keepalive()
-        # noinspection PyUnresolvedReferences
+        if not self.should_keepalive():
+            self._ping_t = self.time_func() - KEEPALIVE
+            # noinspection PyUnresolvedReferences
         super()._check_keepalive()  # type: ignore[misc]
 
     def sync_stop_loop(self) -> None:
@@ -142,7 +128,7 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
             if self._mqtt_port is None or self._mqtt_host is None:
                 raise RoborockException("Mqtt information was not entered. Cannot connect.")
             _LOGGER.info("Connecting to mqtt")
-            super().connect_async(host=self._mqtt_host, port=self._mqtt_port, keepalive=MQTT_KEEPALIVE)
+            super().connect_async(host=self._mqtt_host, port=self._mqtt_port, keepalive=KEEPALIVE)
             return True
         return False
 

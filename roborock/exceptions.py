@@ -1,7 +1,7 @@
 """Roborock exceptions."""
 
 
-class RoborockException(BaseException):
+class RoborockException(Exception):
     """Class for Roborock exceptions."""
 
 
