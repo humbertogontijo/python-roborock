@@ -37,7 +37,15 @@ from .containers import (
     UserData,
     WashTowelMode,
 )
-from .exceptions import RoborockException, RoborockTimeout, VacuumError
+from .exceptions import (
+    RoborockAccountDoesNotExist,
+    RoborockException,
+    RoborockInvalidCode,
+    RoborockInvalidEmail,
+    RoborockTimeout,
+    RoborockUrlException,
+    VacuumError,
+)
 from .roborock_future import RoborockFuture
 from .roborock_message import RoborockMessage
 from .typing import DeviceProp, DockSummary, RoborockCommand
@@ -345,12 +353,15 @@ class RoborockApiClient:
                 params={"email": self._username, "needtwostepauth": "false"},
             )
             if response is None:
-                raise RoborockException("get url by email returned None")
-            if response.get("code") != 200:
-                raise RoborockException(response.get("error"))
+                raise RoborockUrlException("get url by email returned None")
+            response_code = response.get("code")
+            if response_code != 200:
+                if response_code == 2003:
+                    raise RoborockInvalidEmail("Your email was incorrectly formatted.")
+                raise RoborockUrlException(response.get("error"))
             response_data = response.get("data")
             if response_data is None:
-                raise RoborockException("response does not have 'data'")
+                raise RoborockUrlException("response does not have 'data'")
             self.base_url = response_data.get("url")
         return self.base_url
 
@@ -375,8 +386,12 @@ class RoborockApiClient:
         )
         if code_response is None:
             raise RoborockException("Failed to get a response from send email code")
-        if code_response.get("code") != 200:
-            raise RoborockException(code_response.get("msg"))
+        response_code = code_response.get("code")
+        if response_code != 200:
+            if response_code == 2008:
+                raise RoborockAccountDoesNotExist("Account does not exist - check your login and try again.")
+            else:
+                raise RoborockException(f"{code_response.get('msg')} - response code: {code_response.get('code')}")
 
     async def pass_login(self, password: str) -> UserData:
         base_url = await self._get_base_url()
@@ -395,7 +410,7 @@ class RoborockApiClient:
         if login_response is None:
             raise RoborockException("Login response is none")
         if login_response.get("code") != 200:
-            raise RoborockException(login_response.get("msg"))
+            raise RoborockException(f"{login_response.get('msg')} - response code: {login_response.get('code')}")
         user_data = login_response.get("data")
         if not isinstance(user_data, dict):
             raise RoborockException("Got unexpected data type for user_data")
@@ -417,8 +432,11 @@ class RoborockApiClient:
         )
         if login_response is None:
             raise RoborockException("Login request response is None")
-        if login_response.get("code") != 200:
-            raise RoborockException(login_response.get("msg"))
+        response_code = login_response.get("code")
+        if response_code != 200:
+            if response_code == 2018:
+                raise RoborockInvalidCode("Invalid code - check your code and try again.")
+            raise RoborockException(f"{login_response.get('msg')} - response code: {response_code}")
         user_data = login_response.get("data")
         if not isinstance(user_data, dict):
             raise RoborockException("Got unexpected data type for user_data")
@@ -439,7 +457,7 @@ class RoborockApiClient:
         if home_id_response is None:
             raise RoborockException("home_id_response is None")
         if home_id_response.get("code") != 200:
-            raise RoborockException(home_id_response.get("msg"))
+            raise RoborockException(f"{home_id_response.get('msg')} - response code: {home_id_response.get('code')}")
 
         home_id = home_id_response["data"].get("rrHomeId")
         timestamp = math.floor(time.time())
