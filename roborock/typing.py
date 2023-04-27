@@ -221,3 +221,17 @@ class DeviceProp:
     consumable: Optional[Consumable] = None
     last_clean_record: Optional[CleanRecord] = None
     dock_summary: Optional[DockSummary] = None
+
+    def update(self, device_prop: DeviceProp) -> None:
+        if device_prop.status:
+            self.status = device_prop.status
+        if device_prop.dnd_timer:
+            self.dnd_timer = device_prop.dnd_timer
+        if device_prop.clean_summary:
+            self.clean_summary = device_prop.clean_summary
+        if device_prop.consumable:
+            self.consumable = device_prop.consumable
+        if device_prop.last_clean_record:
+            self.last_clean_record = device_prop.last_clean_record
+        if device_prop.dock_summary:
+            self.dock_summary = device_prop.dock_summary
