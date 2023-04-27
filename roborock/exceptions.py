@@ -37,14 +37,18 @@ class CommandVacuumError(RoborockException):
         self.message = f"{command}: {str(vacuum_error)}"
         super().__init__(self.message)
 
+
 class RoborockAccountDoesNotExist(RoborockException):
     """Class for Roborock account does not exist exceptions."""
+
 
 class RoborockUrlException(RoborockException):
     """Class for being unable to get the URL for the Roborock account."""
 
+
 class RoborockInvalidCode(RoborockException):
     """Class for Roborock invalid code exceptions."""
+
 
 class RoborockInvalidEmail(RoborockException):
     """Class for Roborock invalid formatted email exceptions."""

@@ -37,8 +37,15 @@ from .containers import (
     UserData,
     WashTowelMode,
 )
-from .exceptions import RoborockException, RoborockTimeout, VacuumError, RoborockAccountDoesNotExist, \
-    RoborockUrlException, RoborockInvalidCode, RoborockInvalidEmail
+from .exceptions import (
+    RoborockAccountDoesNotExist,
+    RoborockException,
+    RoborockInvalidCode,
+    RoborockInvalidEmail,
+    RoborockTimeout,
+    RoborockUrlException,
+    VacuumError,
+)
 from .roborock_future import RoborockFuture
 from .roborock_message import RoborockMessage
 from .typing import DeviceProp, DockSummary, RoborockCommand
@@ -384,8 +391,7 @@ class RoborockApiClient:
             if response_code == 2008:
                 raise RoborockAccountDoesNotExist("Account does not exist - check your login and try again.")
             else:
-                raise RoborockException(
-                    f"{code_response.get('msg')} - response code: {code_response.get('code')}")
+                raise RoborockException(f"{code_response.get('msg')} - response code: {code_response.get('code')}")
 
     async def pass_login(self, password: str) -> UserData:
         base_url = await self._get_base_url()

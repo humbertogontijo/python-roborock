@@ -285,10 +285,11 @@ class Consumable(RoborockBase):
     sensor_time_left: Optional[int] = None
 
     def __post_init__(self):
-        self.main_brush_time_left = 1080000 - self.main_brush_work_time
-        self.side_brush_time_left = 720000 - self.side_brush_work_time
-        self.filter_time_left =540000 - self.filter_work_time
-        self.sensor_time_left = 108000 - self.sensor_dirty_time
+        self.main_brush_time_left = 1080000 - self.main_brush_work_time if self.main_brush_work_time else None
+        self.side_brush_time_left = 720000 - self.side_brush_work_time if self.side_brush_work_time else None
+        self.filter_time_left = 540000 - self.filter_work_time if self.filter_work_time else None
+        self.sensor_time_left = 108000 - self.sensor_dirty_time if self.sensor_dirty_time else None
+
 
 @dataclass
 class MultiMapsListMapInfoBakMaps(RoborockBase):
