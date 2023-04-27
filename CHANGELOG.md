@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.8.1 (2023-04-27)
+### Fix
+* Adding keepalive to local connection ([`8ff8d2f`](https://github.com/humbertogontijo/python-roborock/commit/8ff8d2f13fd85df96b3b334456799244ac878fbe))
+
 ## v0.8.0 (2023-04-27)
 ### Feature
 * Added error check and deviceprop functionality for core ([#42](https://github.com/humbertogontijo/python-roborock/issues/42)) ([`746eec9`](https://github.com/humbertogontijo/python-roborock/commit/746eec99ae0b6115fea6277f51b546036f7b3f18))
