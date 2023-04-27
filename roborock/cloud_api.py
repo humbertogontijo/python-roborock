@@ -5,7 +5,7 @@ import logging
 import threading
 import uuid
 from asyncio import Lock
-from typing import Mapping, Optional
+from typing import Optional
 from urllib.parse import urlparse
 
 import paho.mqtt.client as mqtt
@@ -25,12 +25,12 @@ DISCONNECT_REQUEST_ID = 1
 class RoborockMqttClient(RoborockClient, mqtt.Client):
     _thread: threading.Thread
 
-    def __init__(self, user_data: UserData, devices_info: Mapping[str, RoborockDeviceInfo]) -> None:
+    def __init__(self, user_data: UserData, device_info: RoborockDeviceInfo) -> None:
         rriot = user_data.rriot
         if rriot is None:
             raise RoborockException("Got no rriot data from user_data")
         endpoint = base64.b64encode(md5bin(rriot.k)[8:14]).decode()
-        RoborockClient.__init__(self, endpoint, devices_info)
+        RoborockClient.__init__(self, endpoint, device_info)
         mqtt.Client.__init__(self, protocol=mqtt.MQTTv5)
         self._mqtt_user = rriot.u
         self._hashed_user = md5hex(self._mqtt_user + ":" + rriot.k)[2:10]
@@ -63,7 +63,7 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
                 connection_queue.resolve((None, VacuumError(rc, message)))
             return
         _LOGGER.info(f"Connected to mqtt {self._mqtt_host}:{self._mqtt_port}")
-        topic = f"rr/m/o/{self._mqtt_user}/{self._hashed_user}/#"
+        topic = f"rr/m/o/{self._mqtt_user}/{self._hashed_user}/{self.device_info.device.duid}"
         (result, mid) = self.subscribe(topic)
         if result != 0:
             message = f"Failed to subscribe (rc: {result})"
@@ -77,8 +77,7 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
 
     def on_message(self, *args, **kwargs) -> None:
         _, __, msg = args
-        device_id = msg.topic.split("/").pop()
-        messages, _ = RoborockParser.decode(msg.payload, self.devices_info[device_id].device.local_key)
+        messages, _ = RoborockParser.decode(msg.payload, self.device_info.device.local_key)
         super().on_message(messages)
 
     def on_disconnect(self, *args, **kwargs) -> None:
@@ -151,21 +150,21 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
     async def validate_connection(self) -> None:
         await self.async_connect()
 
-    def _send_msg_raw(self, device_id, msg) -> None:
-        info = self.publish(f"rr/m/i/{self._mqtt_user}/{self._hashed_user}/{device_id}", msg)
+    def _send_msg_raw(self, msg) -> None:
+        info = self.publish(f"rr/m/i/{self._mqtt_user}/{self._hashed_user}/{self.device_info.device.duid}", msg)
         if info.rc != mqtt.MQTT_ERR_SUCCESS:
             raise RoborockException(f"Failed to publish (rc: {info.rc})")
 
-    async def send_command(self, device_id: str, method: RoborockCommand, params: Optional[list] = None):
+    async def send_command(self, method: RoborockCommand, params: Optional[list] = None):
         await self.validate_connection()
         request_id, timestamp, payload = super()._get_payload(method, params, True)
         _LOGGER.debug(f"id={request_id} Requesting method {method} with {params}")
         request_protocol = 101
         response_protocol = 301 if method in SPECIAL_COMMANDS else 102
         roborock_message = RoborockMessage(timestamp=timestamp, protocol=request_protocol, payload=payload)
-        local_key = self.devices_info[device_id].device.local_key
+        local_key = self.device_info.device.local_key
         msg = RoborockParser.encode(roborock_message, local_key)
-        self._send_msg_raw(device_id, msg)
+        self._send_msg_raw(msg)
         (response, err) = await self._async_response(request_id, response_protocol)
         if err:
             raise CommandVacuumError(method, err) from err
@@ -175,9 +174,9 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
             _LOGGER.debug(f"id={request_id} Response from {method}: {response}")
         return response
 
-    async def get_map_v1(self, device_id):
+    async def get_map_v1(self):
         try:
-            return await self.send_command(device_id, RoborockCommand.GET_MAP_V1)
+            return await self.send_command(RoborockCommand.GET_MAP_V1)
         except RoborockException as e:
             _LOGGER.error(e)
         return None

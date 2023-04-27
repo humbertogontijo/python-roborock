@@ -2,6 +2,7 @@ from unittest.mock import patch
 
 import paho.mqtt.client as mqtt
 import pytest
+from roborock.containers import RoborockDeviceInfo
 
 from roborock import HomeData, RoborockDockDustCollectionModeCode, RoborockDockWashTowelModeCode, UserData
 from roborock.api import PreparedRequest, RoborockApiClient
@@ -19,8 +20,8 @@ def test_can_create_prepared_request():
 
 def test_can_create_mqtt_roborock():
     home_data = HomeData.from_dict(HOME_DATA_RAW)
-    device_map = {home_data.devices[0].duid: home_data.devices[0]}
-    RoborockMqttClient(UserData.from_dict(USER_DATA), device_map)
+    device_info = RoborockDeviceInfo(device=home_data.devices[0])
+    RoborockMqttClient(UserData.from_dict(USER_DATA), device_info)
 
 
 def test_sync_connect(mqtt_client):
@@ -68,11 +69,11 @@ async def test_get_home_data():
 @pytest.mark.asyncio
 async def test_get_dust_collection_mode():
     home_data = HomeData.from_dict(HOME_DATA_RAW)
-    device_map = {home_data.devices[0].duid: home_data.devices[0]}
-    rmc = RoborockMqttClient(UserData.from_dict(USER_DATA), device_map)
+    device_info = RoborockDeviceInfo(device=home_data.devices[0])
+    rmc = RoborockMqttClient(UserData.from_dict(USER_DATA), device_info)
     with patch("roborock.cloud_api.RoborockMqttClient.send_command") as command:
         command.return_value = {"mode": 1}
-        dust = await rmc.get_dust_collection_mode(home_data.devices[0].duid)
+        dust = await rmc.get_dust_collection_mode()
         assert dust is not None
         assert dust.mode == RoborockDockDustCollectionModeCode["1"]
 
@@ -80,11 +81,11 @@ async def test_get_dust_collection_mode():
 @pytest.mark.asyncio
 async def test_get_mop_wash_mode():
     home_data = HomeData.from_dict(HOME_DATA_RAW)
-    device_map = {home_data.devices[0].duid: home_data.devices[0]}
-    rmc = RoborockMqttClient(UserData.from_dict(USER_DATA), device_map)
+    device_info = RoborockDeviceInfo(device=home_data.devices[0])
+    rmc = RoborockMqttClient(UserData.from_dict(USER_DATA), device_info)
     with patch("roborock.cloud_api.RoborockMqttClient.send_command") as command:
         command.return_value = {"smart_wash": 0, "wash_interval": 1500}
-        mop_wash = await rmc.get_smart_wash_params(home_data.devices[0].duid)
+        mop_wash = await rmc.get_smart_wash_params()
         assert mop_wash is not None
         assert mop_wash.smart_wash == 0
         assert mop_wash.wash_interval == 1500
@@ -93,10 +94,10 @@ async def test_get_mop_wash_mode():
 @pytest.mark.asyncio
 async def test_get_washing_mode():
     home_data = HomeData.from_dict(HOME_DATA_RAW)
-    device_map = {home_data.devices[0].duid: home_data.devices[0]}
-    rmc = RoborockMqttClient(UserData.from_dict(USER_DATA), device_map)
+    device_info = RoborockDeviceInfo(device=home_data.devices[0])
+    rmc = RoborockMqttClient(UserData.from_dict(USER_DATA), device_info)
     with patch("roborock.cloud_api.RoborockMqttClient.send_command") as command:
         command.return_value = {"wash_mode": 2}
-        washing_mode = await rmc.get_wash_towel_mode(home_data.devices[0].duid)
+        washing_mode = await rmc.get_wash_towel_mode()
         assert washing_mode is not None
         assert washing_mode.wash_mode == RoborockDockWashTowelModeCode["2"]

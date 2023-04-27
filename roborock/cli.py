@@ -102,26 +102,30 @@ async def list_devices(ctx):
         await _discover(ctx)
         login_data = context.login_data()
     home_data = login_data.home_data
-    click.echo(f"Known devices {', '.join([device.name for device in home_data.devices + home_data.received_devices])}")
+    device_name_id = ", ".join(
+        [f"{device.name}: {device.duid}" for device in home_data.devices + home_data.received_devices]
+    )
+    click.echo(f"Known devices {device_name_id}")
 
 
 @click.command()
+@click.option("--device_id", required=True)
 @click.option("--cmd", required=True)
 @click.option("--params", required=False)
 @click.pass_context
 @run_sync()
-async def command(ctx, cmd, params):
+async def command(ctx, cmd, device_id, params):
     context: RoborockContext = ctx.obj
     login_data = context.login_data()
     if not login_data.home_data:
         await _discover(ctx)
         login_data = context.login_data()
     home_data = login_data.home_data
-    device_map: dict[str, RoborockDeviceInfo] = {}
-    for device in home_data.devices + home_data.received_devices:
-        device_map[device.duid] = RoborockDeviceInfo(device=device)
-    mqtt_client = RoborockMqttClient(login_data.user_data, device_map)
-    await mqtt_client.send_command(home_data.devices[0].duid, cmd, params)
+    devices = home_data.devices + home_data.received_devices
+    device = next((device for device in devices if device.duid == device_id), None)
+    device_info = RoborockDeviceInfo(device=device)
+    mqtt_client = RoborockMqttClient(login_data.user_data, device_info)
+    await mqtt_client.send_command(cmd, params)
     mqtt_client.__del__()
 
 
