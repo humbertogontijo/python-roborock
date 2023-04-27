@@ -10,7 +10,7 @@ from urllib.parse import urlparse
 
 import paho.mqtt.client as mqtt
 
-from .api import SPECIAL_COMMANDS, RoborockClient, md5hex, KEEPALIVE
+from .api import KEEPALIVE, SPECIAL_COMMANDS, RoborockClient, md5hex
 from .containers import RoborockDeviceInfo, UserData
 from .exceptions import CommandVacuumError, RoborockException, VacuumError
 from .roborock_future import RoborockFuture
