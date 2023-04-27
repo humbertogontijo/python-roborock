@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.8.2 (2023-04-27)
+### Fix
+* Using single device api ([`e689e8d`](https://github.com/humbertogontijo/python-roborock/commit/e689e8d141acff998fd524ace923621fc0f91d0c))
+
 ## v0.8.1 (2023-04-27)
 ### Fix
 * Adding keepalive to local connection ([`8ff8d2f`](https://github.com/humbertogontijo/python-roborock/commit/8ff8d2f13fd85df96b3b334456799244ac878fbe))
