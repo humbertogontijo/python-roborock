@@ -146,7 +146,6 @@ RoborockMopIntensityCode = create_code_enum(
         202: "moderate",
         203: "intense",
         204: "custom",
-        207: "custom | relatively large",
     },
 )
 
