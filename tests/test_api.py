@@ -2,11 +2,11 @@ from unittest.mock import patch
 
 import paho.mqtt.client as mqtt
 import pytest
-from roborock.containers import RoborockDeviceInfo
 
 from roborock import HomeData, RoborockDockDustCollectionModeCode, RoborockDockWashTowelModeCode, UserData
 from roborock.api import PreparedRequest, RoborockApiClient
 from roborock.cloud_api import RoborockMqttClient
+from roborock.containers import RoborockDeviceInfo
 from tests.mock_data import BASE_URL_REQUEST, GET_CODE_RESPONSE, HOME_DATA_RAW, USER_DATA
 
 
