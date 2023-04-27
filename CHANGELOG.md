@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.8.0 (2023-04-27)
+### Feature
+* Added error check and deviceprop functionality for core ([#42](https://github.com/humbertogontijo/python-roborock/issues/42)) ([`746eec9`](https://github.com/humbertogontijo/python-roborock/commit/746eec99ae0b6115fea6277f51b546036f7b3f18))
+
 ## v0.7.8 (2023-04-26)
 ### Fix
 * Local api failing to send message ([`4cc38fe`](https://github.com/humbertogontijo/python-roborock/commit/4cc38fe13df487296efda2a1e962c238e3d69168))
