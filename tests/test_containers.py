@@ -187,3 +187,13 @@ def test_clean_record():
     assert cr.avoid_count == 19
     assert cr.wash_count == 2
     assert cr.map_flag == 0
+
+
+def test_no_value():
+    modified_status = STATUS.copy()
+    modified_status["mop_mode"] = 9999
+    s = Status.from_dict(modified_status)
+
+    assert s.mop_mode == RoborockMopModeCode["-9999"]
+    assert "-9999" not in RoborockMopModeCode.keys()
+    assert "UNKNOWN" not in RoborockMopModeCode.values()

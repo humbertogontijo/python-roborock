@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import logging
 from enum import Enum
 from typing import Any, Type, TypeVar
 
 _StrEnumT = TypeVar("_StrEnumT", bound="RoborockEnum")
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class RoborockEnum(str, Enum):
@@ -18,11 +21,15 @@ class RoborockEnum(str, Enum):
 
     @classmethod
     def _missing_(cls: Type[_StrEnumT], code: object):
-        return cls._member_map_.get(str(code))
+        if cls._member_map_.get(str(code)):
+            return cls._member_map_.get(str(code))
+        else:
+            _LOGGER.warning(f"Unknown code {code} for {cls.__name__}")
+            return cls._member_map_.get(str(-9999))
 
     @classmethod
     def as_dict(cls: Type[_StrEnumT]):
-        return {int(i.name): i.value for i in cls}
+        return {int(i.name): i.value for i in cls if i.value != "UNKNOWN"}
 
     @classmethod
     def values(cls: Type[_StrEnumT]):
@@ -42,6 +49,7 @@ class RoborockEnum(str, Enum):
 
 
 def create_code_enum(name: str, data: dict) -> RoborockEnum:
+    data[-9999] = "UNKNOWN"
     return RoborockEnum(name, {str(key): value for key, value in data.items()})
 
 
