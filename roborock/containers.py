@@ -20,6 +20,8 @@ from .code_mappings import (
     RoborockErrorCode,
     RoborockFanPowerCode,
     RoborockMopModeCode,
+    OldRoborockFanPowerCode,
+    OldRoborockMopIntensityCode,
 )
 from .const import FILTER_REPLACE_TIME, MAIN_BRUSH_REPLACE_TIME, SENSOR_DIRTY_REPLACE_TIME, SIDE_BRUSH_REPLACE_TIME
 
@@ -160,6 +162,11 @@ class HomeDataDevice(RoborockBase):
     new_feature_set: Optional[str] = None
     device_status: Optional[HomeDataDeviceStatus] = None
     silent_ota_switch: Optional[bool] = None
+    uses_old_codes: bool = False
+
+    def __post_init__(self):
+        if self.device_status.model == "roborock.vacuum.a10":
+            self.uses_old_codes = True
 
 
 @dataclass
@@ -233,6 +240,10 @@ class Status(RoborockBase):
     charge_status: Optional[int] = None
     unsave_map_reason: Optional[int] = None
     unsave_map_flag: Optional[int] = None
+
+class StatusOldModes(Status):
+    water_box_mode: Optional[OldRoborockMopIntensityCode] = None  # type: ignore[valid-type]
+    fan_power: Optional[OldRoborockFanPowerCode] = None  # type: ignore[valid-type]
 
 
 @dataclass

@@ -1,4 +1,4 @@
-from roborock import CleanRecord, CleanSummary, Consumable, DNDTimer, HomeData, Status, UserData
+from roborock import CleanRecord, CleanSummary, Consumable, DNDTimer, HomeData, Status, UserData, StatusOldModes
 from roborock.code_mappings import (
     RoborockDockErrorCode,
     RoborockDockTypeCode,
@@ -6,7 +6,7 @@ from roborock.code_mappings import (
     RoborockFanPowerCode,
     RoborockMopIntensityCode,
     RoborockMopModeCode,
-    RoborockStateCode,
+    RoborockStateCode, OldRoborockFanPowerCode, OldRoborockMopIntensityCode,
 )
 
 from .mock_data import CLEAN_RECORD, CLEAN_SUMMARY, CONSUMABLE, DND_TIMER, HOME_DATA_RAW, STATUS, USER_DATA
@@ -152,6 +152,14 @@ def test_status():
     assert s.unsave_map_reason == 0
     assert s.unsave_map_flag == 0
 
+def test_old_status():
+    s = StatusOldModes.from_dict(STATUS)
+    assert isinstance(s.water_box_mode, OldRoborockMopIntensityCode)
+    assert isinstance(s.fan_power, OldRoborockFanPowerCode)
+    assert s.msg_ver == 2
+    assert s.msg_seq == 458
+    assert s.state == RoborockStateCode["8"]
+    assert s.fan_power == OldRoborockFanPowerCode["102"]
 
 def test_dnd_timer():
     dnd = DNDTimer.from_dict(DND_TIMER)

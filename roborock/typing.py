@@ -107,6 +107,7 @@ class RoborockCommand(str, Enum):
     GET_DEVICE_ICE = "get_device_ice"
     START_VOICE_CHAT = "start_voice_chat"
     SEND_SDP_TO_ROBOT = "send_sdp_to_robot"
+    GET_FW_FEATURES = "get_fw_features"
 
 
 @dataclass

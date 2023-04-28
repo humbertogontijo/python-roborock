@@ -35,7 +35,7 @@ from .containers import (
     SmartWashParams,
     Status,
     UserData,
-    WashTowelMode,
+    WashTowelMode, StatusOldModes,
 )
 from .exceptions import (
     RoborockAccountDoesNotExist,
@@ -206,6 +206,8 @@ class RoborockClient:
     async def get_status(self, device_id: str) -> Status | None:
         status = await self.send_command(device_id, RoborockCommand.GET_STATUS)
         if isinstance(status, dict):
+            if self.devices_info[device_id].device.uses_old_codes:
+                return StatusOldModes.from_dict(status)
             return Status.from_dict(status)
         return None
 

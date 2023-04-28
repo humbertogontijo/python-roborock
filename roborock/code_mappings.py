@@ -160,7 +160,14 @@ RoborockDockErrorCode = create_code_enum(
 
 RoborockDockTypeCode = create_code_enum(
     "RoborockDockTypeCode",
-    {0: "no_dock", 1: "unknown", 2: "unknown", 3: "empty_wash_fill_dock", 4: "unknown", 5: "auto_empty_dock_pure"},
+    {
+        0: "no_dock",
+        1: "unknown",
+        2: "unknown",
+        3: "empty_wash_fill_dock",
+        4: "unknown",
+        5: "auto_empty_dock_pure"
+    },
 )
 
 RoborockDockDustCollectionModeCode = create_code_enum(
@@ -180,4 +187,27 @@ RoborockDockWashTowelModeCode = create_code_enum(
         1: "balanced",
         2: "deep",
     },
+)
+
+OldRoborockFanPowerCode = create_code_enum(
+    "OldRoborockFanPowerCode",
+    {
+        101: "silent",
+        102: "balanced",
+        103: "turbo",
+        104: "max",
+        105: "gentle",
+        106: "customize (auto)"
+    }
+)
+
+OldRoborockMopIntensityCode = create_code_enum(
+    "OldRoborockMopModeCode",
+    {
+        200: "off",
+        201: "low",
+        202: "medium",
+        203: "high",
+        207: "custom (levels)"
+    }
 )
