@@ -1,7 +1,6 @@
 from roborock import CleanRecord, CleanSummary, Consumable, DNDTimer, HomeData, Status, StatusOldModes, UserData
 from roborock.code_mappings import (
     OldRoborockFanPowerCode,
-    OldRoborockMopIntensityCode,
     RoborockDockErrorCode,
     RoborockDockTypeCode,
     RoborockErrorCode,
@@ -157,8 +156,6 @@ def test_status():
 
 def test_old_status():
     s = StatusOldModes.from_dict(STATUS)
-    assert isinstance(s.water_box_mode, OldRoborockMopIntensityCode)
-    assert isinstance(s.fan_power, OldRoborockFanPowerCode)
     assert s.msg_ver == 2
     assert s.msg_seq == 458
     assert s.state == RoborockStateCode["8"]

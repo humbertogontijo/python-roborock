@@ -127,7 +127,7 @@ class HomeDataDeviceStatus(RoborockBase):
     id: Optional[Any] = None
     name: Optional[Any] = None
     code: Optional[Any] = None
-    model: Optional[Any] = None
+    model: Optional[str] = None
     icon_url: Optional[Any] = None
     attribute: Optional[Any] = None
     capability: Optional[Any] = None
@@ -165,7 +165,7 @@ class HomeDataDevice(RoborockBase):
     uses_old_codes: bool = False
 
     def __post_init__(self):
-        if self.device_status.model == "roborock.vacuum.a10":
+        if self.device_status and self.device_status.model == "roborock.vacuum.a10":
             self.uses_old_codes = True
 
 
