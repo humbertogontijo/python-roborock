@@ -15,13 +15,13 @@ from roborock.code_mappings import (
 )
 
 from .code_mappings import (
+    OldRoborockFanPowerCode,
+    OldRoborockMopIntensityCode,
     RoborockDockDustCollectionModeCode,
     RoborockDockErrorCode,
     RoborockErrorCode,
     RoborockFanPowerCode,
     RoborockMopModeCode,
-    OldRoborockFanPowerCode,
-    OldRoborockMopIntensityCode,
 )
 from .const import FILTER_REPLACE_TIME, MAIN_BRUSH_REPLACE_TIME, SENSOR_DIRTY_REPLACE_TIME, SIDE_BRUSH_REPLACE_TIME
 
@@ -240,6 +240,7 @@ class Status(RoborockBase):
     charge_status: Optional[int] = None
     unsave_map_reason: Optional[int] = None
     unsave_map_flag: Optional[int] = None
+
 
 class StatusOldModes(Status):
     water_box_mode: Optional[OldRoborockMopIntensityCode] = None  # type: ignore[valid-type]

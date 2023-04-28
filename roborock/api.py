@@ -34,8 +34,9 @@ from .containers import (
     RoomMapping,
     SmartWashParams,
     Status,
+    StatusOldModes,
     UserData,
-    WashTowelMode, StatusOldModes,
+    WashTowelMode,
 )
 from .exceptions import (
     RoborockAccountDoesNotExist,
