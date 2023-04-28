@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.8.3 (2023-04-28)
+### Fix
+* Add functionality for missing enum values ([#43](https://github.com/humbertogontijo/python-roborock/issues/43)) ([`49d77f8`](https://github.com/humbertogontijo/python-roborock/commit/49d77f8208a65cb0fb86ab7948138df0bf447e45))
+
 ## v0.8.2 (2023-04-27)
 ### Fix
 * Using single device api ([`e689e8d`](https://github.com/humbertogontijo/python-roborock/commit/e689e8d141acff998fd524ace923621fc0f91d0c))
