@@ -52,7 +52,7 @@ class RoborockMessage:
 
     def get_method(self) -> RoborockCommand | None:
         protocol = self.protocol
-        if protocol in [4, 101, 102]:
+        if protocol in [4, 5, 101, 102]:
             payload = json.loads(self.payload.decode())
             for data_point_number, data_point in payload.get("dps").items():
                 if data_point_number in ["101", "102"]:
@@ -111,7 +111,7 @@ class RoborockParser:
         prefix = b""
         original_index = index
         if len(msg) - index < 17:
-            ## broken message
+            # broken message
             return [], msg[original_index:]
 
         if msg[index + 4 : index + 7] == "1.0".encode():
@@ -119,7 +119,8 @@ class RoborockParser:
             index += 4
         elif msg[index : index + 3] != "1.0".encode():
             raise RoborockException(f"Unknown protocol version {msg[0:3]!r}")
-        if len(msg) - index in [17]:
+        message_size = len(msg) - index
+        if message_size == 17:
             [version, request_id, random, timestamp, protocol] = struct.unpack_from("!3sIIIH", msg, index)
             return [
                 RoborockMessage(
@@ -134,9 +135,10 @@ class RoborockParser:
             ], b""
 
         if len(msg) - index < 19:
-            ## broken message
+            # broken message
             return [], msg[original_index:]
 
+        _format = "!3sIIIHH"
         [
             version,
             request_id,
@@ -144,8 +146,9 @@ class RoborockParser:
             timestamp,
             protocol,
             payload_len,
-        ] = struct.unpack_from("!3sIIIHH", msg, index)
-        index += 19
+        ] = struct.unpack_from(_format, msg, index)
+        format_size = struct.calcsize(_format)
+        index += format_size
 
         if payload_len + index + 4 > len(msg):
             ## broken message
@@ -156,7 +159,7 @@ class RoborockParser:
             index += 2
         else:
             [payload, expected_crc32] = struct.unpack_from(f"!{payload_len}sI", msg, index)
-            crc32 = binascii.crc32(msg[index - 19 : index + payload_len])
+            crc32 = binascii.crc32(msg[index - format_size : index + payload_len])
             index += 4 + payload_len
             if crc32 != expected_crc32:
                 raise RoborockException(f"Wrong CRC32 {crc32}, expected {expected_crc32}")

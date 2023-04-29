@@ -94,6 +94,9 @@ class RoborockClient:
         self._last_disconnection = self.time_func()
         self.keep_alive = KEEPALIVE
 
+    def __del__(self) -> None:
+        self.sync_disconnect()
+
     @property
     def time_func(self) -> Callable[[], float]:
         try:
@@ -103,10 +106,16 @@ class RoborockClient:
             time_func = time.time
         return time_func
 
+    async def async_connect(self):
+        raise NotImplementedError
+
+    def sync_disconnect(self) -> Any:
+        raise NotImplementedError
+
     async def async_disconnect(self) -> Any:
         raise NotImplementedError
 
-    def on_message(self, messages: list[RoborockMessage]) -> None:
+    def on_message_received(self, messages: list[RoborockMessage]) -> None:
         try:
             self._last_device_msg_in = self.time_func()
             for data in messages:
@@ -118,24 +127,23 @@ class RoborockClient:
                             data_point_response = json.loads(data_point)
                             request_id = data_point_response.get("id")
                             queue = self._waiting_queue.get(request_id)
-                            if queue:
-                                if queue.protocol == protocol:
-                                    error = data_point_response.get("error")
-                                    if error:
-                                        queue.resolve(
-                                            (
-                                                None,
-                                                VacuumError(
-                                                    error.get("code"),
-                                                    error.get("message"),
-                                                ),
-                                            )
+                            if queue and queue.protocol == protocol:
+                                error = data_point_response.get("error")
+                                if error:
+                                    queue.resolve(
+                                        (
+                                            None,
+                                            VacuumError(
+                                                error.get("code"),
+                                                error.get("message"),
+                                            ),
                                         )
-                                    else:
-                                        result = data_point_response.get("result")
-                                        if isinstance(result, list) and len(result) == 1:
-                                            result = result[0]
-                                        queue.resolve((result, None))
+                                    )
+                                else:
+                                    result = data_point_response.get("result")
+                                    if isinstance(result, list) and len(result) == 1:
+                                        result = result[0]
+                                    queue.resolve((result, None))
                 elif protocol == 301:
                     payload = data.payload[0:24]
                     [endpoint, _, request_id, _] = struct.unpack("<15sBH6s", payload)
@@ -149,10 +157,14 @@ class RoborockClient:
                             if isinstance(decrypted, list):
                                 decrypted = decrypted[0]
                             queue.resolve((decrypted, None))
+                else:
+                    queue = self._waiting_queue.get(data.seq)
+                    if queue:
+                        queue.resolve((data.payload, None))
         except Exception as ex:
             _LOGGER.exception(ex)
 
-    def on_disconnect(self, exc: Optional[Exception]) -> None:
+    def on_connection_lost(self, exc: Optional[Exception]) -> None:
         self._last_disconnection = self.time_func()
         _LOGGER.warning("Roborock client disconnected")
         if exc is not None:
@@ -161,9 +173,14 @@ class RoborockClient:
     def should_keepalive(self) -> bool:
         now = self.time_func()
         # noinspection PyUnresolvedReferences
-        if now - self._last_disconnection > self.keep_alive**2 and now - self._last_device_msg_in > self.keep_alive:
+        if now - self._last_disconnection > self.keep_alive ** 2 and now - self._last_device_msg_in > self.keep_alive:
             return False
         return True
+
+    async def validate_connection(self) -> None:
+        if not self.should_keepalive():
+            await self.async_disconnect()
+        await self.async_connect()
 
     async def _async_response(self, request_id: int, protocol_id: int = 0) -> tuple[Any, VacuumError | None]:
         try:

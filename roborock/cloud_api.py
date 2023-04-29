@@ -24,6 +24,7 @@ DISCONNECT_REQUEST_ID = 1
 
 class RoborockMqttClient(RoborockClient, mqtt.Client):
     _thread: threading.Thread
+    _client_id: str
 
     def __init__(self, user_data: UserData, device_info: RoborockDeviceInfo) -> None:
         rriot = user_data.rriot
@@ -37,7 +38,7 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
         url = urlparse(rriot.r.m)
         if not isinstance(url.hostname, str):
             raise RoborockException("Url parsing returned an invalid hostname")
-        self._mqtt_host = url.hostname
+        self._mqtt_host = str(url.hostname)
         self._mqtt_port = url.port
         self._mqtt_ssl = url.scheme == "ssl"
         if self._mqtt_ssl:
@@ -50,10 +51,7 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
         self._mutex = Lock()
         self.update_client_id()
 
-    def __del__(self) -> None:
-        self.sync_disconnect()
-
-    def on_connect(self, *args, **kwargs) -> None:
+    def on_connect(self, *args, **kwargs):
         _, __, ___, rc, ____ = args
         connection_queue = self._waiting_queue.get(CONNECT_REQUEST_ID)
         if rc != mqtt.MQTT_ERR_SUCCESS:
@@ -75,15 +73,18 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
         if connection_queue:
             connection_queue.resolve((True, None))
 
-    def on_message(self, *args, **kwargs) -> None:
+    def on_message(self, *args, **kwargs):
         _, __, msg = args
-        messages, _ = RoborockParser.decode(msg.payload, self.device_info.device.local_key)
-        super().on_message(messages)
-
-    def on_disconnect(self, *args, **kwargs) -> None:
         try:
-            _, __, rc, ___ = args
-            super().on_disconnect(RoborockException(f"(rc: {rc})"))
+            messages, _ = RoborockParser.decode(msg.payload, self.device_info.device.local_key)
+            super().on_message_received(messages)
+        except Exception as ex:
+            _LOGGER.exception(ex)
+
+    def on_disconnect(self, *args, **kwargs):
+        _, __, rc, ___ = args
+        try:
+            super().on_connection_lost(RoborockException(f"(rc: {rc})"))
             if rc == mqtt.MQTT_ERR_PROTOCOL:
                 self.update_client_id()
             connection_queue = self._waiting_queue.get(DISCONNECT_REQUEST_ID)
@@ -94,12 +95,6 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
 
     def update_client_id(self):
         self._client_id = mqtt.base62(uuid.uuid4().int, padding=22)
-
-    def _check_keepalive(self) -> None:
-        if not self.should_keepalive():
-            self._ping_t = self.time_func() - KEEPALIVE
-            # noinspection PyUnresolvedReferences
-        super()._check_keepalive()  # type: ignore[misc]
 
     def sync_stop_loop(self) -> None:
         if self._thread:
@@ -147,10 +142,7 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
                 if err:
                     raise RoborockException(err) from err
 
-    async def validate_connection(self) -> None:
-        await self.async_connect()
-
-    def _send_msg_raw(self, msg) -> None:
+    def _send_msg_raw(self, msg: bytes) -> None:
         info = self.publish(f"rr/m/i/{self._mqtt_user}/{self._hashed_user}/{self.device_info.device.duid}", msg)
         if info.rc != mqtt.MQTT_ERR_SUCCESS:
             raise RoborockException(f"Failed to publish (rc: {info.rc})")

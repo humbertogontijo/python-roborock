@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import asyncio
 import logging
-import socket
 from asyncio import Lock, Transport
 from typing import Optional
 
@@ -35,26 +34,34 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
             self.remaining = b""
         (parser_msg, remaining) = RoborockParser.decode(message, self.device_info.device.local_key)
         self.remaining = remaining
-        self.on_message(parser_msg)
+        self.on_message_received(parser_msg)
 
     def connection_lost(self, exc: Optional[Exception]):
-        self.on_disconnect(exc)
+        self.on_connection_lost(exc)
 
     def is_connected(self):
         return self.transport and self.transport.is_reading()
 
     async def async_connect(self) -> None:
-        try:
-            if not self.is_connected():
-                async with async_timeout.timeout(QUEUE_TIMEOUT):
-                    _LOGGER.info(f"Connecting to {self.ip}")
-                    self.transport, _ = await self.loop.create_connection(lambda: self, self.ip, 58867)  # type: ignore
-        except Exception as e:
-            raise RoborockConnectionException(f"Failed connecting to {self.ip}") from e
+        async with self._mutex:
+            try:
+                if not self.is_connected():
+                    async with async_timeout.timeout(QUEUE_TIMEOUT):
+                        _LOGGER.info(f"Connecting to {self.ip}")
+                        self.transport, _ = await self.loop.create_connection(
+                            lambda: self, self.ip, 58867
+                        )  # type: ignore
+                        _LOGGER.info(f"Connected to {self.ip}")
+            except Exception as e:
+                raise RoborockConnectionException(f"Failed connecting to {self.ip}") from e
+
+    def sync_disconnect(self) -> None:
+        if self.transport and not self.loop.is_closed():
+            self.transport.close()
 
     async def async_disconnect(self) -> None:
-        if self.transport:
-            self.transport.close()
+        async with self._mutex:
+            self.sync_disconnect()
 
     def build_roborock_message(self, method: RoborockCommand, params: Optional[list] = None) -> RoborockMessage:
         secured = True if method in SPECIAL_COMMANDS else False
@@ -75,20 +82,30 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
             payload=payload,
         )
 
-    async def send_command(self, method: RoborockCommand, params: Optional[list] = None):
+    async def ping(self):
+        command_info = CommandInfoMap.get(None)
+        roborock_message = RoborockMessage(
+            prefix=command_info.prefix,
+            protocol=0,
+            payload=b''
+        )
+        return (await self.send_message(roborock_message))[0]
+
+    async def send_command(self, method: RoborockCommand, params: Optional[list | dict] = None):
         roborock_message = self.build_roborock_message(method, params)
         return (await self.send_message(roborock_message))[0]
 
     async def async_local_response(self, roborock_message: RoborockMessage):
         request_id = roborock_message.get_request_id()
-        if request_id is not None:
-            # response_protocol = 5 if roborock_message.prefix == secured_prefix else 4
-            response_protocol = 4
-            (response, err) = await self._async_response(request_id, response_protocol)
-            if err:
-                raise CommandVacuumError("", err) from err
-            _LOGGER.debug(f"id={request_id} Response from {roborock_message.get_method()}: {response}")
-            return response
+        if request_id is None:
+            request_id = roborock_message.seq
+        # response_protocol = 5 if roborock_message.prefix == secured_prefix else 4
+        response_protocol = 4
+        (response, err) = await self._async_response(request_id, response_protocol)
+        if err:
+            raise CommandVacuumError("", err) from err
+        _LOGGER.debug(f"id={request_id} Response from {roborock_message.get_method()}: {response}")
+        return response
 
     def _send_msg_raw(self, data: bytes):
         try:
@@ -99,33 +116,21 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
             raise RoborockException(e) from e
 
     async def send_message(self, roborock_messages: list[RoborockMessage] | RoborockMessage):
-        async with self._mutex:
-            await self.async_connect()
-            if isinstance(roborock_messages, RoborockMessage):
-                roborock_messages = [roborock_messages]
-            local_key = self.device_info.device.local_key
-            msg = RoborockParser.encode(roborock_messages, local_key)
-            # Send the command to the Roborock device
-            if not self.should_keepalive():
-                await self.async_disconnect()
+        await self.validate_connection()
+        if isinstance(roborock_messages, RoborockMessage):
+            roborock_messages = [roborock_messages]
+        local_key = self.device_info.device.local_key
+        msg = RoborockParser.encode(roborock_messages, local_key)
+        # Send the command to the Roborock device
+        _LOGGER.debug(f"Requesting device with {roborock_messages}")
+        self._send_msg_raw(msg)
 
-            _LOGGER.debug(f"Requesting device with {roborock_messages}")
-            self._send_msg_raw(msg)
-
-            responses = await asyncio.gather(
-                *[self.async_local_response(roborock_message) for roborock_message in roborock_messages],
-                return_exceptions=True,
-            )
-            exception = next((response for response in responses if isinstance(response, BaseException)), None)
-            if exception:
-                await self.async_disconnect()
-                raise exception
-            return responses
-
-
-class RoborockSocket(socket.socket):
-    _closed = None
-
-    @property
-    def is_closed(self):
-        return self._closed
+        responses = await asyncio.gather(
+            *[self.async_local_response(roborock_message) for roborock_message in roborock_messages],
+            return_exceptions=True,
+        )
+        exception = next((response for response in responses if isinstance(response, BaseException)), None)
+        if exception:
+            await self.async_disconnect()
+            raise exception
+        return responses
