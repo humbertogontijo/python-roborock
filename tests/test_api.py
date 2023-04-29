@@ -75,7 +75,7 @@ async def test_get_dust_collection_mode():
         command.return_value = {"mode": 1}
         dust = await rmc.get_dust_collection_mode()
         assert dust is not None
-        assert dust.mode == RoborockDockDustCollectionModeCode["1"]
+        assert dust.mode == RoborockDockDustCollectionModeCode.light
 
 
 @pytest.mark.asyncio
@@ -100,4 +100,4 @@ async def test_get_washing_mode():
         command.return_value = {"wash_mode": 2}
         washing_mode = await rmc.get_wash_towel_mode()
         assert washing_mode is not None
-        assert washing_mode.wash_mode == RoborockDockWashTowelModeCode["2"]
+        assert washing_mode.wash_mode == RoborockDockWashTowelModeCode.deep

@@ -223,6 +223,7 @@ class RoborockClient:
     async def get_status(self) -> Status | None:
         status = await self.send_command(RoborockCommand.GET_STATUS)
         if isinstance(status, dict):
+            # TODO: Change status based off of which mop mode/ intensity/ vacuum to use
             return Status.from_dict(status)
         return None
 
