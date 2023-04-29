@@ -63,7 +63,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         async with self._mutex:
             self.sync_disconnect()
 
-    def build_roborock_message(self, method: RoborockCommand, params: Optional[list] = None) -> RoborockMessage:
+    def build_roborock_message(self, method: RoborockCommand, params: Optional[list | dict] = None) -> RoborockMessage:
         secured = True if method in SPECIAL_COMMANDS else False
         request_id, timestamp, payload = self._get_payload(method, params, secured)
         _LOGGER.debug(f"id={request_id} Requesting method {method} with {params}")
@@ -83,12 +83,8 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         )
 
     async def ping(self):
-        command_info = CommandInfoMap.get(None)
-        roborock_message = RoborockMessage(
-            prefix=command_info.prefix,
-            protocol=0,
-            payload=b''
-        )
+        command_info = CommandInfoMap[RoborockCommand.NONE]
+        roborock_message = RoborockMessage(prefix=command_info.prefix, protocol=0, payload=b"")
         return (await self.send_message(roborock_message))[0]
 
     async def send_command(self, method: RoborockCommand, params: Optional[list | dict] = None):

@@ -173,7 +173,7 @@ class RoborockClient:
     def should_keepalive(self) -> bool:
         now = self.time_func()
         # noinspection PyUnresolvedReferences
-        if now - self._last_disconnection > self.keep_alive ** 2 and now - self._last_device_msg_in > self.keep_alive:
+        if now - self._last_disconnection > self.keep_alive**2 and now - self._last_device_msg_in > self.keep_alive:
             return False
         return True
 
@@ -193,7 +193,7 @@ class RoborockClient:
         finally:
             del self._waiting_queue[request_id]
 
-    def _get_payload(self, method: RoborockCommand, params: Optional[list] = None, secured=False):
+    def _get_payload(self, method: RoborockCommand, params: Optional[list | dict] = None, secured=False):
         timestamp = math.floor(time.time())
         request_id = randint(10000, 99999)
         inner = {
@@ -217,7 +217,7 @@ class RoborockClient:
         )
         return request_id, timestamp, payload
 
-    async def send_command(self, method: RoborockCommand, params: Optional[list] = None):
+    async def send_command(self, method: RoborockCommand, params: Optional[list | dict] = None):
         raise NotImplementedError
 
     async def get_status(self) -> Status | None:

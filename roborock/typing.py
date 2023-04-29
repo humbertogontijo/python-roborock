@@ -86,6 +86,7 @@ class RoborockCommand(str, Enum):
     GET_WASH_TOWEL_MODE = "get_wash_towel_mode"
     LOAD_MULTI_MAP = "load_multi_map"
     NAME_SEGMENT = "name_segment"
+    NONE = ""
     RESET_CONSUMABLE = "reset_consumable"
     RESUME_SEGMENT_CLEAN = "resume_segment_clean"
     RESUME_ZONED_CLEAN = "resume_zoned_clean"
@@ -133,7 +134,6 @@ class CommandInfo:
 
 
 CommandInfoMap: dict[RoborockCommand | None, CommandInfo] = {
-    None: CommandInfo(prefix=b"\x00\x00\x00\x15", params=None),
     RoborockCommand.APP_CHARGE: CommandInfo(prefix=b"\x00\x00\x00w", params=[]),
     RoborockCommand.APP_GET_DRYER_SETTING: CommandInfo(prefix=b"\x00\x00\x00\x87", params=None),
     RoborockCommand.APP_GET_INIT_STATUS: CommandInfo(prefix=b"\x00\x00\x00\x87", params=[]),
@@ -180,9 +180,7 @@ CommandInfoMap: dict[RoborockCommand | None, CommandInfo] = {
     RoborockCommand.APP_STOP: CommandInfo(prefix=b"\x00\x00\x00w", params=[]),
     RoborockCommand.APP_STOP_WASH: CommandInfo(prefix=b"\x00\x00\x00w", params=None),
     RoborockCommand.APP_WAKEUP_ROBOT: CommandInfo(prefix=b"\x00\x00\x00w", params=[]),
-    RoborockCommand.APP_ZONED_CLEAN: CommandInfo(
-        prefix=b"\x00\x00\x00\x97", params=[[24900, 25100, 26300, 26450, 1]]
-    ),
+    RoborockCommand.APP_ZONED_CLEAN: CommandInfo(prefix=b"\x00\x00\x00\x97", params=[[24900, 25100, 26300, 26450, 1]]),
     RoborockCommand.CHANGE_SOUND_VOLUME: CommandInfo(prefix=b"\x00\x00\x00\x87", params=None),
     RoborockCommand.CLOSE_DND_TIMER: CommandInfo(prefix=b"\x00\x00\x00w", params=[]),
     RoborockCommand.CLOSE_VALLEY_ELECTRICITY_TIMER: CommandInfo(prefix=b"\x00\x00\x00\x87", params=[]),
@@ -235,6 +233,7 @@ CommandInfoMap: dict[RoborockCommand | None, CommandInfo] = {
     RoborockCommand.GET_WASH_TOWEL_MODE: CommandInfo(prefix=b"\x00\x00\x00\x87", params=None),
     RoborockCommand.LOAD_MULTI_MAP: CommandInfo(prefix=b"\x00\x00\x00w", params=None),
     RoborockCommand.NAME_SEGMENT: CommandInfo(prefix=b"\x00\x00\x027", params=None),
+    RoborockCommand.NONE: CommandInfo(prefix=b"\x00\x00\x00\x15", params=None),
     RoborockCommand.RESET_CONSUMABLE: CommandInfo(prefix=b"\x00\x00\x00\x97", params=None),
     RoborockCommand.RESUME_SEGMENT_CLEAN: CommandInfo(prefix=b"\x00\x00\x00\x87", params=None),
     RoborockCommand.RESUME_ZONED_CLEAN: CommandInfo(prefix=b"\x00\x00\x00w", params=None),
@@ -257,8 +256,8 @@ CommandInfoMap: dict[RoborockCommand | None, CommandInfo] = {
         prefix=b"\x00\x00\x01\x97",
         params={
             "app_ice": "eyJjYW5kaWRhdGUiOiAiY2FuZGlkYXRlOjE1MzE5NzE5NTEgMSB1ZHAgNDE4MTk5MDMgNTQuMTc0LjE4Ni4yNDkgNTQxNzU"
-                       "gdHlwIHJlbGF5IHJhZGRyIDE3Ny4xOC4xMzQuOTkgcnBvcnQgNjQ2OTEgZ2VuZXJhdGlvbiAwIHVmcmFnIDVOMVogbmV0d2"
-                       "9yay1pZCAxIG5ldHdvcmstY29zdCAxMCIsICJzZHBNTGluZUluZGV4IjogMSwgInNkcE1pZCI6ICIxIn0="
+            "gdHlwIHJlbGF5IHJhZGRyIDE3Ny4xOC4xMzQuOTkgcnBvcnQgNjQ2OTEgZ2VuZXJhdGlvbiAwIHVmcmFnIDVOMVogbmV0d2"
+            "9yay1pZCAxIG5ldHdvcmstY29zdCAxMCIsICJzZHBNTGluZUluZGV4IjogMSwgInNkcE1pZCI6ICIxIn0="
         },
     ),
     RoborockCommand.SET_APP_TIMEZONE: CommandInfo(prefix=b"\x00\x00\x00\x97", params=["America/Sao_Paulo", 2]),
@@ -282,9 +281,7 @@ CommandInfoMap: dict[RoborockCommand | None, CommandInfo] = {
     RoborockCommand.SET_FDS_ENDPOINT: CommandInfo(prefix=b"\x00\x00\x00\x97", params=["awsusor0.fds.api.xiaomi.com"]),
     RoborockCommand.SET_FLOW_LED_STATUS: CommandInfo(prefix=b"\x00\x00\x00\x87", params={"status": 1}),
     RoborockCommand.SET_IDENTIFY_FURNITURE_STATUS: CommandInfo(prefix=b"\x00\x00\x00\x97", params={"status": 1}),
-    RoborockCommand.SET_IDENTIFY_GROUND_MATERIAL_STATUS: CommandInfo(
-        prefix=b"\x00\x00\x00\x97", params={"status": 1}
-    ),
+    RoborockCommand.SET_IDENTIFY_GROUND_MATERIAL_STATUS: CommandInfo(prefix=b"\x00\x00\x00\x97", params={"status": 1}),
     RoborockCommand.SET_LED_STATUS: CommandInfo(prefix=b"\x00\x00\x00w", params=[1]),
     RoborockCommand.SET_MOP_MODE: CommandInfo(prefix=b"\x00\x00\x00w", params=None),
     RoborockCommand.SET_SERVER_TIMER: CommandInfo(prefix=b"\x00\x00\x00\xc7", params=None),
