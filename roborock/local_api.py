@@ -48,9 +48,9 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
                 if not self.is_connected():
                     async with async_timeout.timeout(QUEUE_TIMEOUT):
                         _LOGGER.info(f"Connecting to {self.ip}")
-                        self.transport, _ = await self.loop.create_connection(
+                        self.transport, _ = await self.loop.create_connection(  # type: ignore
                             lambda: self, self.ip, 58867
-                        )  # type: ignore
+                        )
                         _LOGGER.info(f"Connected to {self.ip}")
             except Exception as e:
                 raise RoborockConnectionException(f"Failed connecting to {self.ip}") from e
