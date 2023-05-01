@@ -1,4 +1,4 @@
-from roborock import CleanRecord, CleanSummary, Consumable, DNDTimer, HomeData, Status, UserData
+from roborock import CleanRecord, CleanSummary, Consumable, DNDTimer, HomeData, Status, UserData, ROBOROCK_S7_MAXV
 from roborock.code_mappings import (
     RoborockDockErrorCode,
     RoborockDockTypeCode,
@@ -6,7 +6,7 @@ from roborock.code_mappings import (
     RoborockFanPowerCode,
     RoborockMopIntensityCode,
     RoborockMopModeCode,
-    RoborockStateCode,
+    RoborockStateCode, model_specifications, RoborockFanSpeedS7MaxV, RoborockMopModeS7, RoborockMopIntensityS7,
 )
 
 from .mock_data import CLEAN_RECORD, CLEAN_SUMMARY, CONSUMABLE, DND_TIMER, HOME_DATA_RAW, STATUS, USER_DATA
@@ -111,11 +111,11 @@ def test_status():
     s = Status.from_dict(STATUS)
     assert s.msg_ver == 2
     assert s.msg_seq == 458
-    assert s.state == RoborockStateCode["8"]
+    assert s.state == RoborockStateCode.charging
     assert s.battery == 100
     assert s.clean_time == 1176
     assert s.clean_area == 20965000
-    assert s.error_code == RoborockErrorCode["0"]
+    assert s.error_code == RoborockErrorCode.none
     assert s.map_present == 1
     assert s.in_cleaning == 0
     assert s.in_returning == 0
@@ -125,12 +125,12 @@ def test_status():
     assert s.back_type == -1
     assert s.wash_phase == 0
     assert s.wash_ready == 0
-    assert s.fan_power == RoborockFanPowerCode["102"]
+    assert s.fan_power == 102
     assert s.dnd_enabled == 0
     assert s.map_status == 3
     assert s.is_locating == 0
     assert s.lock_status == 0
-    assert s.water_box_mode == RoborockMopIntensityCode["203"]
+    assert s.water_box_mode == 203
     assert s.water_box_carriage_status == 1
     assert s.mop_forbidden_enable == 1
     assert s.camera_status == 3457
@@ -139,18 +139,22 @@ def test_status():
     assert s.home_sec_enable_password == 0
     assert s.adbumper_status == [0, 0, 0]
     assert s.water_shortage_status == 0
-    assert s.dock_type == RoborockDockTypeCode["3"]
+    assert s.dock_type == RoborockDockTypeCode.empty_wash_fill_dock
     assert s.dust_collection_status == 0
     assert s.auto_dust_collection == 1
     assert s.avoid_count == 19
-    assert s.mop_mode == RoborockMopModeCode["300"]
+    assert s.mop_mode == 300
     assert s.debug_mode == 0
     assert s.collision_avoid_status == 1
     assert s.switch_map_mode == 0
-    assert s.dock_error_status == RoborockDockErrorCode["0"]
+    assert s.dock_error_status == RoborockDockErrorCode.ok
     assert s.charge_status == 1
     assert s.unsave_map_reason == 0
     assert s.unsave_map_flag == 0
+    s.update_status(model_specification=model_specifications[ROBOROCK_S7_MAXV])
+    assert s.fan_power == RoborockFanSpeedS7MaxV.balanced
+    assert s.mop_mode == RoborockMopModeS7.standard
+    assert s.water_box_mode == RoborockMopIntensityS7.intense
 
 
 def test_dnd_timer():
@@ -191,9 +195,8 @@ def test_clean_record():
 
 def test_no_value():
     modified_status = STATUS.copy()
-    modified_status["mop_mode"] = 9999
+    modified_status["dock_type"] = 9999
     s = Status.from_dict(modified_status)
-
-    assert s.mop_mode == RoborockMopModeCode["-9999"]
-    assert "-9999" not in RoborockMopModeCode.keys()
-    assert "UNKNOWN" not in RoborockMopModeCode.values()
+    assert s.dock_type == RoborockDockTypeCode.missing
+    assert -9999 not in RoborockDockTypeCode.keys()
+    assert "missing" not in RoborockDockTypeCode.values()

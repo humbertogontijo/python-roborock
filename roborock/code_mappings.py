@@ -1,8 +1,18 @@
 from __future__ import annotations
 
 import logging
-from enum import IntEnum, Enum
+from dataclasses import dataclass
+from enum import IntEnum
 from typing import Type
+
+from roborock.const import (
+    ROBOROCK_Q7_MAX,
+    ROBOROCK_S5_MAX,
+    ROBOROCK_S6_MAXV,
+    ROBOROCK_S6_PURE,
+    ROBOROCK_S7,
+    ROBOROCK_S7_MAXV,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -11,21 +21,21 @@ class RoborockEnum(IntEnum):
     """Roborock Enum for codes with int values"""
 
     @classmethod
-    def __missing__(cls: Type[RoborockEnum], key):
-        _LOGGER.debug(f"Missing {cls.__name__} code: {key}")
+    def __missing__(cls: Type[RoborockEnum], key) -> str:
+        _LOGGER.warning(f"Missing {cls.__name__} code: {key} - defaulting to {cls.keys()[0]}")
         return cls.keys()[0]
 
     @classmethod
     def as_dict(cls: Type[RoborockEnum]):
         # TODO: check
-        return {i.value: i.name for i in cls if i.name != "missing"}
+        return {i.value: i for i in cls if i.name != "missing"}
 
     @classmethod
-    def values(cls: Type[RoborockEnum]):
+    def values(cls: Type[RoborockEnum]) -> list[int]:
         return list(cls.as_dict().values())
 
     @classmethod
-    def keys(cls: Type[RoborockEnum]):
+    def keys(cls: Type[RoborockEnum]) -> list[str]:
         return list(cls.as_dict().keys())
 
     @classmethod
@@ -33,7 +43,7 @@ class RoborockEnum(IntEnum):
         return cls.as_dict().items()
 
     @classmethod
-    def __getitem__(cls: Type[RoborockEnum], item):
+    def __getitem__(cls: Type[RoborockEnum], item) -> str:
         return cls.__getitem__(item)
 
 
@@ -96,6 +106,7 @@ class RoborockErrorCode(RoborockEnum):
 class RoborockFanPowerCode(RoborockEnum):
     """Describes the fan power of the vacuum cleaner."""
 
+
 class RoborockFanSpeedV1(RoborockFanPowerCode):
     silent = 38
     standard = 60
@@ -144,6 +155,22 @@ class RoborockFanSpeedS7MaxV(RoborockFanPowerCode):
     max_plus = 108
 
 
+class RoborockFanSpeedS6Pure(RoborockFanPowerCode):
+    # TODO: GET CODES
+    missing = -9999
+
+    def __missing__(self, key):
+        return self.missing
+
+
+class RoborockFanSpeedQ7Max(RoborockFanPowerCode):
+    # TODO: GET CODES
+    missing = -9999
+
+    def __missing__(self, key):
+        return self.missing
+
+
 class RoborockMopModeCode(RoborockEnum):
     """Describes the mop mode of the vacuum cleaner."""
 
@@ -161,7 +188,7 @@ class RoborockMopIntensityCode(RoborockEnum):
     """Describes the mop intensity of the vacuum cleaner."""
 
 
-class RoborockMopIntensitySy(RoborockMopIntensityCode):
+class RoborockMopIntensityS7(RoborockMopIntensityCode):
     """Describes the mop intensity of the vacuum cleaner."""
 
     off = 200
@@ -195,8 +222,9 @@ class RoborockDockTypeCode(RoborockEnum):
     empty_wash_fill_dock = 3
     auto_empty_dock_pure = 5
 
-    def __missing__(self, key):
-        return self.missing
+    @classmethod
+    def __missing__(cls, key):
+        return cls.missing
 
 
 class RoborockDockDustCollectionModeCode(RoborockEnum):
@@ -213,7 +241,6 @@ class RoborockDockDustCollectionModeCode(RoborockEnum):
         return self.missing
 
 
-
 class RoborockDockWashTowelModeCode(RoborockEnum):
     """Describes the wash towel mode of the vacuum cleaner."""
 
@@ -226,3 +253,57 @@ class RoborockDockWashTowelModeCode(RoborockEnum):
     def __missing__(self, key):
         return self.missing
 
+
+@dataclass
+class ModelSpecification:
+    model_name: str
+    model_code: str
+    fan_power_code: Type[RoborockFanPowerCode]
+    mop_mode_code: Type[RoborockMopModeCode] | None
+    mop_intensity_code: Type[RoborockMopIntensityCode] | None
+
+
+model_specifications = {
+    ROBOROCK_S5_MAX: ModelSpecification(
+        model_name="Roborock S5 Max",
+        model_code=ROBOROCK_S5_MAX,
+        fan_power_code=RoborockFanSpeedS6Pure,
+        mop_mode_code=None,
+        mop_intensity_code=RoborockMopIntensityV2,
+    ),
+    ROBOROCK_Q7_MAX: ModelSpecification(
+        model_name="Roborock Q7 Max",
+        model_code=ROBOROCK_Q7_MAX,
+        fan_power_code=RoborockFanSpeedQ7Max,
+        mop_mode_code=None,
+        mop_intensity_code=RoborockMopIntensityV2,
+    ),
+    ROBOROCK_S6_MAXV: ModelSpecification(
+        model_name="Roborock S6 MaxV",
+        model_code=ROBOROCK_S6_MAXV,
+        fan_power_code=RoborockFanSpeedE2,
+        mop_mode_code=None,
+        mop_intensity_code=RoborockMopIntensityV2,
+    ),
+    ROBOROCK_S6_PURE: ModelSpecification(
+        model_name="Roborock S6 Pure",
+        model_code=ROBOROCK_S6_PURE,
+        fan_power_code=RoborockFanSpeedS6Pure,
+        mop_mode_code=None,
+        mop_intensity_code=None,
+    ),
+    ROBOROCK_S7_MAXV: ModelSpecification(
+        model_name="Roborock S7 MaxV",
+        model_code=ROBOROCK_S7_MAXV,
+        fan_power_code=RoborockFanSpeedS7MaxV,
+        mop_mode_code=RoborockMopModeS7,
+        mop_intensity_code=RoborockMopIntensityS7,
+    ),
+    ROBOROCK_S7: ModelSpecification(
+        model_name="Roborock S7",
+        model_code=ROBOROCK_S7,
+        fan_power_code=RoborockFanSpeedS7,
+        mop_mode_code=RoborockMopModeS7,
+        mop_intensity_code=RoborockMopIntensityS7,
+    ),
+}

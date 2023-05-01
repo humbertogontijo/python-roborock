@@ -224,7 +224,11 @@ class RoborockClient:
         status = await self.send_command(RoborockCommand.GET_STATUS)
         if isinstance(status, dict):
             # TODO: Change status based off of which mop mode/ intensity/ vacuum to use
-            return Status.from_dict(status)
+            status = Status.from_dict(status)
+            # TODO: Check this - it seems like in our mock data, there is never model, we may need to pass this in from product
+            status.update_status(self.device_info.device.device_status.model_specification)
+            return status
+
         return None
 
     async def get_dnd_timer(self) -> DNDTimer | None:
