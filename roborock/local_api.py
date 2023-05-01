@@ -1,16 +1,15 @@
 from __future__ import annotations
 
+import async_timeout
 import asyncio
 import logging
 from asyncio import Lock, Transport
 from typing import Optional
 
-import async_timeout
-
-from .api import QUEUE_TIMEOUT, SPECIAL_COMMANDS, RoborockClient
+from .api import QUEUE_TIMEOUT, RoborockClient, SPECIAL_COMMANDS
 from .containers import RoborockLocalDeviceInfo
 from .exceptions import CommandVacuumError, RoborockConnectionException, RoborockException
-from .roborock_message import RoborockMessage, AP_CONFIG, RoborockParser
+from .roborock_message import AP_CONFIG, RoborockMessage, RoborockParser
 from .roborock_typing import CommandInfoMap, RoborockCommand
 from .util import get_running_loop_or_create_one
 

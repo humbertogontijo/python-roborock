@@ -6,11 +6,10 @@ import hashlib
 import json
 import logging
 from asyncio import BaseTransport
-from typing import Callable
-
+from construct import Adapter, Bytes, Checksum, Const, Int16ub, Int32ub, RawCopy, Struct
 from Crypto.Cipher import AES
-from Crypto.Util.Padding import unpad, pad
-from construct import Adapter, Struct, RawCopy, Const, Int32ub, Int16ub, Bytes, Checksum
+from Crypto.Util.Padding import pad, unpad
+from typing import Callable
 
 from roborock.roborock_future import RoborockFuture
 
