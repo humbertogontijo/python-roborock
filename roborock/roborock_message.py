@@ -13,7 +13,7 @@ from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
 
 from roborock.exceptions import RoborockException
-from roborock.typing import RoborockCommand
+from roborock.roborock_typing import RoborockCommand
 
 
 def md5bin(message: str) -> bytes:

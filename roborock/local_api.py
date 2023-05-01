@@ -11,7 +11,7 @@ from .api import QUEUE_TIMEOUT, SPECIAL_COMMANDS, RoborockClient
 from .containers import RoborockLocalDeviceInfo
 from .exceptions import CommandVacuumError, RoborockConnectionException, RoborockException
 from .roborock_message import RoborockMessage, RoborockParser
-from .typing import CommandInfoMap, RoborockCommand
+from .roborock_typing import CommandInfoMap, RoborockCommand
 from .util import get_running_loop_or_create_one
 
 _LOGGER = logging.getLogger(__name__)

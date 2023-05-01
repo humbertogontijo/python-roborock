@@ -271,12 +271,6 @@ class Status(RoborockBase):
                 self.water_box_mode]
 
 
-class StatusOldModes(Status):
-    # type: ignore[valid-type]
-    water_box_mode: Optional[OldRoborockMopIntensityCode] = None
-    fan_power: Optional[OldRoborockFanPowerCode] = None  # type: ignore[valid-type]
-
-
 @dataclass
 class DNDTimer(RoborockBase):
     start_hour: Optional[int] = None
