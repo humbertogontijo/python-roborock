@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import asyncio
-from asyncio import BaseTransport
 import binascii
 import hashlib
 import json
 import logging
+from asyncio import BaseTransport
 from typing import Callable
 
 from construct import Adapter, Bytes, Checksum, Const, Int16ub, Int32ub, RawCopy, Struct

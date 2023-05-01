@@ -54,7 +54,7 @@ from .util import unpack_list
 _LOGGER = logging.getLogger(__name__)
 KEEPALIVE = 60
 QUEUE_TIMEOUT = 4
-SPECIAL_COMMANDS = [
+COMMANDS_SECURED = [
     RoborockCommand.GET_MAP_V1,
 ]
 

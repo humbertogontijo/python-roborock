@@ -10,11 +10,11 @@ from urllib.parse import urlparse
 
 import paho.mqtt.client as mqtt
 
-from .api import KEEPALIVE, SPECIAL_COMMANDS, RoborockClient, md5hex
+from .api import COMMANDS_SECURED, KEEPALIVE, md5hex, RoborockClient
 from .containers import RoborockDeviceInfo, UserData
 from .exceptions import CommandVacuumError, RoborockException, VacuumError
 from .roborock_future import RoborockFuture
-from .roborock_message import RoborockMessage, RoborockParser, md5bin
+from .roborock_message import md5bin, RoborockMessage, RoborockParser
 from .roborock_typing import RoborockCommand
 
 _LOGGER = logging.getLogger(__name__)
@@ -152,7 +152,7 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
         request_id, timestamp, payload = super()._get_payload(method, params, True)
         _LOGGER.debug(f"id={request_id} Requesting method {method} with {params}")
         request_protocol = 101
-        response_protocol = 301 if method in SPECIAL_COMMANDS else 102
+        response_protocol = 301 if method in COMMANDS_SECURED else 102
         roborock_message = RoborockMessage(timestamp=timestamp, protocol=request_protocol, payload=payload)
         local_key = self.device_info.device.local_key
         msg = RoborockParser.encode(roborock_message, local_key)

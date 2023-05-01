@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import asyncio
-from asyncio import Lock, Transport
 import logging
+from asyncio import Lock, Transport
 from typing import Optional
 
 import async_timeout
 
-from .api import QUEUE_TIMEOUT, RoborockClient, SPECIAL_COMMANDS
+from .api import COMMANDS_SECURED, QUEUE_TIMEOUT, RoborockClient
 from .containers import RoborockLocalDeviceInfo
 from .exceptions import CommandVacuumError, RoborockConnectionException, RoborockException
 from .roborock_message import AP_CONFIG, RoborockMessage, RoborockParser
@@ -64,7 +64,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
             self.sync_disconnect()
 
     def build_roborock_message(self, method: RoborockCommand, params: Optional[list | dict] = None) -> RoborockMessage:
-        secured = True if method in SPECIAL_COMMANDS else False
+        secured = True if method in COMMANDS_SECURED else False
         request_id, timestamp, payload = self._get_payload(method, params, secured)
         _LOGGER.debug(f"id={request_id} Requesting method {method} with {params}")
         command_info = CommandInfoMap.get(method)
