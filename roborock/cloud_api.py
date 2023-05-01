@@ -10,11 +10,12 @@ from urllib.parse import urlparse
 
 import paho.mqtt.client as mqtt
 
-from .api import KEEPALIVE, SPECIAL_COMMANDS, RoborockClient, md5hex
+from .api import COMMANDS_SECURED, KEEPALIVE, RoborockClient, md5hex
 from .containers import RoborockDeviceInfo, UserData
 from .exceptions import CommandVacuumError, RoborockException, VacuumError
+from .protocol import Utils
 from .roborock_future import RoborockFuture
-from .roborock_message import RoborockMessage, RoborockParser, md5bin
+from .roborock_message import RoborockMessage, RoborockParser
 from .roborock_typing import RoborockCommand
 
 _LOGGER = logging.getLogger(__name__)
@@ -30,7 +31,7 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
         rriot = user_data.rriot
         if rriot is None:
             raise RoborockException("Got no rriot data from user_data")
-        endpoint = base64.b64encode(md5bin(rriot.k)[8:14]).decode()
+        endpoint = base64.b64encode(Utils.md5(rriot.k.encode())[8:14]).decode()
         RoborockClient.__init__(self, endpoint, device_info)
         mqtt.Client.__init__(self, protocol=mqtt.MQTTv5)
         self._mqtt_user = rriot.u
@@ -46,7 +47,7 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
         self._mqtt_password = rriot.s
         self._hashed_password = md5hex(self._mqtt_password + ":" + rriot.k)[16:]
         super().username_pw_set(self._hashed_user, self._hashed_password)
-        self._endpoint = base64.b64encode(md5bin(rriot.k)[8:14]).decode()
+        self._endpoint = base64.b64encode(Utils.md5(rriot.k.encode())[8:14]).decode()
         self._waiting_queue: dict[int, RoborockFuture] = {}
         self._mutex = Lock()
         self.update_client_id()
@@ -152,7 +153,7 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
         request_id, timestamp, payload = super()._get_payload(method, params, True)
         _LOGGER.debug(f"id={request_id} Requesting method {method} with {params}")
         request_protocol = 101
-        response_protocol = 301 if method in SPECIAL_COMMANDS else 102
+        response_protocol = 301 if method in COMMANDS_SECURED else 102
         roborock_message = RoborockMessage(timestamp=timestamp, protocol=request_protocol, payload=payload)
         local_key = self.device_info.device.local_key
         msg = RoborockParser.encode(roborock_message, local_key)

@@ -7,10 +7,10 @@ from typing import Optional
 
 import async_timeout
 
-from .api import QUEUE_TIMEOUT, SPECIAL_COMMANDS, RoborockClient
+from .api import COMMANDS_SECURED, QUEUE_TIMEOUT, RoborockClient
 from .containers import RoborockLocalDeviceInfo
 from .exceptions import CommandVacuumError, RoborockConnectionException, RoborockException
-from .roborock_message import RoborockMessage, RoborockParser
+from .roborock_message import AP_CONFIG, RoborockMessage, RoborockParser
 from .roborock_typing import CommandInfoMap, RoborockCommand
 from .util import get_running_loop_or_create_one
 
@@ -64,7 +64,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
             self.sync_disconnect()
 
     def build_roborock_message(self, method: RoborockCommand, params: Optional[list | dict] = None) -> RoborockMessage:
-        secured = True if method in SPECIAL_COMMANDS else False
+        secured = True if method in COMMANDS_SECURED else False
         request_id, timestamp, payload = self._get_payload(method, params, secured)
         _LOGGER.debug(f"id={request_id} Requesting method {method} with {params}")
         command_info = CommandInfoMap.get(method)
@@ -84,7 +84,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
 
     async def ping(self):
         command_info = CommandInfoMap[RoborockCommand.NONE]
-        roborock_message = RoborockMessage(prefix=command_info.prefix, protocol=0, payload=b"")
+        roborock_message = RoborockMessage(prefix=command_info.prefix, protocol=AP_CONFIG, payload=b"")
         return (await self.send_message(roborock_message))[0]
 
     async def send_command(self, method: RoborockCommand, params: Optional[list | dict] = None):
