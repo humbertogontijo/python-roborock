@@ -94,37 +94,7 @@ class RoborockCommand(str, Enum):
     SAVE_MAP = "save_map"
     SEND_ICE_TO_ROBOT = "send_ice_to_robot"
     SEND_SDP_TO_ROBOT = "send_sdp_to_robot"
-    SET_APP_TIMEZONE = "set_app_timezone"
-    SET_CAMERA_STATUS = "set_camera_status"
-    SET_CARPET_CLEAN_MODE = "set_carpet_clean_mode"
-    SET_CARPET_MODE = "set_carpet_mode"
-    SET_CHILD_LOCK_STATUS = "set_child_lock_status"
-    SET_CLEAN_MOTOR_MODE = "set_clean_motor_mode"
-    SET_COLLISION_AVOID_STATUS = "set_collision_avoid_status"
-    SET_CUSTOMIZE_CLEAN_MODE = "set_customize_clean_mode"
-    SET_CUSTOM_MODE = "set_custom_mode"
-    SET_DND_TIMER = "set_dnd_timer"
-    SET_DUST_COLLECTION_MODE = "set_dust_collection_mode"
-    SET_FDS_ENDPOINT = "set_fds_endpoint"
-    SET_FLOW_LED_STATUS = "set_flow_led_status"
-    SET_IDENTIFY_FURNITURE_STATUS = "set_identify_furniture_status"
-    SET_IDENTIFY_GROUND_MATERIAL_STATUS = "set_identify_ground_material_status"
-    SET_LED_STATUS = "set_led_status"
-    SET_MOP_MODE = "set_mop_mode"
-    SET_SERVER_TIMER = "set_server_timer"
-    SET_SMART_WASH_PARAMS = "set_smart_wash_params"
-    SET_TIMEZONE = "set_timezone"
-    SET_VALLEY_ELECTRICITY_TIMER = "set_valley_electricity_timer"
-    SET_WASH_TOWEL_MODE = "set_wash_towel_mode"
-    SET_WATER_BOX_CUSTOM_MODE = "set_water_box_custom_mode"
-    START_CAMERA_PREVIEW = "start_camera_preview"
-    START_EDIT_MAP = "start_edit_map"
-    START_VOICE_CHAT = "start_voice_chat"
-    START_WASH_THEN_CHARGE = "start_wash_then_charge"
-    STOP_CAMERA_PREVIEW = "stop_camera_preview"
-    SWITCH_WATER_MARK = "switch_water_mark"
-    TEST_SOUND_VOLUME = "test_sound_volume"
-    UPD_SERVER_TIMER = "upd_server_timer"
+    GET_FW_FEATURES = "get_fw_features"
 
 
 @dataclass
@@ -186,7 +156,8 @@ CommandInfoMap: dict[RoborockCommand | None, CommandInfo] = {
     RoborockCommand.CLOSE_VALLEY_ELECTRICITY_TIMER: CommandInfo(prefix=b"\x00\x00\x00\x87", params=[]),
     RoborockCommand.DNLD_INSTALL_SOUND: CommandInfo(
         prefix=b"\x00\x00\x00\xf7",
-        params={"url": "https://awsusor0.fds.api.xiaomi.com/app/topazsv/voice-pkg/package/en.pkg", "sid": 3, "sver": 5},
+        params={"url": "https://awsusor0.fds.api.xiaomi.com/app/topazsv/voice-pkg/package/en.pkg",
+                "sid": 3, "sver": 5},
     ),
     RoborockCommand.ENABLE_LOG_UPLOAD: CommandInfo(prefix=b"\x00\x00\x00\x87", params=[9, 2]),
     RoborockCommand.END_EDIT_MAP: CommandInfo(prefix=b"\x00\x00\x00w", params=[]),
@@ -265,7 +236,8 @@ CommandInfoMap: dict[RoborockCommand | None, CommandInfo] = {
     RoborockCommand.SET_CARPET_CLEAN_MODE: CommandInfo(prefix=b"\x00\x00\x00\x97", params={"carpet_clean_mode": 0}),
     RoborockCommand.SET_CARPET_MODE: CommandInfo(
         prefix=b"\x00\x00\x00\xd7",
-        params=[{"enable": 1, "current_high": 500, "current_integral": 450, "current_low": 400, "stall_time": 10}],
+        params=[{"enable": 1, "current_high": 500, "current_integral": 450,
+                 "current_low": 400, "stall_time": 10}],
     ),
     RoborockCommand.SET_CHILD_LOCK_STATUS: CommandInfo(prefix=b"\x00\x00\x00\x97", params={"lock_status": 0}),
     RoborockCommand.SET_CLEAN_MOTOR_MODE: CommandInfo(

@@ -34,6 +34,7 @@ from .containers import (
     RoomMapping,
     SmartWashParams,
     Status,
+    StatusOldModes,
     UserData,
     WashTowelMode,
 )
@@ -150,7 +151,8 @@ class RoborockClient:
                     if endpoint.decode().startswith(self._endpoint):
                         iv = bytes(AES.block_size)
                         decipher = AES.new(self._nonce, AES.MODE_CBC, iv)
-                        decrypted = unpad(decipher.decrypt(data.payload[24:]), AES.block_size)
+                        decrypted = unpad(decipher.decrypt(
+                            data.payload[24:]), AES.block_size)
                         decrypted = gzip.decompress(decrypted)
                         queue = self._waiting_queue.get(request_id)
                         if queue:
@@ -189,7 +191,8 @@ class RoborockClient:
             (response, err) = await queue.async_get(QUEUE_TIMEOUT)
             return response, err
         except (asyncio.TimeoutError, asyncio.CancelledError):
-            raise RoborockTimeout(f"Timeout after {QUEUE_TIMEOUT} seconds waiting for response") from None
+            raise RoborockTimeout(
+                f"Timeout after {QUEUE_TIMEOUT} seconds waiting for response") from None
         finally:
             del self._waiting_queue[request_id]
 
@@ -226,7 +229,8 @@ class RoborockClient:
             # TODO: Change status based off of which mop mode/ intensity/ vacuum to use
             status = Status.from_dict(status)
             # TODO: Check this - it seems like in our mock data, there is never model, we may need to pass this in from product
-            status.update_status(self.device_info.device.device_status.model_specification)
+            status.update_status(
+                self.device_info.device.device_status.model_specification)
             return status
 
         return None
@@ -246,7 +250,8 @@ class RoborockClient:
             if isinstance(clean_summary, dict):
                 return CleanSummary.from_dict(clean_summary)
             elif isinstance(clean_summary, list):
-                clean_time, clean_area, clean_count, records = unpack_list(clean_summary, 4)
+                clean_time, clean_area, clean_count, records = unpack_list(
+                    clean_summary, 4)
                 return CleanSummary(
                     clean_time=clean_time, clean_area=clean_area, clean_count=clean_count, records=records
                 )
@@ -433,9 +438,11 @@ class RoborockApiClient:
         response_code = code_response.get("code")
         if response_code != 200:
             if response_code == 2008:
-                raise RoborockAccountDoesNotExist("Account does not exist - check your login and try again.")
+                raise RoborockAccountDoesNotExist(
+                    "Account does not exist - check your login and try again.")
             else:
-                raise RoborockException(f"{code_response.get('msg')} - response code: {code_response.get('code')}")
+                raise RoborockException(
+                    f"{code_response.get('msg')} - response code: {code_response.get('code')}")
 
     async def pass_login(self, password: str) -> UserData:
         base_url = await self._get_base_url()
@@ -454,7 +461,8 @@ class RoborockApiClient:
         if login_response is None:
             raise RoborockException("Login response is none")
         if login_response.get("code") != 200:
-            raise RoborockException(f"{login_response.get('msg')} - response code: {login_response.get('code')}")
+            raise RoborockException(
+                f"{login_response.get('msg')} - response code: {login_response.get('code')}")
         user_data = login_response.get("data")
         if not isinstance(user_data, dict):
             raise RoborockException("Got unexpected data type for user_data")
@@ -479,8 +487,10 @@ class RoborockApiClient:
         response_code = login_response.get("code")
         if response_code != 200:
             if response_code == 2018:
-                raise RoborockInvalidCode("Invalid code - check your code and try again.")
-            raise RoborockException(f"{login_response.get('msg')} - response code: {response_code}")
+                raise RoborockInvalidCode(
+                    "Invalid code - check your code and try again.")
+            raise RoborockException(
+                f"{login_response.get('msg')} - response code: {response_code}")
         user_data = login_response.get("data")
         if not isinstance(user_data, dict):
             raise RoborockException("Got unexpected data type for user_data")
@@ -492,7 +502,8 @@ class RoborockApiClient:
         rriot = user_data.rriot
         if rriot is None:
             raise RoborockException("rriot is none")
-        home_id_request = PreparedRequest(base_url, {"header_clientid": header_clientid})
+        home_id_request = PreparedRequest(
+            base_url, {"header_clientid": header_clientid})
         home_id_response = await home_id_request.request(
             "get",
             "/api/v1/getHomeDetail",
@@ -501,7 +512,8 @@ class RoborockApiClient:
         if home_id_response is None:
             raise RoborockException("home_id_response is None")
         if home_id_response.get("code") != 200:
-            raise RoborockException(f"{home_id_response.get('msg')} - response code: {home_id_response.get('code')}")
+            raise RoborockException(
+                f"{home_id_response.get('msg')} - response code: {home_id_response.get('code')}")
 
         home_id = home_id_response["data"].get("rrHomeId")
         timestamp = math.floor(time.time())
@@ -517,7 +529,8 @@ class RoborockApiClient:
                 "",
             ]
         )
-        mac = base64.b64encode(hmac.new(rriot.h.encode(), prestr.encode(), hashlib.sha256).digest()).decode()
+        mac = base64.b64encode(
+            hmac.new(rriot.h.encode(), prestr.encode(), hashlib.sha256).digest()).decode()
         if rriot.r.a is None:
             raise RoborockException("Missing field 'a' in rriot reference")
         home_request = PreparedRequest(

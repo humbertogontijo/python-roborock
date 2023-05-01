@@ -22,7 +22,8 @@ class RoborockEnum(IntEnum):
 
     @classmethod
     def __missing__(cls: Type[RoborockEnum], key) -> str:
-        _LOGGER.warning(f"Missing {cls.__name__} code: {key} - defaulting to {cls.keys()[0]}")
+        _LOGGER.warning(
+            f"Missing {cls.__name__} code: {key} - defaulting to {cls.keys()[0]}")
         return cls.keys()[0]
 
     @classmethod

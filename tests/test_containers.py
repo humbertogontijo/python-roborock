@@ -1,5 +1,6 @@
 from roborock import ROBOROCK_S7_MAXV, CleanRecord, CleanSummary, Consumable, DNDTimer, HomeData, Status, UserData
 from roborock.code_mappings import (
+    OldRoborockFanPowerCode,
     RoborockDockErrorCode,
     RoborockDockTypeCode,
     RoborockErrorCode,
@@ -156,6 +157,14 @@ def test_status():
     assert s.fan_power == RoborockFanSpeedS7MaxV.balanced
     assert s.mop_mode == RoborockMopModeS7.standard
     assert s.water_box_mode == RoborockMopIntensityS7.intense
+
+
+def test_old_status():
+    s = StatusOldModes.from_dict(STATUS)
+    assert s.msg_ver == 2
+    assert s.msg_seq == 458
+    assert s.state == RoborockStateCode["8"]
+    assert s.fan_power == OldRoborockFanPowerCode["102"]
 
 
 def test_dnd_timer():

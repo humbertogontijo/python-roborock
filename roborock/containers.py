@@ -65,7 +65,8 @@ class RoborockBase:
     def as_dict(self) -> dict:
         return asdict(
             self,
-            dict_factory=lambda _fields: {camelize(key): value for (key, value) in _fields if value is not None},
+            dict_factory=lambda _fields: {camelize(key): value for (
+                key, value) in _fields if value is not None},
         )
 
 
@@ -127,7 +128,8 @@ class HomeDataProduct(RoborockBase):
 
     def __post_init__(self):
         if self.model not in model_specifications:
-            _LOGGER.warning("We don't have specific device information for your model, please open an issue.")
+            _LOGGER.warning(
+                "We don't have specific device information for your model, please open an issue.")
             self.model_specification = model_specifications.get(ROBOROCK_S7_MAXV)
         else:
             self.model_specification = model_specifications.get(self.model)
@@ -138,7 +140,7 @@ class HomeDataDeviceStatus(RoborockBase):
     id: Optional[Any] = None
     name: Optional[Any] = None
     code: Optional[Any] = None
-    model: Optional[Any] = None
+    model: Optional[str] = None
     icon_url: Optional[Any] = None
     attribute: Optional[Any] = None
     capability: Optional[Any] = None
@@ -148,7 +150,8 @@ class HomeDataDeviceStatus(RoborockBase):
 
     def __post_init__(self):
         if self.model not in model_specifications:
-            _LOGGER.warning("We don't have specific device information for your model, please open an issue.")
+            _LOGGER.warning(
+                "We don't have specific device information for your model, please open an issue.")
             self.model_specification = model_specifications.get(ROBOROCK_S7_MAXV)
         else:
             self.model_specification = model_specifications.get(self.model)
@@ -181,6 +184,11 @@ class HomeDataDevice(RoborockBase):
     new_feature_set: Optional[str] = None
     device_status: Optional[HomeDataDeviceStatus] = None
     silent_ota_switch: Optional[bool] = None
+    uses_old_codes: bool = False
+
+    def __post_init__(self):
+        if self.device_status and self.device_status.model == "roborock.vacuum.a10":
+            self.uses_old_codes = True
 
 
 @dataclass
@@ -259,7 +267,14 @@ class Status(RoborockBase):
         if model_specification.mop_mode_code is not None:
             self.mop_mode = model_specification.mop_mode_code.as_dict()[self.mop_mode]
         if model_specification.mop_intensity_code is not None:
-            self.water_box_mode = model_specification.mop_intensity_code.as_dict()[self.water_box_mode]
+            self.water_box_mode = model_specification.mop_intensity_code.as_dict()[
+                self.water_box_mode]
+
+
+class StatusOldModes(Status):
+    # type: ignore[valid-type]
+    water_box_mode: Optional[OldRoborockMopIntensityCode] = None
+    fan_power: Optional[OldRoborockFanPowerCode] = None  # type: ignore[valid-type]
 
 
 @dataclass
@@ -319,8 +334,10 @@ class Consumable(RoborockBase):
         self.side_brush_time_left = (
             SIDE_BRUSH_REPLACE_TIME - self.side_brush_work_time if self.side_brush_work_time else None
         )
-        self.filter_time_left = FILTER_REPLACE_TIME - self.filter_work_time if self.filter_work_time else None
-        self.sensor_time_left = SENSOR_DIRTY_REPLACE_TIME - self.sensor_dirty_time if self.sensor_dirty_time else None
+        self.filter_time_left = FILTER_REPLACE_TIME - \
+            self.filter_work_time if self.filter_work_time else None
+        self.sensor_time_left = SENSOR_DIRTY_REPLACE_TIME - \
+            self.sensor_dirty_time if self.sensor_dirty_time else None
 
 
 @dataclass
