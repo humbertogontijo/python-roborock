@@ -7,18 +7,16 @@ from typing import Any, Optional
 
 from dacite import Config, from_dict
 
-from roborock.code_mappings import (
-    RoborockDockTypeCode,
-    RoborockDockWashTowelModeCode,
-    RoborockMopIntensityCode,
-    RoborockStateCode,
-)
 from .code_mappings import (
     RoborockDockDustCollectionModeCode,
     RoborockDockErrorCode,
+    RoborockDockTypeCode,
+    RoborockDockWashTowelModeCode,
     RoborockErrorCode,
     RoborockFanPowerCode,
+    RoborockMopIntensityCode,
     RoborockMopModeCode,
+    RoborockStateCode,
 )
 from .const import FILTER_REPLACE_TIME, MAIN_BRUSH_REPLACE_TIME, SENSOR_DIRTY_REPLACE_TIME, SIDE_BRUSH_REPLACE_TIME
 
