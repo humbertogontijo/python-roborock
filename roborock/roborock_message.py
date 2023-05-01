@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import binascii
-import hashlib
 import json
 import math
 import struct
@@ -13,21 +12,10 @@ from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
 
 from .exceptions import RoborockException
+from .protocol import Utils
 from .roborock_typing import RoborockCommand
 
-
-def md5bin(message: str) -> bytes:
-    md5 = hashlib.md5()
-    md5.update(message.encode())
-    return md5.digest()
-
-
-def encode_timestamp(_timestamp: int) -> str:
-    hex_value = f"{_timestamp:x}".zfill(8)
-    return "".join(list(map(lambda idx: hex_value[idx], [5, 6, 3, 7, 1, 2, 0, 4])))
-
-
-salt = "TXdfu$jyZ#TZHsg4"
+SALT = "TXdfu$jyZ#TZHsg4".encode()
 
 AP_CONFIG = 1
 SOCK_DISCOVERY = 2
@@ -84,7 +72,7 @@ class RoborockParser:
         for roborock_message in roborock_messages:
             if len(roborock_message.prefix) not in [0, 4]:
                 raise RoborockException("Invalid prefix")
-            aes_key = md5bin(encode_timestamp(roborock_message.timestamp) + local_key + salt)
+            aes_key = Utils.md5(Utils.encode_timestamp(roborock_message.timestamp) + local_key.encode() + SALT)
             cipher = AES.new(aes_key, AES.MODE_ECB)
             payload = roborock_message.payload
             if payload:
@@ -168,7 +156,7 @@ class RoborockParser:
                 raise RoborockException(f"Wrong CRC32 {crc32}, expected {expected_crc32}")
 
         if payload:
-            aes_key = md5bin(encode_timestamp(timestamp) + local_key + salt)
+            aes_key = Utils.md5(Utils.encode_timestamp(timestamp) + local_key.encode() + SALT)
             decipher = AES.new(aes_key, AES.MODE_ECB)
             payload = unpad(decipher.decrypt(payload), AES.block_size)
 
