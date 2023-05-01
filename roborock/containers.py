@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import re
 from dataclasses import asdict, dataclass
 from enum import Enum
@@ -8,20 +9,25 @@ from typing import Any, Optional
 from dacite import Config, from_dict
 
 from .code_mappings import (
+    ModelSpecification,
     RoborockDockDustCollectionModeCode,
     RoborockDockErrorCode,
     RoborockDockTypeCode,
     RoborockDockWashTowelModeCode,
     RoborockErrorCode,
     RoborockStateCode,
-    ModelSpecification,
     model_specifications,
 )
-from .const import FILTER_REPLACE_TIME, MAIN_BRUSH_REPLACE_TIME, SENSOR_DIRTY_REPLACE_TIME, SIDE_BRUSH_REPLACE_TIME, \
-    ROBOROCK_S7_MAXV
-from .exceptions import RoborockException
-import logging
+from .const import (
+    FILTER_REPLACE_TIME,
+    MAIN_BRUSH_REPLACE_TIME,
+    ROBOROCK_S7_MAXV,
+    SENSOR_DIRTY_REPLACE_TIME,
+    SIDE_BRUSH_REPLACE_TIME,
+)
+
 _LOGGER = logging.getLogger(__name__)
+
 
 def camelize(s: str):
     first, *others = s.split("_")
@@ -125,7 +131,6 @@ class HomeDataProduct(RoborockBase):
             self.model_specification = model_specifications.get(ROBOROCK_S7_MAXV)
         else:
             self.model_specification = model_specifications.get(self.model)
-
 
 
 @dataclass
@@ -250,11 +255,11 @@ class Status(RoborockBase):
     unsave_map_flag: Optional[int] = None
 
     def update_status(self, model_specification: ModelSpecification) -> None:
-        self.fan_power: model_specification.fan_power_code = model_specification.fan_power_code.as_dict()[self.fan_power]
+        self.fan_power = model_specification.fan_power_code.as_dict()[self.fan_power]
         if model_specification.mop_mode_code is not None:
-            self.mop_mode: model_specification.mop_mode_code = model_specification.mop_mode_code.as_dict()[self.mop_mode]
+            self.mop_mode = model_specification.mop_mode_code.as_dict()[self.mop_mode]
         if model_specification.mop_intensity_code is not None:
-            self.water_box_mode: model_specification.mop_intensity_code = model_specification.mop_intensity_code.as_dict()[self.water_box_mode]
+            self.water_box_mode = model_specification.mop_intensity_code.as_dict()[self.water_box_mode]
 
 
 @dataclass
