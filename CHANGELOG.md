@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.9.0 (2023-05-01)
+### Feature
+* Single device api and discovery method ([`5fef26d`](https://github.com/humbertogontijo/python-roborock/commit/5fef26d257433c12d38f6b19731018e54884a150))
+
 ## v0.8.3 (2023-04-28)
 ### Fix
 * Add functionality for missing enum values ([#43](https://github.com/humbertogontijo/python-roborock/issues/43)) ([`49d77f8`](https://github.com/humbertogontijo/python-roborock/commit/49d77f8208a65cb0fb86ab7948138df0bf447e45))
