@@ -82,9 +82,7 @@ async def _discover(ctx):
     client = RoborockApiClient(login_data.email)
     home_data = await client.get_home_data(login_data.user_data)
     context.update(LoginData(**login_data.as_dict(), home_data=home_data))
-    click.echo(
-        f"Discovered devices {', '.join([device.name for device in home_data.get_all_devices()])}"
-    )
+    click.echo(f"Discovered devices {', '.join([device.name for device in home_data.get_all_devices()])}")
 
 
 @click.command()
