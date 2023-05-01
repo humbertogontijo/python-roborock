@@ -18,7 +18,6 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class RoborockProtocol(asyncio.DatagramProtocol):
-
     def __init__(self, timeout: int = 5):
         self.timeout = timeout
         self.transport: BaseTransport | None = None
@@ -31,10 +30,7 @@ class RoborockProtocol(asyncio.DatagramProtocol):
 
     async def discover(self):
         loop = asyncio.get_event_loop()
-        self.transport, _ = await loop.create_datagram_endpoint(
-            lambda: self,
-            local_addr=('0.0.0.0', 58866)
-        )
+        self.transport, _ = await loop.create_datagram_endpoint(lambda: self, local_addr=("0.0.0.0", 58866))
         (response, exception) = await self.queue.async_get(self.timeout)
         if exception is not None:
             raise exception
@@ -159,24 +155,15 @@ class EncryptionAdapter(Adapter):
 BROADCAST_TOKEN = "qWKYcdQWrbm9hPqe".encode()
 
 BroadcastMessage = Struct(
-    "message" / RawCopy(
+    "message"
+    / RawCopy(
         Struct(
-            "version" / Const(b'1.0'),
+            "version" / Const(b"1.0"),
             "seq" / Int32ub,
             "protocol" / Int16ub,
             "payload_len" / Int16ub,
-            "payload" / EncryptionAdapter(
-                lambda ctx: BROADCAST_TOKEN,
-                Bytes(
-                    lambda ctx: ctx.payload_len
-                )
-            )
+            "payload" / EncryptionAdapter(lambda ctx: BROADCAST_TOKEN, Bytes(lambda ctx: ctx.payload_len)),
         )
     ),
-    "checksum"
-    / Checksum(
-        Int32ub,
-        Utils.crc,
-        lambda ctx: ctx.message.data
-    ),
+    "checksum" / Checksum(Int32ub, Utils.crc, lambda ctx: ctx.message.data),
 )
