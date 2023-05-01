@@ -83,7 +83,7 @@ async def _discover(ctx):
     home_data = await client.get_home_data(login_data.user_data)
     context.update(LoginData(**login_data.as_dict(), home_data=home_data))
     click.echo(
-        f"Discovered devices {', '.join([device.name for device in home_data.devices + home_data.received_devices])}"
+        f"Discovered devices {', '.join([device.name for device in home_data.get_all_devices()])}"
     )
 
 
@@ -123,8 +123,7 @@ async def command(ctx, cmd, device_id, params):
         await _discover(ctx)
         login_data = context.login_data()
     home_data = login_data.home_data
-    devices = home_data.devices + home_data.received_devices
-    device = next((device for device in devices if device.duid == device_id), None)
+    device = next((device for device in home_data.get_all_devices() if device.duid == device_id))
     device_info = RoborockDeviceInfo(device=device)
     mqtt_client = RoborockMqttClient(login_data.user_data, device_info)
     await mqtt_client.send_command(cmd, params)

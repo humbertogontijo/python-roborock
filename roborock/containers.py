@@ -177,6 +177,14 @@ class HomeData(RoborockBase):
     received_devices: Optional[list[HomeDataDevice]] = None
     rooms: Optional[list[HomeDataRoom]] = None
 
+    def get_all_devices(self) -> list[HomeDataDevice]:
+        devices = []
+        if self.devices is not None:
+            devices += self.devices
+        if self.received_devices is not None:
+            devices += self.received_devices
+        return devices
+
 
 @dataclass
 class LoginData(RoborockBase):
