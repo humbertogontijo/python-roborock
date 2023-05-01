@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-import async_timeout
 import asyncio
-import logging
 from asyncio import Lock, Transport
+import logging
 from typing import Optional
+
+import async_timeout
 
 from .api import QUEUE_TIMEOUT, RoborockClient, SPECIAL_COMMANDS
 from .containers import RoborockLocalDeviceInfo
