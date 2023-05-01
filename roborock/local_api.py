@@ -10,8 +10,8 @@ import async_timeout
 from .api import QUEUE_TIMEOUT, SPECIAL_COMMANDS, RoborockClient
 from .containers import RoborockLocalDeviceInfo
 from .exceptions import CommandVacuumError, RoborockConnectionException, RoborockException
-from .roborock_message import RoborockMessage, RoborockParser
-from .typing import CommandInfoMap, RoborockCommand
+from .roborock_message import RoborockMessage, AP_CONFIG, RoborockParser
+from .roborock_typing import CommandInfoMap, RoborockCommand
 from .util import get_running_loop_or_create_one
 
 _LOGGER = logging.getLogger(__name__)
@@ -84,7 +84,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
 
     async def ping(self):
         command_info = CommandInfoMap[RoborockCommand.NONE]
-        roborock_message = RoborockMessage(prefix=command_info.prefix, protocol=0, payload=b"")
+        roborock_message = RoborockMessage(prefix=command_info.prefix, protocol=AP_CONFIG, payload=b"")
         return (await self.send_message(roborock_message))[0]
 
     async def send_command(self, method: RoborockCommand, params: Optional[list | dict] = None):

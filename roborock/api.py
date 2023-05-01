@@ -48,7 +48,7 @@ from .exceptions import (
 )
 from .roborock_future import RoborockFuture
 from .roborock_message import RoborockMessage
-from .typing import DeviceProp, DockSummary, RoborockCommand
+from .roborock_typing import DeviceProp, DockSummary, RoborockCommand
 from .util import unpack_list
 
 _LOGGER = logging.getLogger(__name__)

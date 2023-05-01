@@ -15,7 +15,7 @@ from .containers import RoborockDeviceInfo, UserData
 from .exceptions import CommandVacuumError, RoborockException, VacuumError
 from .roborock_future import RoborockFuture
 from .roborock_message import RoborockMessage, RoborockParser, md5bin
-from .typing import RoborockCommand
+from .roborock_typing import RoborockCommand
 
 _LOGGER = logging.getLogger(__name__)
 CONNECT_REQUEST_ID = 0

@@ -12,8 +12,8 @@ from random import randint
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
 
-from roborock.exceptions import RoborockException
-from roborock.typing import RoborockCommand
+from .exceptions import RoborockException
+from .roborock_typing import RoborockCommand
 
 
 def md5bin(message: str) -> bytes:
@@ -28,6 +28,9 @@ def encode_timestamp(_timestamp: int) -> str:
 
 
 salt = "TXdfu$jyZ#TZHsg4"
+
+AP_CONFIG = 1
+SOCK_DISCOVERY = 2
 
 
 @dataclass
