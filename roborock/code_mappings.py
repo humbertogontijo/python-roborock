@@ -21,9 +21,11 @@ class RoborockEnum(IntEnum):
     """Roborock Enum for codes with int values"""
 
     @classmethod
-    def __missing__(cls: Type[RoborockEnum], key) -> str:
-        _LOGGER.warning(
-            f"Missing {cls.__name__} code: {key} - defaulting to {cls.keys()[0]}")
+    def _missing_(cls: Type[RoborockEnum], key) -> str:
+        if hasattr(cls, "missing"):
+            _LOGGER.warning(f"Missing {cls.__name__} code: {key} - defaulting to 'missing'")
+            return cls.missing  # type: ignore
+        _LOGGER.warning(f"Missing {cls.__name__} code: {key} - defaulting to {cls.keys()[0]}")
         return cls.keys()[0]
 
     @classmethod
@@ -42,10 +44,6 @@ class RoborockEnum(IntEnum):
     @classmethod
     def items(cls: Type[RoborockEnum]):
         return cls.as_dict().items()
-
-    @classmethod
-    def __getitem__(cls: Type[RoborockEnum], item) -> str:
-        return cls.__getitem__(item)
 
 
 class RoborockStateCode(RoborockEnum):
@@ -141,10 +139,11 @@ class RoborockFanSpeedE2(RoborockFanPowerCode):
 
 class RoborockFanSpeedS7(RoborockFanPowerCode):
     off = 105
-    silent = 101
-    standard = 102
-    medium = 103
-    turbo = 104
+    quiet = 101
+    balanced = 102
+    turbo = 103
+    max = 104
+    custom = 106
 
 
 class RoborockFanSpeedS7MaxV(RoborockFanPowerCode):
@@ -157,19 +156,18 @@ class RoborockFanSpeedS7MaxV(RoborockFanPowerCode):
 
 
 class RoborockFanSpeedS6Pure(RoborockFanPowerCode):
-    # TODO: GET CODES
-    missing = -9999
-
-    def __missing__(self, key):
-        return self.missing
+    gentle = 105
+    quiet = 101
+    balanced = 102
+    turbo = 103
+    max = 104
 
 
 class RoborockFanSpeedQ7Max(RoborockFanPowerCode):
-    # TODO: GET CODES
-    missing = -9999
-
-    def __missing__(self, key):
-        return self.missing
+    quiet = 101
+    balanced = 102
+    turbo = 103
+    max = 104
 
 
 class RoborockMopModeCode(RoborockEnum):
@@ -223,10 +221,6 @@ class RoborockDockTypeCode(RoborockEnum):
     empty_wash_fill_dock = 3
     auto_empty_dock_pure = 5
 
-    @classmethod
-    def __missing__(cls, key):
-        return cls.missing
-
 
 class RoborockDockDustCollectionModeCode(RoborockEnum):
     """Describes the dust collection mode of the vacuum cleaner."""
@@ -238,9 +232,6 @@ class RoborockDockDustCollectionModeCode(RoborockEnum):
     balanced = 2
     max = 4
 
-    def __missing__(self, key):
-        return self.missing
-
 
 class RoborockDockWashTowelModeCode(RoborockEnum):
     """Describes the wash towel mode of the vacuum cleaner."""
@@ -250,9 +241,6 @@ class RoborockDockWashTowelModeCode(RoborockEnum):
     light = 0
     balanced = 1
     deep = 2
-
-    def __missing__(self, key):
-        return self.missing
 
 
 @dataclass

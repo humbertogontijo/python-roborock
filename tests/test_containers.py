@@ -158,7 +158,6 @@ def test_status():
     assert s.water_box_mode == RoborockMopIntensityS7.intense
 
 
-
 def test_dnd_timer():
     dnd = DNDTimer.from_dict(DND_TIMER)
     assert dnd.start_hour == 22
