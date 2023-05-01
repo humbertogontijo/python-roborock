@@ -13,7 +13,6 @@ from roborock.code_mappings import (
     RoborockMopIntensityCode,
     RoborockStateCode,
 )
-
 from .code_mappings import (
     RoborockDockDustCollectionModeCode,
     RoborockDockErrorCode,
@@ -184,8 +183,8 @@ class HomeData(RoborockBase):
 @dataclass
 class LoginData(RoborockBase):
     user_data: UserData
-    home_data: HomeData
-    email: Optional[str] = None
+    email: str
+    home_data: Optional[HomeData] = None
 
 
 @dataclass
