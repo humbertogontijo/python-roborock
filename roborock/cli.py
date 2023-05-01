@@ -71,15 +71,17 @@ async def login(ctx, email, password):
         pass
     client = RoborockApiClient(email)
     user_data = await client.pass_login(password)
-    context.update(LoginData({"user_data": user_data, "email": email}))
+    context.update(LoginData(user_data=user_data, email=email))
 
 
 async def _discover(ctx):
     context: RoborockContext = ctx.obj
     login_data = context.login_data()
+    if not login_data:
+        raise Exception("You need to login first")
     client = RoborockApiClient(login_data.email)
     home_data = await client.get_home_data(login_data.user_data)
-    context.update(LoginData({**login_data, "home_data": home_data}))
+    context.update(LoginData(**login_data.as_dict(), home_data=home_data))
     click.echo(
         f"Discovered devices {', '.join([device.name for device in home_data.devices + home_data.received_devices])}"
     )
@@ -102,26 +104,30 @@ async def list_devices(ctx):
         await _discover(ctx)
         login_data = context.login_data()
     home_data = login_data.home_data
-    click.echo(f"Known devices {', '.join([device.name for device in home_data.devices + home_data.received_devices])}")
+    device_name_id = ", ".join(
+        [f"{device.name}: {device.duid}" for device in home_data.devices + home_data.received_devices]
+    )
+    click.echo(f"Known devices {device_name_id}")
 
 
 @click.command()
+@click.option("--device_id", required=True)
 @click.option("--cmd", required=True)
 @click.option("--params", required=False)
 @click.pass_context
 @run_sync()
-async def command(ctx, cmd, params):
+async def command(ctx, cmd, device_id, params):
     context: RoborockContext = ctx.obj
     login_data = context.login_data()
     if not login_data.home_data:
         await _discover(ctx)
         login_data = context.login_data()
     home_data = login_data.home_data
-    device_map: dict[str, RoborockDeviceInfo] = {}
-    for device in home_data.devices + home_data.received_devices:
-        device_map[device.duid] = RoborockDeviceInfo(device=device)
-    mqtt_client = RoborockMqttClient(login_data.user_data, device_map)
-    await mqtt_client.send_command(home_data.devices[0].duid, cmd, params)
+    devices = home_data.devices + home_data.received_devices
+    device = next((device for device in devices if device.duid == device_id), None)
+    device_info = RoborockDeviceInfo(device=device)
+    mqtt_client = RoborockMqttClient(login_data.user_data, device_info)
+    await mqtt_client.send_command(cmd, params)
     mqtt_client.__del__()
 
 

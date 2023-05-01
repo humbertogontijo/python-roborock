@@ -14,7 +14,7 @@ import secrets
 import struct
 import time
 from random import randint
-from typing import Any, Callable, Coroutine, Mapping, Optional
+from typing import Any, Callable, Coroutine, Optional
 
 import aiohttp
 from Crypto.Cipher import AES
@@ -48,13 +48,13 @@ from .exceptions import (
 )
 from .roborock_future import RoborockFuture
 from .roborock_message import RoborockMessage
-from .typing import DeviceProp, DockSummary, RoborockCommand
+from .roborock_typing import DeviceProp, DockSummary, RoborockCommand
 from .util import unpack_list
 
 _LOGGER = logging.getLogger(__name__)
 KEEPALIVE = 60
 QUEUE_TIMEOUT = 4
-SPECIAL_COMMANDS = [
+COMMANDS_SECURED = [
     RoborockCommand.GET_MAP_V1,
 ]
 
@@ -85,14 +85,17 @@ class PreparedRequest:
 
 
 class RoborockClient:
-    def __init__(self, endpoint: str, devices_info: Mapping[str, RoborockDeviceInfo]) -> None:
-        self.devices_info = devices_info
+    def __init__(self, endpoint: str, device_info: RoborockDeviceInfo) -> None:
+        self.device_info = device_info
         self._endpoint = endpoint
         self._nonce = secrets.token_bytes(16)
         self._waiting_queue: dict[int, RoborockFuture] = {}
         self._last_device_msg_in = self.time_func()
         self._last_disconnection = self.time_func()
         self.keep_alive = KEEPALIVE
+
+    def __del__(self) -> None:
+        self.sync_disconnect()
 
     @property
     def time_func(self) -> Callable[[], float]:
@@ -103,10 +106,16 @@ class RoborockClient:
             time_func = time.time
         return time_func
 
+    async def async_connect(self):
+        raise NotImplementedError
+
+    def sync_disconnect(self) -> Any:
+        raise NotImplementedError
+
     async def async_disconnect(self) -> Any:
         raise NotImplementedError
 
-    def on_message(self, messages: list[RoborockMessage]) -> None:
+    def on_message_received(self, messages: list[RoborockMessage]) -> None:
         try:
             self._last_device_msg_in = self.time_func()
             for data in messages:
@@ -118,24 +127,23 @@ class RoborockClient:
                             data_point_response = json.loads(data_point)
                             request_id = data_point_response.get("id")
                             queue = self._waiting_queue.get(request_id)
-                            if queue:
-                                if queue.protocol == protocol:
-                                    error = data_point_response.get("error")
-                                    if error:
-                                        queue.resolve(
-                                            (
-                                                None,
-                                                VacuumError(
-                                                    error.get("code"),
-                                                    error.get("message"),
-                                                ),
-                                            )
+                            if queue and queue.protocol == protocol:
+                                error = data_point_response.get("error")
+                                if error:
+                                    queue.resolve(
+                                        (
+                                            None,
+                                            VacuumError(
+                                                error.get("code"),
+                                                error.get("message"),
+                                            ),
                                         )
-                                    else:
-                                        result = data_point_response.get("result")
-                                        if isinstance(result, list) and len(result) == 1:
-                                            result = result[0]
-                                        queue.resolve((result, None))
+                                    )
+                                else:
+                                    result = data_point_response.get("result")
+                                    if isinstance(result, list) and len(result) == 1:
+                                        result = result[0]
+                                    queue.resolve((result, None))
                 elif protocol == 301:
                     payload = data.payload[0:24]
                     [endpoint, _, request_id, _] = struct.unpack("<15sBH6s", payload)
@@ -149,10 +157,14 @@ class RoborockClient:
                             if isinstance(decrypted, list):
                                 decrypted = decrypted[0]
                             queue.resolve((decrypted, None))
+                else:
+                    queue = self._waiting_queue.get(data.seq)
+                    if queue:
+                        queue.resolve((data.payload, None))
         except Exception as ex:
             _LOGGER.exception(ex)
 
-    def on_disconnect(self, exc: Optional[Exception]) -> None:
+    def on_connection_lost(self, exc: Optional[Exception]) -> None:
         self._last_disconnection = self.time_func()
         _LOGGER.warning("Roborock client disconnected")
         if exc is not None:
@@ -165,6 +177,11 @@ class RoborockClient:
             return False
         return True
 
+    async def validate_connection(self) -> None:
+        if not self.should_keepalive():
+            await self.async_disconnect()
+        await self.async_connect()
+
     async def _async_response(self, request_id: int, protocol_id: int = 0) -> tuple[Any, VacuumError | None]:
         try:
             queue = RoborockFuture(protocol_id)
@@ -176,7 +193,7 @@ class RoborockClient:
         finally:
             del self._waiting_queue[request_id]
 
-    def _get_payload(self, method: RoborockCommand, params: Optional[list] = None, secured=False):
+    def _get_payload(self, method: RoborockCommand, params: Optional[list | dict] = None, secured=False):
         timestamp = math.floor(time.time())
         request_id = randint(10000, 99999)
         inner = {
@@ -200,27 +217,27 @@ class RoborockClient:
         )
         return request_id, timestamp, payload
 
-    async def send_command(self, device_id: str, method: RoborockCommand, params: Optional[list] = None):
+    async def send_command(self, method: RoborockCommand, params: Optional[list | dict] = None):
         raise NotImplementedError
 
-    async def get_status(self, device_id: str) -> Status | None:
-        status = await self.send_command(device_id, RoborockCommand.GET_STATUS)
+    async def get_status(self) -> Status | None:
+        status = await self.send_command(RoborockCommand.GET_STATUS)
         if isinstance(status, dict):
             return Status.from_dict(status)
         return None
 
-    async def get_dnd_timer(self, device_id: str) -> DNDTimer | None:
+    async def get_dnd_timer(self) -> DNDTimer | None:
         try:
-            dnd_timer = await self.send_command(device_id, RoborockCommand.GET_DND_TIMER)
+            dnd_timer = await self.send_command(RoborockCommand.GET_DND_TIMER)
             if isinstance(dnd_timer, dict):
                 return DNDTimer.from_dict(dnd_timer)
         except RoborockTimeout as e:
             _LOGGER.error(e)
         return None
 
-    async def get_clean_summary(self, device_id: str) -> CleanSummary | None:
+    async def get_clean_summary(self) -> CleanSummary | None:
         try:
-            clean_summary = await self.send_command(device_id, RoborockCommand.GET_CLEAN_SUMMARY)
+            clean_summary = await self.send_command(RoborockCommand.GET_CLEAN_SUMMARY)
             if isinstance(clean_summary, dict):
                 return CleanSummary.from_dict(clean_summary)
             elif isinstance(clean_summary, list):
@@ -232,55 +249,54 @@ class RoborockClient:
             _LOGGER.error(e)
         return None
 
-    async def get_clean_record(self, device_id: str, record_id: int) -> CleanRecord | None:
+    async def get_clean_record(self, record_id: int) -> CleanRecord | None:
         try:
-            clean_record = await self.send_command(device_id, RoborockCommand.GET_CLEAN_RECORD, [record_id])
+            clean_record = await self.send_command(RoborockCommand.GET_CLEAN_RECORD, [record_id])
             if isinstance(clean_record, dict):
                 return CleanRecord.from_dict(clean_record)
         except RoborockTimeout as e:
             _LOGGER.error(e)
         return None
 
-    async def get_consumable(self, device_id: str) -> Consumable | None:
+    async def get_consumable(self) -> Consumable | None:
         try:
-            consumable = await self.send_command(device_id, RoborockCommand.GET_CONSUMABLE)
+            consumable = await self.send_command(RoborockCommand.GET_CONSUMABLE)
             if isinstance(consumable, dict):
                 return Consumable.from_dict(consumable)
         except RoborockTimeout as e:
             _LOGGER.error(e)
         return None
 
-    async def get_wash_towel_mode(self, device_id: str) -> WashTowelMode | None:
+    async def get_wash_towel_mode(self) -> WashTowelMode | None:
         try:
-            washing_mode = await self.send_command(device_id, RoborockCommand.GET_WASH_TOWEL_MODE)
+            washing_mode = await self.send_command(RoborockCommand.GET_WASH_TOWEL_MODE)
             if isinstance(washing_mode, dict):
                 return WashTowelMode.from_dict(washing_mode)
         except RoborockTimeout as e:
             _LOGGER.error(e)
         return None
 
-    async def get_dust_collection_mode(self, device_id: str) -> DustCollectionMode | None:
+    async def get_dust_collection_mode(self) -> DustCollectionMode | None:
         try:
-            dust_collection = await self.send_command(device_id, RoborockCommand.GET_DUST_COLLECTION_MODE)
+            dust_collection = await self.send_command(RoborockCommand.GET_DUST_COLLECTION_MODE)
             if isinstance(dust_collection, dict):
                 return DustCollectionMode.from_dict(dust_collection)
         except RoborockTimeout as e:
             _LOGGER.error(e)
         return None
 
-    async def get_smart_wash_params(self, device_id: str) -> SmartWashParams | None:
+    async def get_smart_wash_params(self) -> SmartWashParams | None:
         try:
-            mop_wash_mode = await self.send_command(device_id, RoborockCommand.GET_SMART_WASH_PARAMS)
+            mop_wash_mode = await self.send_command(RoborockCommand.GET_SMART_WASH_PARAMS)
             if isinstance(mop_wash_mode, dict):
                 return SmartWashParams.from_dict(mop_wash_mode)
         except RoborockTimeout as e:
             _LOGGER.error(e)
         return None
 
-    async def get_dock_summary(self, device_id: str, dock_type: RoborockEnum) -> DockSummary | None:
+    async def get_dock_summary(self, dock_type: RoborockEnum) -> DockSummary | None:
         """Gets the status summary from the dock with the methods available for a given dock.
 
-        :param device_id: Device id
         :param dock_type: RoborockDockTypeCode"""
         try:
             commands: list[
@@ -289,11 +305,11 @@ class RoborockClient:
                     Any,
                     DustCollectionMode | WashTowelMode | SmartWashParams | None,
                 ]
-            ] = [self.get_dust_collection_mode(device_id)]
+            ] = [self.get_dust_collection_mode()]
             if dock_type == RoborockDockTypeCode["3"]:
                 commands += [
-                    self.get_wash_towel_mode(device_id),
-                    self.get_smart_wash_params(device_id),
+                    self.get_wash_towel_mode(),
+                    self.get_smart_wash_params(),
                 ]
             [dust_collection_mode, wash_towel_mode, smart_wash_params] = unpack_list(
                 list(await asyncio.gather(*commands)), 3
@@ -304,21 +320,21 @@ class RoborockClient:
             _LOGGER.error(e)
         return None
 
-    async def get_prop(self, device_id: str) -> DeviceProp | None:
+    async def get_prop(self) -> DeviceProp | None:
         [status, dnd_timer, clean_summary, consumable] = await asyncio.gather(
             *[
-                self.get_status(device_id),
-                self.get_dnd_timer(device_id),
-                self.get_clean_summary(device_id),
-                self.get_consumable(device_id),
+                self.get_status(),
+                self.get_dnd_timer(),
+                self.get_clean_summary(),
+                self.get_consumable(),
             ]
         )
         last_clean_record = None
         if clean_summary and clean_summary.records and len(clean_summary.records) > 0:
-            last_clean_record = await self.get_clean_record(device_id, clean_summary.records[0])
+            last_clean_record = await self.get_clean_record(clean_summary.records[0])
         dock_summary = None
         if status and status.dock_type is not None and status.dock_type != RoborockDockTypeCode["0"]:
-            dock_summary = await self.get_dock_summary(device_id, status.dock_type)
+            dock_summary = await self.get_dock_summary(status.dock_type)
         if any([status, dnd_timer, clean_summary, consumable]):
             return DeviceProp(
                 status,
@@ -330,27 +346,27 @@ class RoborockClient:
             )
         return None
 
-    async def get_multi_maps_list(self, device_id) -> MultiMapsList | None:
+    async def get_multi_maps_list(self) -> MultiMapsList | None:
         try:
-            multi_maps_list = await self.send_command(device_id, RoborockCommand.GET_MULTI_MAPS_LIST)
+            multi_maps_list = await self.send_command(RoborockCommand.GET_MULTI_MAPS_LIST)
             if isinstance(multi_maps_list, dict):
                 return MultiMapsList.from_dict(multi_maps_list)
         except RoborockTimeout as e:
             _LOGGER.error(e)
         return None
 
-    async def get_networking(self, device_id) -> NetworkInfo | None:
+    async def get_networking(self) -> NetworkInfo | None:
         try:
-            networking_info = await self.send_command(device_id, RoborockCommand.GET_NETWORK_INFO)
+            networking_info = await self.send_command(RoborockCommand.GET_NETWORK_INFO)
             if isinstance(networking_info, dict):
                 return NetworkInfo.from_dict(networking_info)
         except RoborockTimeout as e:
             _LOGGER.error(e)
         return None
 
-    async def get_room_mapping(self, device_id: str) -> list[RoomMapping]:
+    async def get_room_mapping(self) -> list[RoomMapping]:
         """Gets the mapping from segment id -> iot id. Only works on local api."""
-        mapping = await self.send_command(device_id, RoborockCommand.GET_ROOM_MAPPING)
+        mapping = await self.send_command(RoborockCommand.GET_ROOM_MAPPING)
         if isinstance(mapping, list):
             return [
                 RoomMapping(segment_id=segment_id, iot_id=iot_id)  # type: ignore
