@@ -19,8 +19,8 @@ _LOGGER = logging.getLogger(__name__)
 
 class RoborockProtocol(asyncio.DatagramProtocol):
 
-    def __init__(self):
-        self.timeout = 10000
+    def __init__(self, timeout: int = 5):
+        self.timeout = timeout
         self.transport: BaseTransport | None = None
         self.queue = RoborockFuture(0)
 
