@@ -275,7 +275,7 @@ CommandInfoMap: dict[RoborockCommand | None, CommandInfo] = {
     RoborockCommand.SET_CUSTOMIZE_CLEAN_MODE: CommandInfo(
         prefix=b"\x00\x00\x00\xa7", params={"data": [], "need_retry": 1}
     ),
-    RoborockCommand.SET_CUSTOM_MODE: CommandInfo(prefix=b"\x00\x00\x00\x87", params=[108]),
+    RoborockCommand.SET_CUSTOM_MODE: CommandInfo(prefix=b"\x00\x00\x00w", params=[108]),
     RoborockCommand.SET_DND_TIMER: CommandInfo(prefix=b"\x00\x00\x00\x87", params=[22, 0, 8, 0]),
     RoborockCommand.SET_DUST_COLLECTION_MODE: CommandInfo(prefix=b"\x00\x00\x00\x87", params=None),
     RoborockCommand.SET_FDS_ENDPOINT: CommandInfo(prefix=b"\x00\x00\x00\x97", params=["awsusor0.fds.api.xiaomi.com"]),

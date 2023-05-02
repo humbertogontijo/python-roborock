@@ -4,7 +4,7 @@ import logging
 import re
 from dataclasses import asdict, dataclass
 from enum import Enum
-from typing import Any, Optional
+from typing import Any, Optional, Type
 
 from dacite import Config, from_dict
 
@@ -15,6 +15,9 @@ from .code_mappings import (
     RoborockDockTypeCode,
     RoborockDockWashTowelModeCode,
     RoborockErrorCode,
+    RoborockFanPowerCode,
+    RoborockMopIntensityCode,
+    RoborockMopModeCode,
     RoborockStateCode,
     model_specifications,
 )
@@ -229,11 +232,13 @@ class Status(RoborockBase):
     wash_phase: Optional[int] = None
     wash_ready: Optional[int] = None
     fan_power: Optional[int] = None
+    fan_power_enum: Optional[Type[RoborockFanPowerCode]] = None
     dnd_enabled: Optional[int] = None
     map_status: Optional[int] = None
     is_locating: Optional[int] = None
     lock_status: Optional[int] = None
     water_box_mode: Optional[int] = None
+    water_box_mode_enum: Optional[Type[RoborockMopIntensityCode]] = None
     water_box_carriage_status: Optional[int] = None
     mop_forbidden_enable: Optional[int] = None
     camera_status: Optional[int] = None
@@ -247,6 +252,7 @@ class Status(RoborockBase):
     auto_dust_collection: Optional[int] = None
     avoid_count: Optional[int] = None
     mop_mode: Optional[int] = None
+    mop_mode_enum: Optional[Type[RoborockMopModeCode]] = None
     debug_mode: Optional[int] = None
     collision_avoid_status: Optional[int] = None
     switch_map_mode: Optional[int] = None
@@ -256,11 +262,11 @@ class Status(RoborockBase):
     unsave_map_flag: Optional[int] = None
 
     def update_status(self, model_specification: ModelSpecification) -> None:
-        self.fan_power = model_specification.fan_power_code.as_dict()[self.fan_power]
+        self.fan_power_enum = model_specification.fan_power_code.as_enum_dict()[self.fan_power]
         if model_specification.mop_mode_code is not None:
-            self.mop_mode = model_specification.mop_mode_code.as_dict()[self.mop_mode]
+            self.mop_mode_enum = model_specification.mop_mode_code.as_enum_dict()[self.mop_mode]
         if model_specification.mop_intensity_code is not None:
-            self.water_box_mode = model_specification.mop_intensity_code.as_dict()[self.water_box_mode]
+            self.water_box_mode_enum = model_specification.mop_intensity_code.as_enum_dict()[self.water_box_mode]
 
 
 @dataclass

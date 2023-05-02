@@ -153,7 +153,7 @@ def test_status():
     assert s.unsave_map_reason == 0
     assert s.unsave_map_flag == 0
     s.update_status(model_specification=model_specifications[ROBOROCK_S7_MAXV])
-    assert s.fan_power == RoborockFanSpeedS7MaxV.balanced
+    assert s.fan_power == RoborockFanSpeedS7MaxV.Balanced
     assert s.mop_mode == RoborockMopModeS7.standard
     assert s.water_box_mode == RoborockMopIntensityS7.intense
 

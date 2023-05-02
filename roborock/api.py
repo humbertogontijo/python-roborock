@@ -166,7 +166,7 @@ class RoborockClient:
 
     def on_connection_lost(self, exc: Optional[Exception]) -> None:
         self._last_disconnection = self.time_func()
-        _LOGGER.warning("Roborock client disconnected")
+        _LOGGER.info("Roborock client disconnected")
         if exc is not None:
             _LOGGER.warning(exc)
 

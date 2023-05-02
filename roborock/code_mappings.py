@@ -12,6 +12,7 @@ from roborock.const import (
     ROBOROCK_S6_PURE,
     ROBOROCK_S7,
     ROBOROCK_S7_MAXV,
+    ROBOROCK_S8_PRO_ULTRA,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -30,7 +31,10 @@ class RoborockEnum(IntEnum):
 
     @classmethod
     def as_dict(cls: Type[RoborockEnum]):
-        # TODO: check
+        return {i.value: i.name for i in cls if i.name != "missing"}
+
+    @classmethod
+    def as_enum_dict(cls: Type[RoborockEnum]):
         return {i.value: i for i in cls if i.name != "missing"}
 
     @classmethod
@@ -105,69 +109,72 @@ class RoborockErrorCode(RoborockEnum):
 class RoborockFanPowerCode(RoborockEnum):
     """Describes the fan power of the vacuum cleaner."""
 
+    # Fan speeds should have the first letter capitalized - as there is no way to change the name in translations as
+    # far as I am aware
+
 
 class RoborockFanSpeedV1(RoborockFanPowerCode):
-    silent = 38
-    standard = 60
-    medium = 77
-    turbo = 90
+    Silent = 38
+    Standard = 60
+    Medium = 77
+    Turbo = 90
 
 
 class RoborockFanSpeedV2(RoborockFanPowerCode):
-    silent = 101
-    balanced = 102
-    turbo = 103
-    max = 104
-    gentle = 105
-    auto = 106
+    Silent = 101
+    Balanced = 102
+    Turbo = 103
+    Max = 104
+    Gentle = 105
+    Auto = 106
 
 
 class RoborockFanSpeedV3(RoborockFanPowerCode):
-    silent = 38
-    standard = 60
-    medium = 75
-    turbo = 100
+    Silent = 38
+    Standard = 60
+    Medium = 75
+    Turbo = 100
 
 
 class RoborockFanSpeedE2(RoborockFanPowerCode):
-    gentle = 41
-    silent = 50
-    standard = 68
-    medium = 79
-    turbo = 100
+    Gentle = 41
+    Silent = 50
+    Standard = 68
+    Medium = 79
+    Turbo = 100
 
 
 class RoborockFanSpeedS7(RoborockFanPowerCode):
-    off = 105
-    quiet = 101
-    balanced = 102
-    turbo = 103
-    max = 104
-    custom = 106
+    Off = 105
+    Quiet = 101
+    Balanced = 102
+    Turbo = 103
+    Max = 104
+    Custom = 106
 
 
 class RoborockFanSpeedS7MaxV(RoborockFanPowerCode):
-    off = 105
-    quiet = 101
-    balanced = 102
-    turbo = 103
-    max = 104
-    max_plus = 108
+    Off = 105
+    Quiet = 101
+    Balanced = 102
+    Turbo = 103
+    Max = 104
+    Max_plus = 108
 
 
 class RoborockFanSpeedS6Pure(RoborockFanPowerCode):
-    gentle = 105
-    quiet = 101
-    balanced = 102
-    turbo = 103
-    max = 104
+    Gentle = 105
+    Quiet = 101
+    Balanced = 102
+    Turbo = 103
+    Max = 104
 
 
 class RoborockFanSpeedQ7Max(RoborockFanPowerCode):
-    quiet = 101
-    balanced = 102
-    turbo = 103
-    max = 104
+    Quiet = 101
+    Balanced = 102
+    Turbo = 103
+    Max = 104
 
 
 class RoborockMopModeCode(RoborockEnum):
@@ -180,6 +187,13 @@ class RoborockMopModeS7(RoborockMopModeCode):
     standard = 300
     deep = 301
     custom = 302
+    deep_plus = 303
+
+
+class RoborockMopModeS8ProUltra(RoborockMopModeCode):
+    # TODO: Add code for fast
+    standard = 300
+    deep = 301
     deep_plus = 303
 
 
@@ -293,6 +307,13 @@ model_specifications = {
         model_code=ROBOROCK_S7,
         fan_power_code=RoborockFanSpeedS7,
         mop_mode_code=RoborockMopModeS7,
+        mop_intensity_code=RoborockMopIntensityS7,
+    ),
+    ROBOROCK_S8_PRO_ULTRA: ModelSpecification(
+        model_name="Roborock S8 Pro Ultra",
+        model_code=ROBOROCK_S8_PRO_ULTRA,
+        fan_power_code=RoborockFanSpeedS7MaxV,
+        mop_mode_code=RoborockMopModeS8ProUltra,
         mop_intensity_code=RoborockMopIntensityS7,
     ),
 }
