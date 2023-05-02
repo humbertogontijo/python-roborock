@@ -234,6 +234,7 @@ class RoborockDockTypeCode(RoborockEnum):
     no_dock = 0
     empty_wash_fill_dock = 3
     auto_empty_dock_pure = 5
+    s8_dock = 7
 
 
 class RoborockDockDustCollectionModeCode(RoborockEnum):

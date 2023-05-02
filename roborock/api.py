@@ -309,7 +309,7 @@ class RoborockClient:
                     DustCollectionMode | WashTowelMode | SmartWashParams | None,
                 ]
             ] = [self.get_dust_collection_mode()]
-            if dock_type == RoborockDockTypeCode.empty_wash_fill_dock:
+            if dock_type == RoborockDockTypeCode.empty_wash_fill_dock or dock_type == RoborockDockTypeCode.s8_dock:
                 commands += [
                     self.get_wash_towel_mode(),
                     self.get_smart_wash_params(),
