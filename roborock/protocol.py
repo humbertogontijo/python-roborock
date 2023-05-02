@@ -8,13 +8,35 @@ import logging
 from asyncio import BaseTransport
 from typing import Callable
 
-from construct import Adapter, Bytes, Checksum, Const, Int16ub, Int32ub, RawCopy, Struct
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
+from construct import (
+    Bytes,
+    Checksum,
+    ChecksumError,
+    Const,
+    Construct,
+    Container,
+    GreedyBytes,
+    GreedyRange,
+    Int16ub,
+    Int32ub,
+    Optional,
+    Peek,
+    RawCopy,
+    Struct,
+    bytestringtype,
+)
 
+from roborock import RoborockException
 from roborock.roborock_future import RoborockFuture
+from roborock.roborock_message import RoborockMessage
 
 _LOGGER = logging.getLogger(__name__)
+SALT = "TXdfu$jyZ#TZHsg4".encode()
+BROADCAST_TOKEN = "qWKYcdQWrbm9hPqe".encode()
+AP_CONFIG = 1
+SOCK_DISCOVERY = 2
 
 
 class RoborockProtocol(asyncio.DatagramProtocol):
@@ -24,8 +46,8 @@ class RoborockProtocol(asyncio.DatagramProtocol):
         self.queue = RoborockFuture(0)
 
     def datagram_received(self, data, _):
-        broadcast_message = BroadcastMessage.parse(data)
-        self.queue.resolve((json.loads(broadcast_message.message.value.payload), None))
+        [broadcast_message], _ = BroadcastParser.parse(data)
+        self.queue.resolve((json.loads(broadcast_message.payload), None))
         self.close()
 
     async def discover(self):
@@ -41,7 +63,7 @@ class RoborockProtocol(asyncio.DatagramProtocol):
 
 
 class Utils:
-    """This class is adapted from the original xpn.py code by gst666."""
+    """Util class for protocol manipulation."""
 
     @staticmethod
     def verify_token(token: bytes):
@@ -109,34 +131,34 @@ class Utils:
         """Gather bytes for checksum calculation."""
         return binascii.crc32(data)
 
-    @staticmethod
-    def get_length(x) -> int:
-        """Return total packet length."""
-        datalen = x._.data.length  # type: int
-        return datalen + 32
 
-    @staticmethod
-    def is_hello(x) -> bool:
-        """Return if packet is a hello packet."""
-        # not very nice, but we know that hellos are 32b of length
-        val = x.get("length", x.header.value["length"])
-
-        return val == 32
-
-
-class EncryptionAdapter(Adapter):
+class EncryptionAdapter(Construct):
     """Adapter to handle communication encryption."""
 
-    def __init__(self, token_func: Callable, subcon):
-        super().__init__(subcon)
+    def __init__(self, token_func: Callable):
+        super().__init__()
         self.token_func = token_func
-        self.flagbuildnone = True
+
+    def _parse(self, stream, context, path):
+        subcon1 = Optional(Int16ub)
+        length = subcon1.parse_stream(stream, **context)
+        if length is None:
+            subcon1.parse_stream(stream, **context)  # seek 2
+            return None
+        subcon2 = Bytes(length)
+        obj = subcon2.parse_stream(stream, **context)
+        return self._decode(obj, context, path)
 
     def _build(self, obj, stream, context, path):
         obj2 = self._encode(obj, context, path)
-        return self.subcon._build(obj2, stream, context, path)
+        subcon1 = Int16ub
+        length = len(obj2)
+        subcon1.build_stream(length, stream, **context)
+        subcon2 = Bytes(length)
+        subcon2.build_stream(obj2, stream, **context)
+        return obj
 
-    def _encode(self, obj, context, path):
+    def _encode(self, obj, context, _):
         """Encrypt the given payload with the token stored in the context.
 
         :param obj: JSON object to encrypt
@@ -145,25 +167,132 @@ class EncryptionAdapter(Adapter):
         encrypted = Utils.encrypt(obj, token)
         return encrypted
 
-    def _decode(self, obj, context, path):
+    def _decode(self, obj, context, _):
         """Decrypts the given payload with the token stored in the context."""
         token = self.token_func(context)
         decrypted = Utils.decrypt(obj, token)
         return decrypted
 
 
-BROADCAST_TOKEN = "qWKYcdQWrbm9hPqe".encode()
+class OptionalChecksum(Checksum):
+    def _parse(self, stream, context, path):
+        hash1 = self.checksumfield.parse_stream(stream, **context)
+        if hash1 is None:
+            return None
+        hash2 = self.hashfunc(self.bytesfunc(context))
+        if hash1 != hash2:
+            raise ChecksumError(
+                "wrong checksum, read %r, computed %r"
+                % (
+                    hash1 if not isinstance(hash1, bytestringtype) else binascii.hexlify(hash1),
+                    hash2 if not isinstance(hash2, bytestringtype) else binascii.hexlify(hash2),
+                ),
+                path=path,
+            )
+        return hash1
 
-BroadcastMessage = Struct(
+
+class OptionalPrefix(Construct):
+    def _parse(self, stream, context, path):
+        subcon1 = Peek(Optional(Const(b"1.0")))
+        peek_version = subcon1.parse_stream(stream, **context)
+        if peek_version is None:
+            subcon2 = Bytes(4)
+            return subcon2.parse_stream(stream, **context)
+        return b""
+
+    def _build(self, obj, stream, context, path):
+        if obj is not None:
+            subcon1 = Bytes(4)
+            subcon1.build_stream(obj, stream, **context)
+        return obj
+
+
+_Messages = Struct("messages" / GreedyRange(
+    Struct(
+        "prefix" / OptionalPrefix(),
+        "message"
+        / RawCopy(
+            Struct(
+                "version" / Const(b"1.0"),
+                "seq" / Int32ub,
+                "random" / Int32ub,
+                "timestamp" / Int32ub,
+                "protocol" / Int16ub,
+                "payload"
+                / EncryptionAdapter(
+                    lambda ctx: Utils.md5(
+                        Utils.encode_timestamp(ctx.timestamp) + Utils.ensure_bytes(ctx.search("local_key")) + SALT
+                    ),
+                ),
+            )
+        ),
+        "checksum" / OptionalChecksum(Optional(Int32ub), Utils.crc, lambda ctx: ctx.message.data),
+    )
+), "remaining" / Optional(GreedyBytes))
+
+_BroadcastMessage = Struct(
     "message"
     / RawCopy(
         Struct(
             "version" / Const(b"1.0"),
             "seq" / Int32ub,
             "protocol" / Int16ub,
-            "payload_len" / Int16ub,
-            "payload" / EncryptionAdapter(lambda ctx: BROADCAST_TOKEN, Bytes(lambda ctx: ctx.payload_len)),
+            "payload" / EncryptionAdapter(lambda ctx: BROADCAST_TOKEN),
         )
     ),
     "checksum" / Checksum(Int32ub, Utils.crc, lambda ctx: ctx.message.data),
 )
+
+
+class _Parser:
+    def __init__(self, con: Construct, required_local_key: bool):
+        self.con = con
+        self.required_local_key = required_local_key
+
+    def parse(self, data: bytes, local_key: str | None = None) -> tuple[list[RoborockMessage], bytes]:
+        if self.required_local_key and local_key is None:
+            raise RoborockException("Local key is required")
+        parsed = self.con.parse(data, local_key=local_key)
+        parsed_messages = [Container({"message": parsed.message})] if parsed.get("message") else parsed.messages
+        messages = []
+        for message in parsed_messages:
+            messages.append(
+                RoborockMessage(
+                    prefix=message.get("prefix"),
+                    version=message.message.value.version,
+                    seq=message.message.value.seq,
+                    random=message.message.value.get("random"),
+                    timestamp=message.message.value.get("timestamp"),
+                    protocol=message.message.value.protocol,
+                    payload=message.message.value.payload,
+                )
+            )
+        remaining = parsed.get('remaining') or b''
+        return messages, remaining
+
+    def build(self, roborock_messages: list[RoborockMessage] | RoborockMessage, local_key: str) -> bytes:
+        if isinstance(roborock_messages, RoborockMessage):
+            roborock_messages = [roborock_messages]
+        messages = []
+        for roborock_message in roborock_messages:
+            messages.append(
+                {
+                    "prefix": roborock_message.prefix,
+                    "message": {
+                        "value": {
+                            "version": roborock_message.version,
+                            "seq": roborock_message.seq,
+                            "random": roborock_message.random,
+                            "timestamp": roborock_message.timestamp,
+                            "protocol": roborock_message.protocol,
+                            "payload": roborock_message.payload,
+                        }
+                    },
+                }
+            )
+        return self.con.build({"messages": [message for message in messages]}, local_key=local_key)
+
+
+MessageParser: _Parser = _Parser(_Messages, True)
+BroadcastParser: _Parser = _Parser(_BroadcastMessage, False)

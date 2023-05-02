@@ -13,9 +13,9 @@ import paho.mqtt.client as mqtt
 from .api import COMMANDS_SECURED, KEEPALIVE, RoborockClient, md5hex
 from .containers import RoborockDeviceInfo, UserData
 from .exceptions import CommandVacuumError, RoborockException, VacuumError
-from .protocol import Utils
+from .protocol import MessageParser, Utils
 from .roborock_future import RoborockFuture
-from .roborock_message import RoborockMessage, RoborockParser
+from .roborock_message import RoborockMessage
 from .roborock_typing import RoborockCommand
 
 _LOGGER = logging.getLogger(__name__)
@@ -77,7 +77,7 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
     def on_message(self, *args, **kwargs):
         _, __, msg = args
         try:
-            messages, _ = RoborockParser.decode(msg.payload, self.device_info.device.local_key)
+            messages, _ = MessageParser.parse(msg.payload, local_key=self.device_info.device.local_key)
             super().on_message_received(messages)
         except Exception as ex:
             _LOGGER.exception(ex)
@@ -156,7 +156,7 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
         response_protocol = 301 if method in COMMANDS_SECURED else 102
         roborock_message = RoborockMessage(timestamp=timestamp, protocol=request_protocol, payload=payload)
         local_key = self.device_info.device.local_key
-        msg = RoborockParser.encode(roborock_message, local_key)
+        msg = MessageParser.build(roborock_message, local_key)
         self._send_msg_raw(msg)
         (response, err) = await self._async_response(request_id, response_protocol)
         if err:

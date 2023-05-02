@@ -10,7 +10,8 @@ import async_timeout
 from .api import COMMANDS_SECURED, QUEUE_TIMEOUT, RoborockClient
 from .containers import RoborockLocalDeviceInfo
 from .exceptions import CommandVacuumError, RoborockConnectionException, RoborockException
-from .roborock_message import AP_CONFIG, RoborockMessage, RoborockParser
+from .protocol import AP_CONFIG, MessageParser
+from .roborock_message import RoborockMessage
 from .roborock_typing import CommandInfoMap, RoborockCommand
 from .util import get_running_loop_or_create_one
 
@@ -32,8 +33,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         if self.remaining:
             message = self.remaining + message
             self.remaining = b""
-        (parser_msg, remaining) = RoborockParser.decode(message, self.device_info.device.local_key)
-        self.remaining = remaining
+        parser_msg, self.remaining = MessageParser.parse(message, local_key=self.device_info.device.local_key)
         self.on_message_received(parser_msg)
 
     def connection_lost(self, exc: Optional[Exception]):
@@ -116,7 +116,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         if isinstance(roborock_messages, RoborockMessage):
             roborock_messages = [roborock_messages]
         local_key = self.device_info.device.local_key
-        msg = RoborockParser.encode(roborock_messages, local_key)
+        msg = MessageParser.build(roborock_messages, local_key=local_key)
         # Send the command to the Roborock device
         _LOGGER.debug(f"Requesting device with {roborock_messages}")
         self._send_msg_raw(msg)
