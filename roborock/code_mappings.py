@@ -191,10 +191,10 @@ class RoborockMopModeS7(RoborockMopModeCode):
 
 
 class RoborockMopModeS8ProUltra(RoborockMopModeCode):
-    # TODO: Add code for fast
     standard = 300
     deep = 301
     deep_plus = 303
+    fast = 304
 
 
 class RoborockMopIntensityCode(RoborockEnum):
