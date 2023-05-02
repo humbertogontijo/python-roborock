@@ -2,14 +2,13 @@ from __future__ import annotations
 
 import asyncio
 import binascii
+import gzip
 import hashlib
 import json
 import logging
 from asyncio import BaseTransport
 from typing import Callable
 
-from Crypto.Cipher import AES
-from Crypto.Util.Padding import pad, unpad
 from construct import (
     Bytes,
     Checksum,
@@ -27,6 +26,8 @@ from construct import (
     Struct,
     bytestringtype,
 )
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad, unpad
 
 from roborock import RoborockException
 from roborock.roborock_future import RoborockFuture
@@ -92,8 +93,8 @@ class Utils:
         return checksum.digest()
 
     @staticmethod
-    def encrypt(plaintext: bytes, token: bytes) -> bytes:
-        """Encrypt plaintext with a given token.
+    def encrypt_ecb(plaintext: bytes, token: bytes) -> bytes:
+        """Encrypt plaintext with a given token using ecb mode.
 
         :param bytes plaintext: Plaintext (json) to encrypt
         :param bytes token: Token to use
@@ -109,8 +110,8 @@ class Utils:
         return plaintext
 
     @staticmethod
-    def decrypt(ciphertext: bytes, token: bytes) -> bytes:
-        """Decrypt ciphertext with a given token.
+    def decrypt_ecb(ciphertext: bytes, token: bytes) -> bytes:
+        """Decrypt ciphertext with a given token using ecb mode.
 
         :param bytes ciphertext: Ciphertext to decrypt
         :param bytes token: Token to use
@@ -127,9 +128,32 @@ class Utils:
         return ciphertext
 
     @staticmethod
+    def decrypt_cbc(ciphertext: bytes, token: bytes) -> bytes:
+        """Decrypt ciphertext with a given token using cbc mode.
+
+        :param bytes ciphertext: Ciphertext to decrypt
+        :param bytes token: Token to use
+        :return: Decrypted bytes object
+        """
+        if not isinstance(ciphertext, bytes):
+            raise TypeError("ciphertext requires bytes")
+        if ciphertext:
+            Utils.verify_token(token)
+
+            iv = bytes(AES.block_size)
+            decipher = AES.new(token, AES.MODE_CBC, iv)
+            return unpad(decipher.decrypt(ciphertext), AES.block_size)
+        return ciphertext
+
+    @staticmethod
     def crc(data: bytes) -> int:
         """Gather bytes for checksum calculation."""
         return binascii.crc32(data)
+
+    @staticmethod
+    def decompress(compressed_data: bytes):
+        """Decompress data using gzip."""
+        return gzip.decompress(compressed_data)
 
 
 class EncryptionAdapter(Construct):
@@ -164,13 +188,13 @@ class EncryptionAdapter(Construct):
         :param obj: JSON object to encrypt
         """
         token = self.token_func(context)
-        encrypted = Utils.encrypt(obj, token)
+        encrypted = Utils.encrypt_ecb(obj, token)
         return encrypted
 
     def _decode(self, obj, context, _):
         """Decrypts the given payload with the token stored in the context."""
         token = self.token_func(context)
-        decrypted = Utils.decrypt(obj, token)
+        decrypted = Utils.decrypt_ecb(obj, token)
         return decrypted
 
 
