@@ -208,28 +208,32 @@ class OptionalPrefix(Construct):
         return obj
 
 
-_Messages = Struct("messages" / GreedyRange(
-    Struct(
-        "prefix" / OptionalPrefix(),
-        "message"
-        / RawCopy(
-            Struct(
-                "version" / Const(b"1.0"),
-                "seq" / Int32ub,
-                "random" / Int32ub,
-                "timestamp" / Int32ub,
-                "protocol" / Int16ub,
-                "payload"
-                / EncryptionAdapter(
-                    lambda ctx: Utils.md5(
-                        Utils.encode_timestamp(ctx.timestamp) + Utils.ensure_bytes(ctx.search("local_key")) + SALT
+_Messages = Struct(
+    "messages"
+    / GreedyRange(
+        Struct(
+            "prefix" / OptionalPrefix(),
+            "message"
+            / RawCopy(
+                Struct(
+                    "version" / Const(b"1.0"),
+                    "seq" / Int32ub,
+                    "random" / Int32ub,
+                    "timestamp" / Int32ub,
+                    "protocol" / Int16ub,
+                    "payload"
+                    / EncryptionAdapter(
+                        lambda ctx: Utils.md5(
+                            Utils.encode_timestamp(ctx.timestamp) + Utils.ensure_bytes(ctx.search("local_key")) + SALT
+                        ),
                     ),
-                ),
-            )
-        ),
-        "checksum" / OptionalChecksum(Optional(Int32ub), Utils.crc, lambda ctx: ctx.message.data),
-    )
-), "remaining" / Optional(GreedyBytes))
+                )
+            ),
+            "checksum" / OptionalChecksum(Optional(Int32ub), Utils.crc, lambda ctx: ctx.message.data),
+        )
+    ),
+    "remaining" / Optional(GreedyBytes),
+)
 
 _BroadcastMessage = Struct(
     "message"
@@ -268,7 +272,7 @@ class _Parser:
                     payload=message.message.value.payload,
                 )
             )
-        remaining = parsed.get('remaining') or b''
+        remaining = parsed.get("remaining") or b""
         return messages, remaining
 
     def build(self, roborock_messages: list[RoborockMessage] | RoborockMessage, local_key: str) -> bytes:
