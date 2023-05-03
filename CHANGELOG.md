@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.10.0 (2023-05-03)
+### Feature
+* Add specific device functionality ([#46](https://github.com/humbertogontijo/python-roborock/issues/46)) ([`32abce5`](https://github.com/humbertogontijo/python-roborock/commit/32abce5d51d14aab9adef5b9560ceee534186b1a))
+
 ## v0.9.0 (2023-05-01)
 ### Feature
 * Single device api and discovery method ([`5fef26d`](https://github.com/humbertogontijo/python-roborock/commit/5fef26d257433c12d38f6b19731018e54884a150))

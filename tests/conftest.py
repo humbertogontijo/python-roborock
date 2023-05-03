@@ -10,7 +10,9 @@ from tests.mock_data import HOME_DATA_RAW, USER_DATA
 def mqtt_client():
     user_data = UserData.from_dict(USER_DATA)
     home_data = HomeData.from_dict(HOME_DATA_RAW)
-    device_info = RoborockDeviceInfo(device=home_data.devices[0])
+    device_info = RoborockDeviceInfo(
+        device=home_data.devices[0], model_specification=home_data.products[0].model_specification
+    )
     client = RoborockMqttClient(user_data, device_info)
     yield client
     # Clean up any resources after the test

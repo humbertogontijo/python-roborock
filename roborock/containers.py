@@ -1,13 +1,15 @@
 from __future__ import annotations
 
+import logging
 import re
 from dataclasses import asdict, dataclass
 from enum import Enum
-from typing import Any, Optional
+from typing import Any, Optional, Type
 
 from dacite import Config, from_dict
 
 from .code_mappings import (
+    ModelSpecification,
     RoborockDockDustCollectionModeCode,
     RoborockDockErrorCode,
     RoborockDockTypeCode,
@@ -17,8 +19,17 @@ from .code_mappings import (
     RoborockMopIntensityCode,
     RoborockMopModeCode,
     RoborockStateCode,
+    model_specifications,
 )
-from .const import FILTER_REPLACE_TIME, MAIN_BRUSH_REPLACE_TIME, SENSOR_DIRTY_REPLACE_TIME, SIDE_BRUSH_REPLACE_TIME
+from .const import (
+    FILTER_REPLACE_TIME,
+    MAIN_BRUSH_REPLACE_TIME,
+    ROBOROCK_S7_MAXV,
+    SENSOR_DIRTY_REPLACE_TIME,
+    SIDE_BRUSH_REPLACE_TIME,
+)
+
+_LOGGER = logging.getLogger(__name__)
 
 
 def camelize(s: str):
@@ -115,6 +126,14 @@ class HomeDataProduct(RoborockBase):
     capability: Optional[int] = None
     category: Optional[str] = None
     schema: Optional[list[HomeDataProductSchema]] = None
+    model_specification: ModelSpecification | None = None
+
+    def __post_init__(self):
+        if self.model not in model_specifications:
+            _LOGGER.warning("We don't have specific device information for your model, please open an issue.")
+            self.model_specification = model_specifications.get(ROBOROCK_S7_MAXV)
+        else:
+            self.model_specification = model_specifications.get(self.model)
 
 
 @dataclass
@@ -122,12 +141,13 @@ class HomeDataDeviceStatus(RoborockBase):
     id: Optional[Any] = None
     name: Optional[Any] = None
     code: Optional[Any] = None
-    model: Optional[Any] = None
+    model: Optional[str] = None
     icon_url: Optional[Any] = None
     attribute: Optional[Any] = None
     capability: Optional[Any] = None
     category: Optional[Any] = None
     schema: Optional[Any] = None
+    model_specification: ModelSpecification | None = None
 
 
 @dataclass
@@ -197,11 +217,11 @@ class LoginData(RoborockBase):
 class Status(RoborockBase):
     msg_ver: Optional[int] = None
     msg_seq: Optional[int] = None
-    state: Optional[RoborockStateCode] = None  # type: ignore[valid-type]
+    state: Optional[RoborockStateCode] = None
     battery: Optional[int] = None
     clean_time: Optional[int] = None
     clean_area: Optional[int] = None
-    error_code: Optional[RoborockErrorCode] = None  # type: ignore[valid-type]
+    error_code: Optional[RoborockErrorCode] = None
     map_present: Optional[int] = None
     in_cleaning: Optional[int] = None
     in_returning: Optional[int] = None
@@ -211,13 +231,14 @@ class Status(RoborockBase):
     back_type: Optional[int] = None
     wash_phase: Optional[int] = None
     wash_ready: Optional[int] = None
-    fan_power: Optional[RoborockFanPowerCode] = None  # type: ignore[valid-type]
+    fan_power: Optional[int] = None
+    fan_power_enum: Optional[Type[RoborockFanPowerCode]] = None
     dnd_enabled: Optional[int] = None
     map_status: Optional[int] = None
     is_locating: Optional[int] = None
     lock_status: Optional[int] = None
-    water_box_mode: Optional[RoborockMopIntensityCode] = None  # type: ignore[valid-type]
-    mop_intensity: Optional[str] = None
+    water_box_mode: Optional[int] = None
+    water_box_mode_enum: Optional[Type[RoborockMopIntensityCode]] = None
     water_box_carriage_status: Optional[int] = None
     mop_forbidden_enable: Optional[int] = None
     camera_status: Optional[int] = None
@@ -226,18 +247,26 @@ class Status(RoborockBase):
     home_sec_enable_password: Optional[int] = None
     adbumper_status: Optional[list[int]] = None
     water_shortage_status: Optional[int] = None
-    dock_type: Optional[RoborockDockTypeCode] = None  # type: ignore[valid-type]
+    dock_type: Optional[RoborockDockTypeCode] = None
     dust_collection_status: Optional[int] = None
     auto_dust_collection: Optional[int] = None
     avoid_count: Optional[int] = None
-    mop_mode: Optional[RoborockMopModeCode] = None  # type: ignore[valid-type]
+    mop_mode: Optional[int] = None
+    mop_mode_enum: Optional[Type[RoborockMopModeCode]] = None
     debug_mode: Optional[int] = None
     collision_avoid_status: Optional[int] = None
     switch_map_mode: Optional[int] = None
-    dock_error_status: Optional[RoborockDockErrorCode] = None  # type: ignore[valid-type]
+    dock_error_status: Optional[RoborockDockErrorCode] = None
     charge_status: Optional[int] = None
     unsave_map_reason: Optional[int] = None
     unsave_map_flag: Optional[int] = None
+
+    def update_status(self, model_specification: ModelSpecification) -> None:
+        self.fan_power_enum = model_specification.fan_power_code.as_enum_dict()[self.fan_power]
+        if model_specification.mop_mode_code is not None:
+            self.mop_mode_enum = model_specification.mop_mode_code.as_enum_dict()[self.mop_mode]
+        if model_specification.mop_intensity_code is not None:
+            self.water_box_mode_enum = model_specification.mop_intensity_code.as_enum_dict()[self.water_box_mode]
 
 
 @dataclass
@@ -336,12 +365,12 @@ class SmartWashParams(RoborockBase):
 
 @dataclass
 class DustCollectionMode(RoborockBase):
-    mode: Optional[RoborockDockDustCollectionModeCode] = None  # type: ignore[valid-type]
+    mode: Optional[RoborockDockDustCollectionModeCode] = None
 
 
 @dataclass
 class WashTowelMode(RoborockBase):
-    wash_mode: Optional[RoborockDockWashTowelModeCode] = None  # type: ignore[valid-type]
+    wash_mode: Optional[RoborockDockWashTowelModeCode] = None
 
 
 @dataclass
@@ -356,6 +385,7 @@ class NetworkInfo(RoborockBase):
 @dataclass
 class RoborockDeviceInfo(RoborockBase):
     device: HomeDataDevice
+    model_specification: ModelSpecification
 
 @dataclass
 class RoomMapping(RoborockBase):
