@@ -92,11 +92,16 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         return (await self.send_message(roborock_message))[0]
 
     async def async_local_response(self, roborock_message: RoborockMessage):
-        request_id = roborock_message.get_request_id()
-        if request_id is None:
+        method = roborock_message.get_method()
+        request_id: int | None
+        if method and not method.startswith("get"):
             request_id = roborock_message.seq
-        # response_protocol = 5 if roborock_message.prefix == secured_prefix else 4
-        response_protocol = 4
+            response_protocol = 5
+        else:
+            request_id = roborock_message.get_request_id()
+            response_protocol = 4
+        if request_id is None:
+            raise RoborockException(f"Failed build message {roborock_message}")
         (response, err) = await self._async_response(request_id, response_protocol)
         if err:
             raise CommandVacuumError("", err) from err

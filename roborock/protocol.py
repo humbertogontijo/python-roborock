@@ -166,7 +166,7 @@ class EncryptionAdapter(Construct):
     def _parse(self, stream, context, path):
         subcon1 = Optional(Int16ub)
         length = subcon1.parse_stream(stream, **context)
-        if length is None:
+        if not length:
             subcon1.parse_stream(stream, **context)  # seek 2
             return None
         subcon2 = Bytes(length)
@@ -200,9 +200,9 @@ class EncryptionAdapter(Construct):
 
 class OptionalChecksum(Checksum):
     def _parse(self, stream, context, path):
+        if not context.message.value.payload:
+            return
         hash1 = self.checksumfield.parse_stream(stream, **context)
-        if hash1 is None:
-            return None
         hash2 = self.hashfunc(self.bytesfunc(context))
         if hash1 != hash2:
             raise ChecksumError(
