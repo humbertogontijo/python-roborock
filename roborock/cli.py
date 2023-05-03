@@ -131,7 +131,7 @@ async def command(ctx, cmd, device_id, params):
             for product in home_data.products
             if device is not None and product.did == device.duid
         ),
-        None
+        None,
     )
     if model_specification is None:
         raise RoborockException(f"Could not find model specifications for device {device.name}")
