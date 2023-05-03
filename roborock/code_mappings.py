@@ -108,6 +108,7 @@ class RoborockErrorCode(RoborockEnum):
 
 class RoborockFanPowerCode(RoborockEnum):
     """Describes the fan power of the vacuum cleaner."""
+
     # Fan speeds should have the first letter capitalized - as there is no way to change the name in translations as
     # far as I am aware
 
@@ -182,6 +183,7 @@ class RoborockMopModeCode(RoborockEnum):
 
 class RoborockMopModeS7(RoborockMopModeCode):
     """Describes the mop mode of the vacuum cleaner."""
+
     standard = 300
     deep = 301
     custom = 302
@@ -201,6 +203,7 @@ class RoborockMopIntensityCode(RoborockEnum):
 
 class RoborockMopIntensityS7(RoborockMopIntensityCode):
     """Describes the mop intensity of the vacuum cleaner."""
+
     off = 200
     mild = 201
     moderate = 202
@@ -210,6 +213,7 @@ class RoborockMopIntensityS7(RoborockMopIntensityCode):
 
 class RoborockMopIntensityV2(RoborockMopIntensityCode):
     """Describes the mop intensity of the vacuum cleaner."""
+
     off = 200
     low = 201
     medium = 202
@@ -219,6 +223,7 @@ class RoborockMopIntensityV2(RoborockMopIntensityCode):
 
 class RoborockDockErrorCode(RoborockEnum):
     """Describes the error code of the dock."""
+
     ok = 0
     water_empty = 38
     waste_water_tank_full = 39
@@ -234,6 +239,7 @@ class RoborockDockTypeCode(RoborockEnum):
 
 class RoborockDockDustCollectionModeCode(RoborockEnum):
     """Describes the dust collection mode of the vacuum cleaner."""
+
     # TODO: Get the correct values for various different docks
     missing = -9999
     smart = 0
@@ -244,6 +250,7 @@ class RoborockDockDustCollectionModeCode(RoborockEnum):
 
 class RoborockDockWashTowelModeCode(RoborockEnum):
     """Describes the wash towel mode of the vacuum cleaner."""
+
     # TODO: Get the correct values for various different docks
     missing = -9999
     light = 0

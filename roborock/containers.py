@@ -126,7 +126,7 @@ class HomeDataProduct(RoborockBase):
     capability: Optional[int] = None
     category: Optional[str] = None
     schema: Optional[list[HomeDataProductSchema]] = None
-    model_specification: ModelSpecification | None = None
+    model_specification: Optional[ModelSpecification] = None
 
     def __post_init__(self):
         if self.model not in model_specifications:
@@ -147,7 +147,7 @@ class HomeDataDeviceStatus(RoborockBase):
     capability: Optional[Any] = None
     category: Optional[Any] = None
     schema: Optional[Any] = None
-    model_specification: ModelSpecification | None = None
+    model_specification: Optional[ModelSpecification] = None
 
 
 @dataclass
