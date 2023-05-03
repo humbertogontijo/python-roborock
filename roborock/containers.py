@@ -357,12 +357,6 @@ class NetworkInfo(RoborockBase):
 class RoborockDeviceInfo(RoborockBase):
     device: HomeDataDevice
 
-
-@dataclass
-class RoborockLocalDeviceInfo(RoborockDeviceInfo):
-    network_info: NetworkInfo
-
-
 @dataclass
 class RoomMapping(RoborockBase):
     segment_id: int

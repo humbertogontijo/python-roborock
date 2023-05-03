@@ -8,7 +8,7 @@ from typing import Optional
 import async_timeout
 
 from .api import COMMANDS_SECURED, QUEUE_TIMEOUT, RoborockClient
-from .containers import RoborockLocalDeviceInfo
+from .containers import RoborockDeviceInfo
 from .exceptions import CommandVacuumError, RoborockConnectionException, RoborockException
 from .protocol import AP_CONFIG, MessageParser
 from .roborock_message import RoborockMessage
@@ -19,10 +19,10 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class RoborockLocalClient(RoborockClient, asyncio.Protocol):
-    def __init__(self, device_info: RoborockLocalDeviceInfo):
+    def __init__(self, device_info: RoborockDeviceInfo, ip: str):
         super().__init__("abc", device_info)
         self.loop = get_running_loop_or_create_one()
-        self.ip = device_info.network_info.ip
+        self.ip = ip
         self._batch_structs: list[RoborockMessage] = []
         self._executing = False
         self.remaining = b""
