@@ -387,6 +387,7 @@ class RoborockDeviceInfo(RoborockBase):
     device: HomeDataDevice
     model_specification: ModelSpecification
 
+
 @dataclass
 class RoomMapping(RoborockBase):
     segment_id: int
