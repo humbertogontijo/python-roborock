@@ -108,73 +108,72 @@ class RoborockErrorCode(RoborockEnum):
 
 class RoborockFanPowerCode(RoborockEnum):
     """Describes the fan power of the vacuum cleaner."""
-
     # Fan speeds should have the first letter capitalized - as there is no way to change the name in translations as
     # far as I am aware
 
 
 class RoborockFanSpeedV1(RoborockFanPowerCode):
-    Silent = 38
-    Standard = 60
-    Medium = 77
-    Turbo = 90
+    silent = 38
+    standard = 60
+    medium = 77
+    turbo = 90
 
 
 class RoborockFanSpeedV2(RoborockFanPowerCode):
-    Silent = 101
-    Balanced = 102
-    Turbo = 103
-    Max = 104
-    Gentle = 105
-    Auto = 106
+    silent = 101
+    balanced = 102
+    turbo = 103
+    max = 104
+    gentle = 105
+    auto = 106
 
 
 class RoborockFanSpeedV3(RoborockFanPowerCode):
-    Silent = 38
-    Standard = 60
-    Medium = 75
-    Turbo = 100
+    silent = 38
+    standard = 60
+    medium = 75
+    turbo = 100
 
 
 class RoborockFanSpeedE2(RoborockFanPowerCode):
-    Gentle = 41
-    Silent = 50
-    Standard = 68
-    Medium = 79
-    Turbo = 100
+    gentle = 41
+    silent = 50
+    standard = 68
+    medium = 79
+    turbo = 100
 
 
 class RoborockFanSpeedS7(RoborockFanPowerCode):
-    Off = 105
-    Quiet = 101
-    Balanced = 102
-    Turbo = 103
-    Max = 104
-    Custom = 106
+    off = 105
+    quiet = 101
+    balanced = 102
+    turbo = 103
+    max = 104
+    custom = 106
 
 
 class RoborockFanSpeedS7MaxV(RoborockFanPowerCode):
-    Off = 105
-    Quiet = 101
-    Balanced = 102
-    Turbo = 103
-    Max = 104
-    Max_plus = 108
+    off = 105
+    quiet = 101
+    balanced = 102
+    turbo = 103
+    max = 104
+    max_plus = 108
 
 
 class RoborockFanSpeedS6Pure(RoborockFanPowerCode):
-    Gentle = 105
-    Quiet = 101
-    Balanced = 102
-    Turbo = 103
-    Max = 104
+    gentle = 105
+    quiet = 101
+    balanced = 102
+    turbo = 103
+    max = 104
 
 
 class RoborockFanSpeedQ7Max(RoborockFanPowerCode):
-    Quiet = 101
-    Balanced = 102
-    Turbo = 103
-    Max = 104
+    quiet = 101
+    balanced = 102
+    turbo = 103
+    max = 104
 
 
 class RoborockMopModeCode(RoborockEnum):
@@ -183,7 +182,6 @@ class RoborockMopModeCode(RoborockEnum):
 
 class RoborockMopModeS7(RoborockMopModeCode):
     """Describes the mop mode of the vacuum cleaner."""
-
     standard = 300
     deep = 301
     custom = 302
@@ -203,7 +201,6 @@ class RoborockMopIntensityCode(RoborockEnum):
 
 class RoborockMopIntensityS7(RoborockMopIntensityCode):
     """Describes the mop intensity of the vacuum cleaner."""
-
     off = 200
     mild = 201
     moderate = 202
@@ -213,7 +210,6 @@ class RoborockMopIntensityS7(RoborockMopIntensityCode):
 
 class RoborockMopIntensityV2(RoborockMopIntensityCode):
     """Describes the mop intensity of the vacuum cleaner."""
-
     off = 200
     low = 201
     medium = 202
@@ -223,7 +219,6 @@ class RoborockMopIntensityV2(RoborockMopIntensityCode):
 
 class RoborockDockErrorCode(RoborockEnum):
     """Describes the error code of the dock."""
-
     ok = 0
     water_empty = 38
     waste_water_tank_full = 39
@@ -239,7 +234,6 @@ class RoborockDockTypeCode(RoborockEnum):
 
 class RoborockDockDustCollectionModeCode(RoborockEnum):
     """Describes the dust collection mode of the vacuum cleaner."""
-
     # TODO: Get the correct values for various different docks
     missing = -9999
     smart = 0
@@ -250,7 +244,6 @@ class RoborockDockDustCollectionModeCode(RoborockEnum):
 
 class RoborockDockWashTowelModeCode(RoborockEnum):
     """Describes the wash towel mode of the vacuum cleaner."""
-
     # TODO: Get the correct values for various different docks
     missing = -9999
     light = 0
