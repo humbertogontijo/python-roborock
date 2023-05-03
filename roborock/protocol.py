@@ -30,7 +30,6 @@ from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
 
 from roborock import RoborockException
-from roborock.roborock_future import RoborockFuture
 from roborock.roborock_message import RoborockMessage
 
 _LOGGER = logging.getLogger(__name__)
@@ -44,20 +43,20 @@ class RoborockProtocol(asyncio.DatagramProtocol):
     def __init__(self, timeout: int = 5):
         self.timeout = timeout
         self.transport: BaseTransport | None = None
-        self.queue = RoborockFuture(0)
+        self.devices_found: list[dict] = []
 
     def datagram_received(self, data, _):
         [broadcast_message], _ = BroadcastParser.parse(data)
-        self.queue.resolve((json.loads(broadcast_message.payload), None))
-        self.close()
+        self.devices_found.append(json.loads(broadcast_message.payload))
 
     async def discover(self):
         loop = asyncio.get_event_loop()
         self.transport, _ = await loop.create_datagram_endpoint(lambda: self, local_addr=("0.0.0.0", 58866))
-        (response, exception) = await self.queue.async_get(self.timeout)
-        if exception is not None:
-            raise exception
-        return response
+        await asyncio.sleep(self.timeout)
+        self.transport.close()
+        devices_found = self.devices_found
+        self.devices_found = []
+        return devices_found
 
     def close(self):
         self.transport.close() if self.transport else None
