@@ -121,8 +121,12 @@ async def command(ctx, cmd, device_id, params):
         await _discover(ctx)
         login_data = context.login_data()
     home_data = login_data.home_data
-    device = next((device for device in home_data.get_all_devices() if device.duid == device_id))
-    device_info = RoborockDeviceInfo(device=device)
+    devices = home_data.devices + home_data.received_devices
+    device = next((device for device in devices if device.duid == device_id), None)
+    model_specification = next(
+        (product.model_specification for product in home_data.products if product.did == device.duid), None
+    )
+    device_info = RoborockDeviceInfo(device=device, model_specification=model_specification)
     mqtt_client = RoborockMqttClient(login_data.user_data, device_info)
     await mqtt_client.send_command(cmd, params)
     mqtt_client.__del__()

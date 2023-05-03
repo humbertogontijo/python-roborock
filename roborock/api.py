@@ -20,7 +20,7 @@ import aiohttp
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import unpad
 
-from .code_mappings import RoborockDockTypeCode, RoborockEnum
+from .code_mappings import RoborockDockTypeCode
 from .containers import (
     CleanRecord,
     CleanSummary,
@@ -166,7 +166,7 @@ class RoborockClient:
 
     def on_connection_lost(self, exc: Optional[Exception]) -> None:
         self._last_disconnection = self.time_func()
-        _LOGGER.warning("Roborock client disconnected")
+        _LOGGER.info("Roborock client disconnected")
         if exc is not None:
             _LOGGER.warning(exc)
 
@@ -223,7 +223,10 @@ class RoborockClient:
     async def get_status(self) -> Status | None:
         status = await self.send_command(RoborockCommand.GET_STATUS)
         if isinstance(status, dict):
-            return Status.from_dict(status)
+            status = Status.from_dict(status)
+            status.update_status(self.device_info.model_specification)
+            return status
+
         return None
 
     async def get_dnd_timer(self) -> DNDTimer | None:
@@ -294,7 +297,7 @@ class RoborockClient:
             _LOGGER.error(e)
         return None
 
-    async def get_dock_summary(self, dock_type: RoborockEnum) -> DockSummary | None:
+    async def get_dock_summary(self, dock_type: RoborockDockTypeCode) -> DockSummary | None:
         """Gets the status summary from the dock with the methods available for a given dock.
 
         :param dock_type: RoborockDockTypeCode"""
@@ -306,7 +309,7 @@ class RoborockClient:
                     DustCollectionMode | WashTowelMode | SmartWashParams | None,
                 ]
             ] = [self.get_dust_collection_mode()]
-            if dock_type == RoborockDockTypeCode["3"]:
+            if dock_type == RoborockDockTypeCode.empty_wash_fill_dock or dock_type == RoborockDockTypeCode.s8_dock:
                 commands += [
                     self.get_wash_towel_mode(),
                     self.get_smart_wash_params(),
@@ -333,7 +336,7 @@ class RoborockClient:
         if clean_summary and clean_summary.records and len(clean_summary.records) > 0:
             last_clean_record = await self.get_clean_record(clean_summary.records[0])
         dock_summary = None
-        if status and status.dock_type is not None and status.dock_type != RoborockDockTypeCode["0"]:
+        if status and status.dock_type is not None and status.dock_type != RoborockDockTypeCode.no_dock:
             dock_summary = await self.get_dock_summary(status.dock_type)
         if any([status, dnd_timer, clean_summary, consumable]):
             return DeviceProp(

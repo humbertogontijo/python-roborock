@@ -1,183 +1,320 @@
 from __future__ import annotations
 
 import logging
-from enum import Enum
-from typing import Any, Type, TypeVar
+from dataclasses import dataclass
+from enum import IntEnum
+from typing import Type
 
-_StrEnumT = TypeVar("_StrEnumT", bound="RoborockEnum")
+from roborock.const import (
+    ROBOROCK_Q7_MAX,
+    ROBOROCK_S5_MAX,
+    ROBOROCK_S6_MAXV,
+    ROBOROCK_S6_PURE,
+    ROBOROCK_S7,
+    ROBOROCK_S7_MAXV,
+    ROBOROCK_S8_PRO_ULTRA,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class RoborockEnum(str, Enum):
-    def __new__(cls: Type[_StrEnumT], value: str, *args: Any, **kwargs: Any) -> _StrEnumT:
-        """Create a new StrEnum instance."""
-        if not isinstance(value, str):
-            raise TypeError(f"{value!r} is not a string")
-        return super().__new__(cls, value, *args, **kwargs)
-
-    def __str__(self):
-        return str(self.value)
+class RoborockEnum(IntEnum):
+    """Roborock Enum for codes with int values"""
 
     @classmethod
-    def _missing_(cls: Type[_StrEnumT], code: object):
-        if cls._member_map_.get(str(code)):
-            return cls._member_map_.get(str(code))
-        else:
-            _LOGGER.warning(f"Unknown code {code} for {cls.__name__}")
-            return cls._member_map_.get(str(-9999))
+    def _missing_(cls: Type[RoborockEnum], key) -> str:
+        if hasattr(cls, "missing"):
+            _LOGGER.warning(f"Missing {cls.__name__} code: {key} - defaulting to 'missing'")
+            return cls.missing  # type: ignore
+        _LOGGER.warning(f"Missing {cls.__name__} code: {key} - defaulting to {cls.keys()[0]}")
+        return cls.keys()[0]
 
     @classmethod
-    def as_dict(cls: Type[_StrEnumT]):
-        return {int(i.name): i.value for i in cls if i.value != "UNKNOWN"}
+    def as_dict(cls: Type[RoborockEnum]):
+        return {i.value: i.name for i in cls if i.name != "missing"}
 
     @classmethod
-    def values(cls: Type[_StrEnumT]):
+    def as_enum_dict(cls: Type[RoborockEnum]):
+        return {i.value: i for i in cls if i.name != "missing"}
+
+    @classmethod
+    def values(cls: Type[RoborockEnum]) -> list[int]:
         return list(cls.as_dict().values())
 
     @classmethod
-    def keys(cls: Type[_StrEnumT]):
+    def keys(cls: Type[RoborockEnum]) -> list[str]:
         return list(cls.as_dict().keys())
 
     @classmethod
-    def items(cls: Type[_StrEnumT]):
+    def items(cls: Type[RoborockEnum]):
         return cls.as_dict().items()
 
-    @classmethod
-    def __getitem__(cls: Type[_StrEnumT], item):
-        return cls.__getitem__(item)
+
+class RoborockStateCode(RoborockEnum):
+    starting = 1
+    charger_disconnected = 2
+    idle = 3
+    remote_control_active = 4
+    cleaning = 5
+    returning_home = 6
+    manual_mode = 7
+    charging = 8
+    charging_problem = 9
+    paused = 10
+    spot_cleaning = 11
+    error = 12
+    shutting_down = 13
+    updating = 14
+    docking = 15
+    going_to_target = 16
+    zoned_cleaning = 17
+    segment_cleaning = 18
+    emptying_the_bin = 22  # on s7+
+    washing_the_mop = 23  # on a46
+    going_to_wash_the_mop = 26  # on a46
+    charging_complete = 100
+    device_offline = 101
 
 
-def create_code_enum(name: str, data: dict) -> RoborockEnum:
-    data[-9999] = "UNKNOWN"
-    return RoborockEnum(name, {str(key): value for key, value in data.items()})
+class RoborockErrorCode(RoborockEnum):
+    none = 0
+    lidar_blocked = 1
+    bumper_stuck = 2
+    wheels_suspended = 3
+    cliff_sensor_error = 4
+    main_brush_jammed = 5
+    side_brush_jammed = 6
+    wheels_jammed = 7
+    robot_trapped = 8
+    no_dustbin = 9
+    low_battery = 12
+    charging_error = 13
+    battery_error = 14
+    wall_sensor_dirty = 15
+    robot_tilted = 16
+    side_brush_error = 17
+    fan_error = 18
+    vertical_bumper_pressed = 21
+    dock_locator_error = 22
+    return_to_dock_fail = 23
+    nogo_zone_detected = 24
+    vibrarise_jammed = 27
+    robot_on_carpet = 28
+    filter_blocked = 29
+    invisible_wall_detected = 30
+    cannot_cross_carpet = 31
+    internal_error = 32
 
 
-RoborockStateCode = create_code_enum(
-    "RoborockStateCode",
-    {
-        1: "starting",
-        2: "charger_disconnected",
-        3: "idle",
-        4: "remote_control_active",
-        5: "cleaning",
-        6: "returning_home",
-        7: "manual_mode",
-        8: "charging",
-        9: "charging_problem",
-        10: "paused",
-        11: "spot_cleaning",
-        12: "error",
-        13: "shutting_down",
-        14: "updating",
-        15: "docking",
-        16: "going_to_target",
-        17: "zoned_cleaning",
-        18: "segment_cleaning",
-        22: "emptying_the_bin",  # on s7+, see #1189
-        23: "washing_the_mop",  # on a46, #1435
-        26: "going_to_wash_the_mop",  # on a46, #1435
-        100: "charging_complete",
-        101: "device_offline",
-    },
-)
+class RoborockFanPowerCode(RoborockEnum):
+    """Describes the fan power of the vacuum cleaner."""
 
-RoborockErrorCode = create_code_enum(
-    "RoborockErrorCode",
-    {
-        0: "none",
-        1: "lidar_blocked",
-        2: "bumper_stuck",
-        3: "wheels_suspended",
-        4: "cliff_sensor_error",
-        5: "main_brush_jammed",
-        6: "side_brush_jammed",
-        7: "wheels_jammed",
-        8: "robot_trapped",
-        9: "no_dustbin",
-        12: "low_battery",
-        13: "charging_error",
-        14: "battery_error",
-        15: "wall_sensor_dirty",
-        16: "robot_tilted",
-        17: "side_brush_error",
-        18: "fan_error",
-        21: "vertical_bumper_pressed",
-        22: "dock_locator_error",
-        23: "return_to_dock_fail",
-        24: "nogo_zone_detected",
-        27: "vibrarise_jammed",
-        28: "robot_on_carpet",
-        29: "filter_blocked",
-        30: "invisible_wall_detected",
-        31: "cannot_cross_carpet",
-        32: "internal_error",
-    },
-)
+    # Fan speeds should have the first letter capitalized - as there is no way to change the name in translations as
+    # far as I am aware
 
-RoborockFanPowerCode = create_code_enum(
-    "RoborockFanPowerCode",
-    {
-        105: "off",
-        101: "silent",
-        102: "balanced",
-        103: "turbo",
-        104: "max",
-        108: "max_plus",
-        106: "custom",
-    },
-)
 
-RoborockMopModeCode = create_code_enum(
-    "RoborockMopModeCode",
-    {
-        300: "standard",
-        301: "deep",
-        303: "deep_plus",
-        302: "custom",
-    },
-)
+class RoborockFanSpeedV1(RoborockFanPowerCode):
+    Silent = 38
+    Standard = 60
+    Medium = 77
+    Turbo = 90
 
-RoborockMopIntensityCode = create_code_enum(
-    "RoborockMopIntensityCode",
-    {
-        200: "off",
-        201: "mild",
-        202: "moderate",
-        203: "intense",
-        204: "custom",
-    },
-)
 
-RoborockDockErrorCode = create_code_enum(
-    "RoborockDockErrorCode",
-    {
-        0: "ok",
-        38: "water empty",
-        39: "waste water tank full",
-    },
-)
+class RoborockFanSpeedV2(RoborockFanPowerCode):
+    Silent = 101
+    Balanced = 102
+    Turbo = 103
+    Max = 104
+    Gentle = 105
+    Auto = 106
 
-RoborockDockTypeCode = create_code_enum(
-    "RoborockDockTypeCode",
-    {0: "no_dock", 1: "unknown", 2: "unknown", 3: "empty_wash_fill_dock", 4: "unknown", 5: "auto_empty_dock_pure"},
-)
 
-RoborockDockDustCollectionModeCode = create_code_enum(
-    "RoborockDockDustCollectionModeCode",
-    {
-        0: "smart",
-        1: "light",
-        2: "balanced",
-        4: "max",
-    },
-)
+class RoborockFanSpeedV3(RoborockFanPowerCode):
+    Silent = 38
+    Standard = 60
+    Medium = 75
+    Turbo = 100
 
-RoborockDockWashTowelModeCode = create_code_enum(
-    "RoborockDockWashTowelModeCode",
-    {
-        0: "light",
-        1: "balanced",
-        2: "deep",
-    },
-)
+
+class RoborockFanSpeedE2(RoborockFanPowerCode):
+    Gentle = 41
+    Silent = 50
+    Standard = 68
+    Medium = 79
+    Turbo = 100
+
+
+class RoborockFanSpeedS7(RoborockFanPowerCode):
+    Off = 105
+    Quiet = 101
+    Balanced = 102
+    Turbo = 103
+    Max = 104
+    Custom = 106
+
+
+class RoborockFanSpeedS7MaxV(RoborockFanPowerCode):
+    Off = 105
+    Quiet = 101
+    Balanced = 102
+    Turbo = 103
+    Max = 104
+    Max_plus = 108
+
+
+class RoborockFanSpeedS6Pure(RoborockFanPowerCode):
+    Gentle = 105
+    Quiet = 101
+    Balanced = 102
+    Turbo = 103
+    Max = 104
+
+
+class RoborockFanSpeedQ7Max(RoborockFanPowerCode):
+    Quiet = 101
+    Balanced = 102
+    Turbo = 103
+    Max = 104
+
+
+class RoborockMopModeCode(RoborockEnum):
+    """Describes the mop mode of the vacuum cleaner."""
+
+
+class RoborockMopModeS7(RoborockMopModeCode):
+    """Describes the mop mode of the vacuum cleaner."""
+
+    standard = 300
+    deep = 301
+    custom = 302
+    deep_plus = 303
+
+
+class RoborockMopModeS8ProUltra(RoborockMopModeCode):
+    standard = 300
+    deep = 301
+    deep_plus = 303
+    fast = 304
+
+
+class RoborockMopIntensityCode(RoborockEnum):
+    """Describes the mop intensity of the vacuum cleaner."""
+
+
+class RoborockMopIntensityS7(RoborockMopIntensityCode):
+    """Describes the mop intensity of the vacuum cleaner."""
+
+    off = 200
+    mild = 201
+    moderate = 202
+    intense = 203
+    custom = 204
+
+
+class RoborockMopIntensityV2(RoborockMopIntensityCode):
+    """Describes the mop intensity of the vacuum cleaner."""
+
+    off = 200
+    low = 201
+    medium = 202
+    high = 203
+    custom = 207
+
+
+class RoborockDockErrorCode(RoborockEnum):
+    """Describes the error code of the dock."""
+
+    ok = 0
+    water_empty = 38
+    waste_water_tank_full = 39
+
+
+class RoborockDockTypeCode(RoborockEnum):
+    missing = -9999
+    no_dock = 0
+    empty_wash_fill_dock = 3
+    auto_empty_dock_pure = 5
+    s8_dock = 7
+
+
+class RoborockDockDustCollectionModeCode(RoborockEnum):
+    """Describes the dust collection mode of the vacuum cleaner."""
+
+    # TODO: Get the correct values for various different docks
+    missing = -9999
+    smart = 0
+    light = 1
+    balanced = 2
+    max = 4
+
+
+class RoborockDockWashTowelModeCode(RoborockEnum):
+    """Describes the wash towel mode of the vacuum cleaner."""
+
+    # TODO: Get the correct values for various different docks
+    missing = -9999
+    light = 0
+    balanced = 1
+    deep = 2
+
+
+@dataclass
+class ModelSpecification:
+    model_name: str
+    model_code: str
+    fan_power_code: Type[RoborockFanPowerCode]
+    mop_mode_code: Type[RoborockMopModeCode] | None
+    mop_intensity_code: Type[RoborockMopIntensityCode] | None
+
+
+model_specifications = {
+    ROBOROCK_S5_MAX: ModelSpecification(
+        model_name="Roborock S5 Max",
+        model_code=ROBOROCK_S5_MAX,
+        fan_power_code=RoborockFanSpeedS6Pure,
+        mop_mode_code=None,
+        mop_intensity_code=RoborockMopIntensityV2,
+    ),
+    ROBOROCK_Q7_MAX: ModelSpecification(
+        model_name="Roborock Q7 Max",
+        model_code=ROBOROCK_Q7_MAX,
+        fan_power_code=RoborockFanSpeedQ7Max,
+        mop_mode_code=None,
+        mop_intensity_code=RoborockMopIntensityV2,
+    ),
+    ROBOROCK_S6_MAXV: ModelSpecification(
+        model_name="Roborock S6 MaxV",
+        model_code=ROBOROCK_S6_MAXV,
+        fan_power_code=RoborockFanSpeedE2,
+        mop_mode_code=None,
+        mop_intensity_code=RoborockMopIntensityV2,
+    ),
+    ROBOROCK_S6_PURE: ModelSpecification(
+        model_name="Roborock S6 Pure",
+        model_code=ROBOROCK_S6_PURE,
+        fan_power_code=RoborockFanSpeedS6Pure,
+        mop_mode_code=None,
+        mop_intensity_code=None,
+    ),
+    ROBOROCK_S7_MAXV: ModelSpecification(
+        model_name="Roborock S7 MaxV",
+        model_code=ROBOROCK_S7_MAXV,
+        fan_power_code=RoborockFanSpeedS7MaxV,
+        mop_mode_code=RoborockMopModeS7,
+        mop_intensity_code=RoborockMopIntensityS7,
+    ),
+    ROBOROCK_S7: ModelSpecification(
+        model_name="Roborock S7",
+        model_code=ROBOROCK_S7,
+        fan_power_code=RoborockFanSpeedS7,
+        mop_mode_code=RoborockMopModeS7,
+        mop_intensity_code=RoborockMopIntensityS7,
+    ),
+    ROBOROCK_S8_PRO_ULTRA: ModelSpecification(
+        model_name="Roborock S8 Pro Ultra",
+        model_code=ROBOROCK_S8_PRO_ULTRA,
+        fan_power_code=RoborockFanSpeedS7MaxV,
+        mop_mode_code=RoborockMopModeS8ProUltra,
+        mop_intensity_code=RoborockMopIntensityS7,
+    ),
+}
