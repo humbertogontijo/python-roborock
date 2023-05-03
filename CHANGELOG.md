@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.10.1 (2023-05-03)
+### Fix
+* Allow discovering multiple devices ([`ada9e07`](https://github.com/humbertogontijo/python-roborock/commit/ada9e0723728b1d7e3ccd6dc37cbbe06a3c6a2cc))
+
 ## v0.10.0 (2023-05-03)
 ### Feature
 * Add specific device functionality ([#46](https://github.com/humbertogontijo/python-roborock/issues/46)) ([`32abce5`](https://github.com/humbertogontijo/python-roborock/commit/32abce5d51d14aab9adef5b9560ceee534186b1a))
