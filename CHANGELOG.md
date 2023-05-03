@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v0.10.2 (2023-05-03)
+### Fix
+* Test errors ([`6a46515`](https://github.com/humbertogontijo/python-roborock/commit/6a465157bbf6fa15bc578a1c4b1dffa17a694a92))
+* Change devices fan speed enum to lower case ([`c559d40`](https://github.com/humbertogontijo/python-roborock/commit/c559d40183e47ef8698651281ae8946a99cb897e))
+
 ## v0.10.1 (2023-05-03)
 ### Fix
 * Allow discovering multiple devices ([`ada9e07`](https://github.com/humbertogontijo/python-roborock/commit/ada9e0723728b1d7e3ccd6dc37cbbe06a3c6a2cc))
