@@ -8,9 +8,10 @@ from typing import Optional
 import async_timeout
 
 from .api import COMMANDS_SECURED, QUEUE_TIMEOUT, RoborockClient
-from .containers import RoborockLocalDeviceInfo
+from .containers import RoborockDeviceInfo
 from .exceptions import CommandVacuumError, RoborockConnectionException, RoborockException
-from .roborock_message import AP_CONFIG, RoborockMessage, RoborockParser
+from .protocol import AP_CONFIG, MessageParser
+from .roborock_message import RoborockMessage
 from .roborock_typing import CommandInfoMap, RoborockCommand
 from .util import get_running_loop_or_create_one
 
@@ -18,10 +19,10 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class RoborockLocalClient(RoborockClient, asyncio.Protocol):
-    def __init__(self, device_info: RoborockLocalDeviceInfo):
+    def __init__(self, device_info: RoborockDeviceInfo, ip: str):
         super().__init__("abc", device_info)
         self.loop = get_running_loop_or_create_one()
-        self.ip = device_info.network_info.ip
+        self.ip = ip
         self._batch_structs: list[RoborockMessage] = []
         self._executing = False
         self.remaining = b""
@@ -32,8 +33,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         if self.remaining:
             message = self.remaining + message
             self.remaining = b""
-        (parser_msg, remaining) = RoborockParser.decode(message, self.device_info.device.local_key)
-        self.remaining = remaining
+        parser_msg, self.remaining = MessageParser.parse(message, local_key=self.device_info.device.local_key)
         self.on_message_received(parser_msg)
 
     def connection_lost(self, exc: Optional[Exception]):
@@ -92,11 +92,16 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         return (await self.send_message(roborock_message))[0]
 
     async def async_local_response(self, roborock_message: RoborockMessage):
-        request_id = roborock_message.get_request_id()
-        if request_id is None:
+        method = roborock_message.get_method()
+        request_id: int | None
+        if method and not method.startswith("get"):
             request_id = roborock_message.seq
-        # response_protocol = 5 if roborock_message.prefix == secured_prefix else 4
-        response_protocol = 4
+            response_protocol = 5
+        else:
+            request_id = roborock_message.get_request_id()
+            response_protocol = 4
+        if request_id is None:
+            raise RoborockException(f"Failed build message {roborock_message}")
         (response, err) = await self._async_response(request_id, response_protocol)
         if err:
             raise CommandVacuumError("", err) from err
@@ -116,7 +121,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         if isinstance(roborock_messages, RoborockMessage):
             roborock_messages = [roborock_messages]
         local_key = self.device_info.device.local_key
-        msg = RoborockParser.encode(roborock_messages, local_key)
+        msg = MessageParser.build(roborock_messages, local_key=local_key)
         # Send the command to the Roborock device
         _LOGGER.debug(f"Requesting device with {roborock_messages}")
         self._send_msg_raw(msg)

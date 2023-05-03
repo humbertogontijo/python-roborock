@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import asyncio
 import base64
-import gzip
 import hashlib
 import hmac
 import json
@@ -17,8 +16,6 @@ from random import randint
 from typing import Any, Callable, Coroutine, Optional
 
 import aiohttp
-from Crypto.Cipher import AES
-from Crypto.Util.Padding import unpad
 
 from .code_mappings import RoborockDockTypeCode
 from .containers import (
@@ -46,6 +43,7 @@ from .exceptions import (
     RoborockUrlException,
     VacuumError,
 )
+from .protocol import Utils
 from .roborock_future import RoborockFuture
 from .roborock_message import RoborockMessage
 from .roborock_typing import DeviceProp, DockSummary, RoborockCommand
@@ -148,15 +146,13 @@ class RoborockClient:
                     payload = data.payload[0:24]
                     [endpoint, _, request_id, _] = struct.unpack("<15sBH6s", payload)
                     if endpoint.decode().startswith(self._endpoint):
-                        iv = bytes(AES.block_size)
-                        decipher = AES.new(self._nonce, AES.MODE_CBC, iv)
-                        decrypted = unpad(decipher.decrypt(data.payload[24:]), AES.block_size)
-                        decrypted = gzip.decompress(decrypted)
+                        decrypted = Utils.decrypt_cbc(data.payload[24:], self._nonce)
+                        decompressed = Utils.decompress(decrypted)
                         queue = self._waiting_queue.get(request_id)
                         if queue:
-                            if isinstance(decrypted, list):
-                                decrypted = decrypted[0]
-                            queue.resolve((decrypted, None))
+                            if isinstance(decompressed, list):
+                                decompressed = decompressed[0]
+                            queue.resolve((decompressed, None))
                 else:
                     queue = self._waiting_queue.get(data.seq)
                     if queue:
