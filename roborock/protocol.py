@@ -6,7 +6,7 @@ import gzip
 import hashlib
 import json
 import logging
-from asyncio import BaseTransport
+from asyncio import BaseTransport, Lock
 from typing import Callable
 
 from construct import (
@@ -43,20 +43,27 @@ class RoborockProtocol(asyncio.DatagramProtocol):
     def __init__(self, timeout: int = 5):
         self.timeout = timeout
         self.transport: BaseTransport | None = None
-        self.devices_found: list[dict] = []
+        self.devices_found: dict = {}
+        self._mutex = Lock()
+
+    def __del__(self):
+        self.close()
 
     def datagram_received(self, data, _):
         [broadcast_message], _ = BroadcastParser.parse(data)
-        self.devices_found.append(json.loads(broadcast_message.payload))
+        parsed_message = json.loads(broadcast_message.payload)
+        self.devices_found[parsed_message.get("duid")] = parsed_message.get("ip")
 
     async def discover(self):
-        loop = asyncio.get_event_loop()
-        self.transport, _ = await loop.create_datagram_endpoint(lambda: self, local_addr=("0.0.0.0", 58866))
-        await asyncio.sleep(self.timeout)
-        self.transport.close()
-        devices_found = self.devices_found
-        self.devices_found = []
-        return devices_found
+        async with self._mutex:
+            try:
+                loop = asyncio.get_event_loop()
+                self.transport, _ = await loop.create_datagram_endpoint(lambda: self, local_addr=("0.0.0.0", 58866))
+                await asyncio.sleep(self.timeout)
+                return self.devices_found
+            finally:
+                self.close()
+                self.devices_found = {}
 
     def close(self):
         self.transport.close() if self.transport else None
