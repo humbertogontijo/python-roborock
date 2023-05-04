@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.11.0 (2023-05-04)
+### Feature
+* Add error check for invalid user agreement ([#49](https://github.com/humbertogontijo/python-roborock/issues/49)) ([`0374449`](https://github.com/humbertogontijo/python-roborock/commit/0374449d7280c93ceb772b7fbe009c6d19d0c462))
+
 ## v0.10.3 (2023-05-04)
 ### Fix
 * Port already in use ([`e5d71d8`](https://github.com/humbertogontijo/python-roborock/commit/e5d71d88f5144c172482cd6ee71d9a5b01dbbe3f))
