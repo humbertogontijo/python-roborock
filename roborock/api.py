@@ -40,6 +40,7 @@ from .exceptions import (
     RoborockInvalidCode,
     RoborockInvalidEmail,
     RoborockInvalidUserAgreement,
+    RoborockNoUserAgreement,
     RoborockTimeout,
     RoborockUrlException,
     VacuumError,
@@ -475,9 +476,11 @@ class RoborockApiClient:
         if response_code != 200:
             if response_code == 2018:
                 raise RoborockInvalidCode("Invalid code - check your code and try again.")
+            if response_code == 3009:
+                raise RoborockNoUserAgreement("You must accept the user agreement in the Roborock app to continue.")
             if response_code == 3006:
                 raise RoborockInvalidUserAgreement(
-                    "You must accept the user agreement in the Roborock app to continue."
+                    "User agreement must be accepted again - or you are attempting to use the Mi Home app."
                 )
             raise RoborockException(f"{login_response.get('msg')} - response code: {response_code}")
         user_data = login_response.get("data")
