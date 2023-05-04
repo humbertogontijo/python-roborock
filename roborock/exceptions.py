@@ -52,3 +52,11 @@ class RoborockInvalidCode(RoborockException):
 
 class RoborockInvalidEmail(RoborockException):
     """Class for Roborock invalid formatted email exceptions."""
+
+
+class RoborockInvalidUserAgreement(RoborockException):
+    """Class for Roborock invalid user agreement exceptions."""
+
+
+class RoborockNoUserAgreement(RoborockException):
+    """Class for Roborock no user agreement exceptions."""
