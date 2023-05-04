@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.10.3 (2023-05-04)
+### Fix
+* Port already in use ([`e5d71d8`](https://github.com/humbertogontijo/python-roborock/commit/e5d71d88f5144c172482cd6ee71d9a5b01dbbe3f))
+
 ## v0.10.2 (2023-05-03)
 ### Fix
 * Test errors ([`6a46515`](https://github.com/humbertogontijo/python-roborock/commit/6a465157bbf6fa15bc578a1c4b1dffa17a694a92))
