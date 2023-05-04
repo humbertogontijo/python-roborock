@@ -7,6 +7,7 @@ from typing import Type
 
 from roborock.const import (
     ROBOROCK_Q7_MAX,
+    ROBOROCK_S4_MAX,
     ROBOROCK_S5_MAX,
     ROBOROCK_S6_MAXV,
     ROBOROCK_S6_PURE,
@@ -268,6 +269,13 @@ class ModelSpecification:
 
 
 model_specifications = {
+    ROBOROCK_S4_MAX: ModelSpecification(
+        model_name="Roborock S4 Max",
+        model_code=ROBOROCK_S4_MAX,
+        fan_power_code=RoborockFanSpeedS6Pure,
+        mop_mode_code=RoborockMopModeS7,
+        mop_intensity_code=RoborockMopIntensityS7,
+    ),
     ROBOROCK_S5_MAX: ModelSpecification(
         model_name="Roborock S5 Max",
         model_code=ROBOROCK_S5_MAX,
