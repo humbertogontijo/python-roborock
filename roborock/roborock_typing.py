@@ -144,13 +144,15 @@ CommandInfoMap: dict[RoborockCommand | None, CommandInfo] = {
     RoborockCommand.APP_RC_MOVE: CommandInfo(prefix=b"\x00\x00\x00w", params=None),
     RoborockCommand.APP_RC_START: CommandInfo(prefix=b"\x00\x00\x00w", params=[]),
     RoborockCommand.APP_RC_STOP: CommandInfo(prefix=b"\x00\x00\x00w", params=[]),
-    RoborockCommand.APP_SEGMENT_CLEAN: CommandInfo(prefix=b"\x00\x00\x00\x87", params=None),
+    RoborockCommand.APP_SEGMENT_CLEAN: CommandInfo(prefix=b"\x00\x00\x00\x97", params=[{"segments": 16, "repeat": 2}]),
+    # RoborockCommand.APP_SEGMENT_CLEAN: CommandInfo(prefix=b"\x00\x00\x00\x87", params=None),
     RoborockCommand.APP_SET_DRYER_SETTING: CommandInfo(prefix=b"\x00\x00\x00\x87", params=None),
     RoborockCommand.APP_SET_SMART_CLIFF_FORBIDDEN: CommandInfo(
         prefix=b"\x00\x00\x00\xa7", params={"zones": [], "map_index": 0}
     ),
     RoborockCommand.APP_SPOT: CommandInfo(prefix=b"\x00\x00\x00w", params=[]),
-    RoborockCommand.APP_START: CommandInfo(prefix=b"\x00\x00\x00\x87", params=[{"use_new_map": 1}]),
+    RoborockCommand.APP_START: CommandInfo(prefix=b"\x00\x00\x00w", params=None),
+    # RoborockCommand.APP_START: CommandInfo(prefix=b"\x00\x00\x00\x87", params=[{"use_new_map": 1}]),
     RoborockCommand.APP_START_COLLECT_DUST: CommandInfo(prefix=b"\x00\x00\x00\x87", params=None),
     RoborockCommand.APP_START_WASH: CommandInfo(prefix=b"\x00\x00\x00w", params=None),
     RoborockCommand.APP_STAT: CommandInfo(
