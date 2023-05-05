@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.13.4 (2023-05-05)
+### Fix
+* Command prefixes ([`65c5db8`](https://github.com/humbertogontijo/python-roborock/commit/65c5db834baadc4c1a61704bd2279c48dd0f6074))
+
 ## v0.13.3 (2023-05-05)
 ### Fix
 * Roborock enum ([`ae0b93e`](https://github.com/humbertogontijo/python-roborock/commit/ae0b93ee0f0fc9c62c3f40b436ece209938e9e6c))
