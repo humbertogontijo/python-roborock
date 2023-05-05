@@ -294,7 +294,7 @@ class S8ProUltraStatus(Status):
     mop_mode: Optional[RoborockMopModeS8ProUltra] = None
 
 
-MODEL_STATUS: dict[str, Type[Status]] = {
+ModelStatus: dict[str, Type[Status]] = {
     ROBOROCK_S5_MAX: S5MaxStatus,
     ROBOROCK_Q7_MAX: Q7MaxStatus,
     ROBOROCK_S6_MAXV: S6MaxVStatus,

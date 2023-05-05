@@ -126,11 +126,7 @@ async def command(ctx, cmd, device_id, params):
     if device is None:
         raise RoborockException("No device found")
     model = next(
-        (
-            product.model
-            for product in home_data.products
-            if device is not None and product.did == device.duid
-        ),
+        (product.model for product in home_data.products if device is not None and product.did == device.duid),
         None,
     )
     if model is None:
