@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.13.0 (2023-05-05)
+### Feature
+* Add s4_max ([#54](https://github.com/humbertogontijo/python-roborock/issues/54)) ([`e7cfd15`](https://github.com/humbertogontijo/python-roborock/commit/e7cfd153b3c41215fd1c85d4968a14d1862c91b5))
+
 ## v0.12.1 (2023-05-05)
 ### Fix
 * Changed incorrect s8 pro ultra string ([`c6a37a9`](https://github.com/humbertogontijo/python-roborock/commit/c6a37a97da9279af3a6a24dc0fd01770cdd9b3b1))
