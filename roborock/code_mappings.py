@@ -1,19 +1,8 @@
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass
 from enum import IntEnum
 from typing import Type
-
-from roborock.const import (
-    ROBOROCK_Q7_MAX,
-    ROBOROCK_S5_MAX,
-    ROBOROCK_S6_MAXV,
-    ROBOROCK_S6_PURE,
-    ROBOROCK_S7,
-    ROBOROCK_S7_MAXV,
-    ROBOROCK_S8_PRO_ULTRA,
-)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -256,65 +245,3 @@ class RoborockDockWashTowelModeCode(RoborockEnum):
     light = 0
     balanced = 1
     deep = 2
-
-
-@dataclass
-class ModelSpecification:
-    model_name: str
-    model_code: str
-    fan_power_code: Type[RoborockFanPowerCode]
-    mop_mode_code: Type[RoborockMopModeCode] | None
-    mop_intensity_code: Type[RoborockMopIntensityCode] | None
-
-
-model_specifications = {
-    ROBOROCK_S5_MAX: ModelSpecification(
-        model_name="Roborock S5 Max",
-        model_code=ROBOROCK_S5_MAX,
-        fan_power_code=RoborockFanSpeedS6Pure,
-        mop_mode_code=None,
-        mop_intensity_code=RoborockMopIntensityV2,
-    ),
-    ROBOROCK_Q7_MAX: ModelSpecification(
-        model_name="Roborock Q7 Max",
-        model_code=ROBOROCK_Q7_MAX,
-        fan_power_code=RoborockFanSpeedQ7Max,
-        mop_mode_code=None,
-        mop_intensity_code=RoborockMopIntensityV2,
-    ),
-    ROBOROCK_S6_MAXV: ModelSpecification(
-        model_name="Roborock S6 MaxV",
-        model_code=ROBOROCK_S6_MAXV,
-        fan_power_code=RoborockFanSpeedE2,
-        mop_mode_code=None,
-        mop_intensity_code=RoborockMopIntensityV2,
-    ),
-    ROBOROCK_S6_PURE: ModelSpecification(
-        model_name="Roborock S6 Pure",
-        model_code=ROBOROCK_S6_PURE,
-        fan_power_code=RoborockFanSpeedS6Pure,
-        mop_mode_code=None,
-        mop_intensity_code=None,
-    ),
-    ROBOROCK_S7_MAXV: ModelSpecification(
-        model_name="Roborock S7 MaxV",
-        model_code=ROBOROCK_S7_MAXV,
-        fan_power_code=RoborockFanSpeedS7MaxV,
-        mop_mode_code=RoborockMopModeS7,
-        mop_intensity_code=RoborockMopIntensityS7,
-    ),
-    ROBOROCK_S7: ModelSpecification(
-        model_name="Roborock S7",
-        model_code=ROBOROCK_S7,
-        fan_power_code=RoborockFanSpeedS7,
-        mop_mode_code=RoborockMopModeS7,
-        mop_intensity_code=RoborockMopIntensityS7,
-    ),
-    ROBOROCK_S8_PRO_ULTRA: ModelSpecification(
-        model_name="Roborock S8 Pro Ultra",
-        model_code=ROBOROCK_S8_PRO_ULTRA,
-        fan_power_code=RoborockFanSpeedS7MaxV,
-        mop_mode_code=RoborockMopModeS8ProUltra,
-        mop_intensity_code=RoborockMopIntensityS7,
-    ),
-}

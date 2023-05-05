@@ -125,17 +125,17 @@ async def command(ctx, cmd, device_id, params):
     device = next((device for device in devices if device.duid == device_id), None)
     if device is None:
         raise RoborockException("No device found")
-    model_specification = next(
+    model = next(
         (
-            product.model_specification
+            product.model
             for product in home_data.products
             if device is not None and product.did == device.duid
         ),
         None,
     )
-    if model_specification is None:
-        raise RoborockException(f"Could not find model specifications for device {device.name}")
-    device_info = RoborockDeviceInfo(device=device, model_specification=model_specification)
+    if model is None:
+        raise RoborockException(f"Could not find model for device {device.name}")
+    device_info = RoborockDeviceInfo(device=device, model=model)
     mqtt_client = RoborockMqttClient(login_data.user_data, device_info)
     await mqtt_client.send_command(cmd, params)
     mqtt_client.__del__()
