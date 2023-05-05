@@ -9,22 +9,35 @@ from typing import Any, Optional, Type
 from dacite import Config, from_dict
 
 from .code_mappings import (
-    ModelSpecification,
     RoborockDockDustCollectionModeCode,
     RoborockDockErrorCode,
     RoborockDockTypeCode,
     RoborockDockWashTowelModeCode,
     RoborockErrorCode,
     RoborockFanPowerCode,
+    RoborockFanSpeedE2,
+    RoborockFanSpeedQ7Max,
+    RoborockFanSpeedS6Pure,
+    RoborockFanSpeedS7,
+    RoborockFanSpeedS7MaxV,
     RoborockMopIntensityCode,
+    RoborockMopIntensityS7,
+    RoborockMopIntensityV2,
     RoborockMopModeCode,
+    RoborockMopModeS7,
+    RoborockMopModeS8ProUltra,
     RoborockStateCode,
-    model_specifications,
 )
 from .const import (
     FILTER_REPLACE_TIME,
     MAIN_BRUSH_REPLACE_TIME,
+    ROBOROCK_Q7_MAX,
+    ROBOROCK_S5_MAX,
+    ROBOROCK_S6_MAXV,
+    ROBOROCK_S6_PURE,
+    ROBOROCK_S7,
     ROBOROCK_S7_MAXV,
+    ROBOROCK_S8_PRO_ULTRA,
     SENSOR_DIRTY_REPLACE_TIME,
     SIDE_BRUSH_REPLACE_TIME,
 )
@@ -126,28 +139,6 @@ class HomeDataProduct(RoborockBase):
     capability: Optional[int] = None
     category: Optional[str] = None
     schema: Optional[list[HomeDataProductSchema]] = None
-    model_specification: Optional[ModelSpecification] = None
-
-    def __post_init__(self):
-        if self.model not in model_specifications:
-            _LOGGER.warning("We don't have specific device information for your model, please open an issue.")
-            self.model_specification = model_specifications.get(ROBOROCK_S7_MAXV)
-        else:
-            self.model_specification = model_specifications.get(self.model)
-
-
-@dataclass
-class HomeDataDeviceStatus(RoborockBase):
-    id: Optional[Any] = None
-    name: Optional[Any] = None
-    code: Optional[Any] = None
-    model: Optional[str] = None
-    icon_url: Optional[Any] = None
-    attribute: Optional[Any] = None
-    capability: Optional[Any] = None
-    category: Optional[Any] = None
-    schema: Optional[Any] = None
-    model_specification: Optional[ModelSpecification] = None
 
 
 @dataclass
@@ -175,7 +166,7 @@ class HomeDataDevice(RoborockBase):
     sn: Optional[str] = None
     feature_set: Optional[str] = None
     new_feature_set: Optional[str] = None
-    device_status: Optional[HomeDataDeviceStatus] = None
+    device_status: Optional[dict] = None
     silent_ota_switch: Optional[bool] = None
 
 
@@ -231,14 +222,12 @@ class Status(RoborockBase):
     back_type: Optional[int] = None
     wash_phase: Optional[int] = None
     wash_ready: Optional[int] = None
-    fan_power: Optional[int] = None
-    fan_power_enum: Optional[Type[RoborockFanPowerCode]] = None
+    fan_power: Optional[RoborockFanPowerCode] = None
     dnd_enabled: Optional[int] = None
     map_status: Optional[int] = None
     is_locating: Optional[int] = None
     lock_status: Optional[int] = None
-    water_box_mode: Optional[int] = None
-    water_box_mode_enum: Optional[Type[RoborockMopIntensityCode]] = None
+    water_box_mode: Optional[RoborockMopIntensityCode] = None
     water_box_carriage_status: Optional[int] = None
     mop_forbidden_enable: Optional[int] = None
     camera_status: Optional[int] = None
@@ -251,8 +240,7 @@ class Status(RoborockBase):
     dust_collection_status: Optional[int] = None
     auto_dust_collection: Optional[int] = None
     avoid_count: Optional[int] = None
-    mop_mode: Optional[int] = None
-    mop_mode_enum: Optional[Type[RoborockMopModeCode]] = None
+    mop_mode: Optional[RoborockMopModeCode] = None
     debug_mode: Optional[int] = None
     collision_avoid_status: Optional[int] = None
     switch_map_mode: Optional[int] = None
@@ -261,12 +249,60 @@ class Status(RoborockBase):
     unsave_map_reason: Optional[int] = None
     unsave_map_flag: Optional[int] = None
 
-    def update_status(self, model_specification: ModelSpecification) -> None:
-        self.fan_power_enum = model_specification.fan_power_code.as_enum_dict()[self.fan_power]
-        if model_specification.mop_mode_code is not None:
-            self.mop_mode_enum = model_specification.mop_mode_code.as_enum_dict()[self.mop_mode]
-        if model_specification.mop_intensity_code is not None:
-            self.water_box_mode_enum = model_specification.mop_intensity_code.as_enum_dict()[self.water_box_mode]
+
+@dataclass
+class S5MaxStatus(Status):
+    fan_power: Optional[RoborockFanSpeedS6Pure] = None
+    water_box_mode: Optional[RoborockMopIntensityV2] = None
+
+
+@dataclass
+class Q7MaxStatus(Status):
+    fan_power: Optional[RoborockFanSpeedQ7Max] = None
+    water_box_mode: Optional[RoborockMopIntensityV2] = None
+
+
+@dataclass
+class S6MaxVStatus(Status):
+    fan_power: Optional[RoborockFanSpeedE2] = None
+    water_box_mode: Optional[RoborockMopIntensityV2] = None
+
+
+@dataclass
+class S6PureStatus(Status):
+    fan_power: Optional[RoborockFanSpeedS6Pure] = None
+
+
+@dataclass
+class S7MaxVStatus(Status):
+    fan_power: Optional[RoborockFanSpeedS7MaxV] = None
+    water_box_mode: Optional[RoborockMopIntensityS7] = None
+    mop_mode: Optional[RoborockMopModeS7] = None
+
+
+@dataclass
+class S7Status(Status):
+    fan_power: Optional[RoborockFanSpeedS7] = None
+    water_box_mode: Optional[RoborockMopIntensityS7] = None
+    mop_mode: Optional[RoborockMopModeS7] = None
+
+
+@dataclass
+class S8ProUltraStatus(Status):
+    fan_power: Optional[RoborockFanSpeedS7MaxV] = None
+    water_box_mode: Optional[RoborockMopIntensityS7] = None
+    mop_mode: Optional[RoborockMopModeS8ProUltra] = None
+
+
+ModelStatus: dict[str, Type[Status]] = {
+    ROBOROCK_S5_MAX: S5MaxStatus,
+    ROBOROCK_Q7_MAX: Q7MaxStatus,
+    ROBOROCK_S6_MAXV: S6MaxVStatus,
+    ROBOROCK_S6_PURE: S6PureStatus,
+    ROBOROCK_S7_MAXV: S7MaxVStatus,
+    ROBOROCK_S7: S7Status,
+    ROBOROCK_S8_PRO_ULTRA: S8ProUltraStatus,
+}
 
 
 @dataclass
@@ -385,7 +421,7 @@ class NetworkInfo(RoborockBase):
 @dataclass
 class RoborockDeviceInfo(RoborockBase):
     device: HomeDataDevice
-    model_specification: ModelSpecification
+    model: str
 
 
 @dataclass

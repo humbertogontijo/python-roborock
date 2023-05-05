@@ -13,7 +13,7 @@ import secrets
 import struct
 import time
 from random import randint
-from typing import Any, Callable, Coroutine, Optional
+from typing import Any, Callable, Coroutine, Optional, Type
 
 import aiohttp
 
@@ -25,6 +25,7 @@ from .containers import (
     DNDTimer,
     DustCollectionMode,
     HomeData,
+    ModelStatus,
     MultiMapsList,
     NetworkInfo,
     RoborockDeviceInfo,
@@ -221,9 +222,8 @@ class RoborockClient:
     async def get_status(self) -> Status | None:
         status = await self.send_command(RoborockCommand.GET_STATUS)
         if isinstance(status, dict):
-            status = Status.from_dict(status)
-            status.update_status(self.device_info.model_specification)
-            return status
+            _cls: Type[Status] = ModelStatus[self.device_info.model]
+            return _cls.from_dict(status)
 
         return None
 

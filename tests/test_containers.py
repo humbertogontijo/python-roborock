@@ -1,4 +1,4 @@
-from roborock import ROBOROCK_S7_MAXV, CleanRecord, CleanSummary, Consumable, DNDTimer, HomeData, Status, UserData
+from roborock import CleanRecord, CleanSummary, Consumable, DNDTimer, HomeData, S7MaxVStatus, UserData
 from roborock.code_mappings import (
     RoborockDockErrorCode,
     RoborockDockTypeCode,
@@ -7,7 +7,6 @@ from roborock.code_mappings import (
     RoborockMopIntensityS7,
     RoborockMopModeS7,
     RoborockStateCode,
-    model_specifications,
 )
 
 from .mock_data import CLEAN_RECORD, CLEAN_SUMMARY, CONSUMABLE, DND_TIMER, HOME_DATA_RAW, STATUS, USER_DATA
@@ -109,7 +108,7 @@ def test_consumable():
 
 
 def test_status():
-    s = Status.from_dict(STATUS)
+    s = S7MaxVStatus.from_dict(STATUS)
     assert s.msg_ver == 2
     assert s.msg_seq == 458
     assert s.state == RoborockStateCode.charging
@@ -152,7 +151,6 @@ def test_status():
     assert s.charge_status == 1
     assert s.unsave_map_reason == 0
     assert s.unsave_map_flag == 0
-    s.update_status(model_specification=model_specifications[ROBOROCK_S7_MAXV])
     assert s.fan_power == RoborockFanSpeedS7MaxV.balanced
     assert s.mop_mode == RoborockMopModeS7.standard
     assert s.water_box_mode == RoborockMopIntensityS7.intense
@@ -197,7 +195,7 @@ def test_clean_record():
 def test_no_value():
     modified_status = STATUS.copy()
     modified_status["dock_type"] = 9999
-    s = Status.from_dict(modified_status)
+    s = S7MaxVStatus.from_dict(modified_status)
     assert s.dock_type == RoborockDockTypeCode.missing
     assert -9999 not in RoborockDockTypeCode.keys()
     assert "missing" not in RoborockDockTypeCode.values()
