@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.12.1 (2023-05-05)
+### Fix
+* Changed incorrect s8 pro ultra string ([`c6a37a9`](https://github.com/humbertogontijo/python-roborock/commit/c6a37a97da9279af3a6a24dc0fd01770cdd9b3b1))
+
 ## v0.12.0 (2023-05-05)
 ### Feature
 * Extending device status by device model ([#51](https://github.com/humbertogontijo/python-roborock/issues/51)) ([`8092b67`](https://github.com/humbertogontijo/python-roborock/commit/8092b67b8c9a380cca5178217fde3a61746fcf75))
