@@ -11,16 +11,17 @@ class RoborockEnum(IntEnum):
     """Roborock Enum for codes with int values"""
 
     @classmethod
-    def _missing_(cls: Type[RoborockEnum], key) -> str:
+    def _missing_(cls: Type[RoborockEnum], key) -> RoborockEnum:
         if hasattr(cls, "missing"):
             _LOGGER.warning(f"Missing {cls.__name__} code: {key} - defaulting to 'missing'")
             return cls.missing  # type: ignore
-        _LOGGER.warning(f"Missing {cls.__name__} code: {key} - defaulting to {cls.keys()[0]}")
-        return cls.keys()[0]
+        default_value = next((item for item in cls))
+        _LOGGER.warning(f"Missing {cls.__name__} code: {key} - defaulting to {default_value}")
+        return default_value
 
     @classmethod
     def as_dict(cls: Type[RoborockEnum]):
-        return {i.value: i.name for i in cls if i.name != "missing"}
+        return {i.name: i.value for i in cls if i.name != "missing"}
 
     @classmethod
     def as_enum_dict(cls: Type[RoborockEnum]):
