@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.13.2 (2023-05-05)
+### Fix
+* Minor changes ([`522734a`](https://github.com/humbertogontijo/python-roborock/commit/522734a4bdcf6555feede24e3e97c6a3a98fa760))
+
 ## v0.13.1 (2023-05-05)
 ### Fix
 * Adding app_start_collect_dust prefix ([`3124d7e`](https://github.com/humbertogontijo/python-roborock/commit/3124d7ea6277ec08d8e592448b2a4f8cb60fb7db))
