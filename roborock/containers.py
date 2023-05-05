@@ -32,6 +32,7 @@ from .const import (
     FILTER_REPLACE_TIME,
     MAIN_BRUSH_REPLACE_TIME,
     ROBOROCK_Q7_MAX,
+    ROBOROCK_S4_MAX,
     ROBOROCK_S5_MAX,
     ROBOROCK_S6_MAXV,
     ROBOROCK_S6_PURE,
@@ -251,6 +252,13 @@ class Status(RoborockBase):
 
 
 @dataclass
+class S4MaxStatus(Status):
+    fan_power: Optional[RoborockFanSpeedS6Pure] = None
+    water_box_mode: Optional[RoborockMopIntensityS7] = None
+    mop_mode: Optional[RoborockMopModeS7] = None
+
+
+@dataclass
 class S5MaxStatus(Status):
     fan_power: Optional[RoborockFanSpeedS6Pure] = None
     water_box_mode: Optional[RoborockMopIntensityV2] = None
@@ -295,6 +303,7 @@ class S8ProUltraStatus(Status):
 
 
 ModelStatus: dict[str, Type[Status]] = {
+    ROBOROCK_S4_MAX: S4MaxStatus,
     ROBOROCK_S5_MAX: S5MaxStatus,
     ROBOROCK_Q7_MAX: Q7MaxStatus,
     ROBOROCK_S6_MAXV: S6MaxVStatus,
