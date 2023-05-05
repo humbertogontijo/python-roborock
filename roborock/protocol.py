@@ -29,7 +29,7 @@ from construct import (
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
 
-from roborock import RoborockException
+from roborock import BroadcastMessage, RoborockException
 from roborock.roborock_message import RoborockMessage
 
 _LOGGER = logging.getLogger(__name__)
@@ -43,7 +43,7 @@ class RoborockProtocol(asyncio.DatagramProtocol):
     def __init__(self, timeout: int = 5):
         self.timeout = timeout
         self.transport: BaseTransport | None = None
-        self.devices_found: dict = {}
+        self.devices_found: list[BroadcastMessage] = []
         self._mutex = Lock()
 
     def __del__(self):
@@ -51,8 +51,8 @@ class RoborockProtocol(asyncio.DatagramProtocol):
 
     def datagram_received(self, data, _):
         [broadcast_message], _ = BroadcastParser.parse(data)
-        parsed_message = json.loads(broadcast_message.payload)
-        self.devices_found[parsed_message.get("duid")] = parsed_message.get("ip")
+        parsed_message = BroadcastMessage.from_dict(json.loads(broadcast_message.payload))
+        self.devices_found.append(parsed_message)
 
     async def discover(self):
         async with self._mutex:
@@ -63,7 +63,7 @@ class RoborockProtocol(asyncio.DatagramProtocol):
                 return self.devices_found
             finally:
                 self.close()
-                self.devices_found = {}
+                self.devices_found = []
 
     def close(self):
         self.transport.close() if self.transport else None

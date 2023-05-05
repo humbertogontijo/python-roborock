@@ -11,7 +11,7 @@ from urllib.parse import urlparse
 import paho.mqtt.client as mqtt
 
 from .api import COMMANDS_SECURED, KEEPALIVE, RoborockClient, md5hex
-from .containers import RoborockDeviceInfo, UserData
+from .containers import DeviceData, UserData
 from .exceptions import CommandVacuumError, RoborockException, VacuumError
 from .protocol import MessageParser, Utils
 from .roborock_future import RoborockFuture
@@ -27,7 +27,7 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
     _thread: threading.Thread
     _client_id: str
 
-    def __init__(self, user_data: UserData, device_info: RoborockDeviceInfo) -> None:
+    def __init__(self, user_data: UserData, device_info: DeviceData) -> None:
         rriot = user_data.rriot
         if rriot is None:
             raise RoborockException("Got no rriot data from user_data")

@@ -7,8 +7,8 @@ from typing import Optional
 
 import async_timeout
 
+from . import DeviceData
 from .api import COMMANDS_SECURED, QUEUE_TIMEOUT, RoborockClient
-from .containers import RoborockDeviceInfo
 from .exceptions import CommandVacuumError, RoborockConnectionException, RoborockException
 from .protocol import AP_CONFIG, MessageParser
 from .roborock_message import RoborockMessage
@@ -19,10 +19,12 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class RoborockLocalClient(RoborockClient, asyncio.Protocol):
-    def __init__(self, device_info: RoborockDeviceInfo, ip: str):
-        super().__init__("abc", device_info)
+    def __init__(self, device_data: DeviceData):
+        if device_data.host is None:
+            raise RoborockException("Host is required")
+        super().__init__("abc", device_data)
         self.loop = get_running_loop_or_create_one()
-        self.ip = ip
+        self.host = device_data.host
         self._batch_structs: list[RoborockMessage] = []
         self._executing = False
         self.remaining = b""
@@ -47,13 +49,13 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
             try:
                 if not self.is_connected():
                     async with async_timeout.timeout(QUEUE_TIMEOUT):
-                        _LOGGER.info(f"Connecting to {self.ip}")
+                        _LOGGER.info(f"Connecting to {self.host}")
                         self.transport, _ = await self.loop.create_connection(  # type: ignore
-                            lambda: self, self.ip, 58867
+                            lambda: self, self.host, 58867
                         )
-                        _LOGGER.info(f"Connected to {self.ip}")
+                        _LOGGER.info(f"Connected to {self.host}")
             except Exception as e:
-                raise RoborockConnectionException(f"Failed connecting to {self.ip}") from e
+                raise RoborockConnectionException(f"Failed connecting to {self.host}") from e
 
     def sync_disconnect(self) -> None:
         if self.transport and not self.loop.is_closed():

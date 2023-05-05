@@ -23,12 +23,12 @@ from .containers import (
     CleanSummary,
     Consumable,
     DNDTimer,
+    DeviceData,
     DustCollectionMode,
     HomeData,
     ModelStatus,
     MultiMapsList,
     NetworkInfo,
-    RoborockDeviceInfo,
     RoomMapping,
     SmartWashParams,
     Status,
@@ -86,7 +86,7 @@ class PreparedRequest:
 
 
 class RoborockClient:
-    def __init__(self, endpoint: str, device_info: RoborockDeviceInfo) -> None:
+    def __init__(self, endpoint: str, device_info: DeviceData) -> None:
         self.device_info = device_info
         self._endpoint = endpoint
         self._nonce = secrets.token_bytes(16)
@@ -192,7 +192,12 @@ class RoborockClient:
         finally:
             del self._waiting_queue[request_id]
 
-    def _get_payload(self, method: RoborockCommand, params: Optional[list | dict] = None, secured=False):
+    def _get_payload(
+        self,
+        method: RoborockCommand,
+        params: Optional[list | dict] = None,
+        secured=False,
+    ):
         timestamp = math.floor(time.time())
         request_id = randint(10000, 99999)
         inner = {
@@ -244,7 +249,10 @@ class RoborockClient:
             elif isinstance(clean_summary, list):
                 clean_time, clean_area, clean_count, records = unpack_list(clean_summary, 4)
                 return CleanSummary(
-                    clean_time=clean_time, clean_area=clean_area, clean_count=clean_count, records=records
+                    clean_time=clean_time,
+                    clean_area=clean_area,
+                    clean_count=clean_count,
+                    records=records,
                 )
         except RoborockTimeout as e:
             _LOGGER.error(e)

@@ -10,7 +10,7 @@ import click
 from roborock import RoborockException
 from roborock.api import RoborockApiClient
 from roborock.cloud_api import RoborockMqttClient
-from roborock.containers import LoginData, RoborockDeviceInfo
+from roborock.containers import LoginData, DeviceData
 from roborock.util import run_sync
 
 _LOGGER = logging.getLogger(__name__)
@@ -131,7 +131,7 @@ async def command(ctx, cmd, device_id, params):
     )
     if model is None:
         raise RoborockException(f"Could not find model for device {device.name}")
-    device_info = RoborockDeviceInfo(device=device, model=model)
+    device_info = DeviceData(device=device, model=model)
     mqtt_client = RoborockMqttClient(login_data.user_data, device_info)
     await mqtt_client.send_command(cmd, params)
     mqtt_client.__del__()

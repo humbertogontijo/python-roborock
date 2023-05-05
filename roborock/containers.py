@@ -428,12 +428,19 @@ class NetworkInfo(RoborockBase):
 
 
 @dataclass
-class RoborockDeviceInfo(RoborockBase):
+class DeviceData(RoborockBase):
     device: HomeDataDevice
     model: str
+    host: Optional[str] = None
 
 
 @dataclass
 class RoomMapping(RoborockBase):
     segment_id: int
     iot_id: str
+
+
+@dataclass
+class BroadcastMessage(RoborockBase):
+    duid: str
+    ip: str
