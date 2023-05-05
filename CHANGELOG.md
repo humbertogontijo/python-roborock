@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.12.0 (2023-05-05)
+### Feature
+* Extending device status by device model ([#51](https://github.com/humbertogontijo/python-roborock/issues/51)) ([`8092b67`](https://github.com/humbertogontijo/python-roborock/commit/8092b67b8c9a380cca5178217fde3a61746fcf75))
+
 ## v0.11.0 (2023-05-04)
 ### Feature
 * Add error check for invalid user agreement ([#49](https://github.com/humbertogontijo/python-roborock/issues/49)) ([`0374449`](https://github.com/humbertogontijo/python-roborock/commit/0374449d7280c93ceb772b7fbe009c6d19d0c462))
