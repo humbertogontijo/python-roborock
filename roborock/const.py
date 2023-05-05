@@ -30,7 +30,7 @@ ROBOROCK_S6_MAXV = "roborock.vacuum.a10"
 ROBOROCK_E2 = "roborock.vacuum.e2"
 ROBOROCK_1S = "roborock.vacuum.m1s"
 ROBOROCK_C1 = "roborock.vacuum.c1"
-ROBOROCK_S8_PRO_ULTRA = "roborock.vacuum.a61"  # CHECK THIS
+ROBOROCK_S8_PRO_ULTRA = "roborock.vacuum.a70"
 ROBOROCK_S8 = "roborock.vacuum.a60"  # CHECK THIS
 ROBOROCK_WILD = "roborock.vacuum.*"  # wildcard
 
