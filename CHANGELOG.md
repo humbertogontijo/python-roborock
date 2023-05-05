@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.13.1 (2023-05-05)
+### Fix
+* Adding app_start_collect_dust prefix ([`3124d7e`](https://github.com/humbertogontijo/python-roborock/commit/3124d7ea6277ec08d8e592448b2a4f8cb60fb7db))
+
 ## v0.13.0 (2023-05-05)
 ### Feature
 * Add s4_max ([#54](https://github.com/humbertogontijo/python-roborock/issues/54)) ([`e7cfd15`](https://github.com/humbertogontijo/python-roborock/commit/e7cfd153b3c41215fd1c85d4968a14d1862c91b5))
