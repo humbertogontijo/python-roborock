@@ -10,7 +10,7 @@ import click
 from roborock import RoborockException
 from roborock.api import RoborockApiClient
 from roborock.cloud_api import RoborockMqttClient
-from roborock.containers import LoginData, DeviceData
+from roborock.containers import DeviceData, LoginData
 from roborock.util import run_sync
 
 _LOGGER = logging.getLogger(__name__)
