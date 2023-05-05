@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.13.3 (2023-05-05)
+### Fix
+* Roborock enum ([`ae0b93e`](https://github.com/humbertogontijo/python-roborock/commit/ae0b93ee0f0fc9c62c3f40b436ece209938e9e6c))
+
 ## v0.13.2 (2023-05-05)
 ### Fix
 * Minor changes ([`522734a`](https://github.com/humbertogontijo/python-roborock/commit/522734a4bdcf6555feede24e3e97c6a3a98fa760))
