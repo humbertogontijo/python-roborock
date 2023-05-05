@@ -315,7 +315,7 @@ ModelStatus: dict[str, Type[Status]] = {
 
 
 @dataclass
-class DNDTimer(RoborockBase):
+class DnDTimer(RoborockBase):
     start_hour: Optional[int] = None
     start_minute: Optional[int] = None
     end_hour: Optional[int] = None

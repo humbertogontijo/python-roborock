@@ -1,4 +1,4 @@
-from roborock import CleanRecord, CleanSummary, Consumable, DNDTimer, HomeData, S7MaxVStatus, UserData
+from roborock import CleanRecord, CleanSummary, Consumable, DnDTimer, HomeData, S7MaxVStatus, UserData
 from roborock.code_mappings import (
     RoborockDockErrorCode,
     RoborockDockTypeCode,
@@ -157,7 +157,7 @@ def test_status():
 
 
 def test_dnd_timer():
-    dnd = DNDTimer.from_dict(DND_TIMER)
+    dnd = DnDTimer.from_dict(DND_TIMER)
     assert dnd.start_hour == 22
     assert dnd.start_minute == 0
     assert dnd.end_hour == 7

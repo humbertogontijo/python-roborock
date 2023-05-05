@@ -22,8 +22,8 @@ from .containers import (
     CleanRecord,
     CleanSummary,
     Consumable,
-    DNDTimer,
     DeviceData,
+    DnDTimer,
     DustCollectionMode,
     HomeData,
     ModelStatus,
@@ -232,11 +232,11 @@ class RoborockClient:
 
         return None
 
-    async def get_dnd_timer(self) -> DNDTimer | None:
+    async def get_dnd_timer(self) -> DnDTimer | None:
         try:
             dnd_timer = await self.send_command(RoborockCommand.GET_DND_TIMER)
             if isinstance(dnd_timer, dict):
-                return DNDTimer.from_dict(dnd_timer)
+                return DnDTimer.from_dict(dnd_timer)
         except RoborockTimeout as e:
             _LOGGER.error(e)
         return None

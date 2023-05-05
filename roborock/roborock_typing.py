@@ -8,7 +8,7 @@ from .containers import (
     CleanRecord,
     CleanSummary,
     Consumable,
-    DNDTimer,
+    DnDTimer,
     DustCollectionMode,
     SmartWashParams,
     Status,
@@ -314,7 +314,7 @@ class DockSummary:
 @dataclass
 class DeviceProp:
     status: Optional[Status] = None
-    dnd_timer: Optional[DNDTimer] = None
+    dnd_timer: Optional[DnDTimer] = None
     clean_summary: Optional[CleanSummary] = None
     consumable: Optional[Consumable] = None
     last_clean_record: Optional[CleanRecord] = None
