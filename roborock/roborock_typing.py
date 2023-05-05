@@ -31,6 +31,7 @@ class RoborockCommand(str, Enum):
     APP_SET_SMART_CLIFF_FORBIDDEN = "app_set_smart_cliff_forbidden"
     APP_SPOT = "app_spot"
     APP_START = "app_start"
+    APP_START_COLLECT_DUST = "app_start_collect_dust"
     APP_START_WASH = "app_start_wash"
     APP_STAT = "app_stat"
     APP_STOP = "app_stop"
@@ -150,6 +151,7 @@ CommandInfoMap: dict[RoborockCommand | None, CommandInfo] = {
     ),
     RoborockCommand.APP_SPOT: CommandInfo(prefix=b"\x00\x00\x00w", params=[]),
     RoborockCommand.APP_START: CommandInfo(prefix=b"\x00\x00\x00\x87", params=[{"use_new_map": 1}]),
+    RoborockCommand.APP_START_COLLECT_DUST: CommandInfo(prefix=b"\x00\x00\x00\x87", params=None),
     RoborockCommand.APP_START_WASH: CommandInfo(prefix=b"\x00\x00\x00w", params=None),
     RoborockCommand.APP_STAT: CommandInfo(
         prefix=b"\x00\x00\x01\xa7",
