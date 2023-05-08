@@ -30,6 +30,7 @@ from .containers import (
     MultiMapsList,
     NetworkInfo,
     RoomMapping,
+    S7MaxVStatus,
     SmartWashParams,
     Status,
     UserData,
@@ -227,7 +228,9 @@ class RoborockClient:
     async def get_status(self) -> Status | None:
         status = await self.send_command(RoborockCommand.GET_STATUS)
         if isinstance(status, dict):
-            _cls: Type[Status] = ModelStatus[self.device_info.model]
+            _cls: Type[Status] = ModelStatus.get(
+                self.device_info.model, S7MaxVStatus
+            )  # Default to S7 MAXV if we don't have the data
             return _cls.from_dict(status)
 
         return None

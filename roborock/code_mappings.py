@@ -149,6 +149,7 @@ class RoborockFanSpeedS7MaxV(RoborockFanPowerCode):
     balanced = 102
     turbo = 103
     max = 104
+    custom = 106
     max_plus = 108
 
 
