@@ -31,9 +31,11 @@ from .code_mappings import (
 from .const import (
     FILTER_REPLACE_TIME,
     MAIN_BRUSH_REPLACE_TIME,
+    ROBOROCK_G10S_PRO,
     ROBOROCK_Q7_MAX,
     ROBOROCK_S4_MAX,
     ROBOROCK_S5_MAX,
+    ROBOROCK_S6,
     ROBOROCK_S6_MAXV,
     ROBOROCK_S6_PURE,
     ROBOROCK_S7,
@@ -306,11 +308,13 @@ ModelStatus: dict[str, Type[Status]] = {
     ROBOROCK_S4_MAX: S4MaxStatus,
     ROBOROCK_S5_MAX: S5MaxStatus,
     ROBOROCK_Q7_MAX: Q7MaxStatus,
+    ROBOROCK_S6: S6PureStatus,
     ROBOROCK_S6_MAXV: S6MaxVStatus,
     ROBOROCK_S6_PURE: S6PureStatus,
     ROBOROCK_S7_MAXV: S7MaxVStatus,
     ROBOROCK_S7: S7Status,
     ROBOROCK_S8_PRO_ULTRA: S8ProUltraStatus,
+    ROBOROCK_G10S_PRO: S7MaxVStatus,
 }
 
 
