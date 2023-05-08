@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.14.0 (2023-05-08)
+### Feature
+* Add more codes for status ([#55](https://github.com/humbertogontijo/python-roborock/issues/55)) ([`cddd765`](https://github.com/humbertogontijo/python-roborock/commit/cddd765aa15e31ae50db5a6b29ff6988050aa5cc))
+
 ## v0.13.4 (2023-05-05)
 ### Fix
 * Command prefixes ([`65c5db8`](https://github.com/humbertogontijo/python-roborock/commit/65c5db834baadc4c1a61704bd2279c48dd0f6074))
