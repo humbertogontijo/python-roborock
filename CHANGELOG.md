@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v0.15.0 (2023-05-09)
+### Feature
+* Add docs ([#58](https://github.com/humbertogontijo/python-roborock/issues/58)) ([`959abe1`](https://github.com/humbertogontijo/python-roborock/commit/959abe1f3b2be0bfb8705d1bc1f9cbe966577540))
+
+### Fix
+* Add int for clean summary ([#57](https://github.com/humbertogontijo/python-roborock/issues/57)) ([`4257aa7`](https://github.com/humbertogontijo/python-roborock/commit/4257aa7888178703d1b38ed00c12ef932ca1e862))
+
 ## v0.14.1 (2023-05-09)
 ### Fix
 * Add types for S8 ([#56](https://github.com/humbertogontijo/python-roborock/issues/56)) ([`125b6e7`](https://github.com/humbertogontijo/python-roborock/commit/125b6e728145fde39f49fa6b80168bb985f2cc43))
