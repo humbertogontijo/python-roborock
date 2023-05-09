@@ -43,6 +43,7 @@ from .const import (
     ROBOROCK_S8_PRO_ULTRA,
     SENSOR_DIRTY_REPLACE_TIME,
     SIDE_BRUSH_REPLACE_TIME,
+    ROBOROCK_S8,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -304,6 +305,13 @@ class S8ProUltraStatus(Status):
     mop_mode: Optional[RoborockMopModeS8ProUltra] = None
 
 
+@dataclass
+class S8Status(Status):
+    fan_power: Optional[RoborockFanSpeedS7MaxV] = None
+    water_box_mode: Optional[RoborockMopIntensityS7] = None
+    mop_mode: Optional[RoborockMopModeS8ProUltra] = None
+
+
 ModelStatus: dict[str, Type[Status]] = {
     ROBOROCK_S4_MAX: S4MaxStatus,
     ROBOROCK_S5_MAX: S5MaxStatus,
@@ -313,6 +321,7 @@ ModelStatus: dict[str, Type[Status]] = {
     ROBOROCK_S6_PURE: S6PureStatus,
     ROBOROCK_S7_MAXV: S7MaxVStatus,
     ROBOROCK_S7: S7Status,
+    ROBOROCK_S8: S8Status,
     ROBOROCK_S8_PRO_ULTRA: S8ProUltraStatus,
     ROBOROCK_G10S_PRO: S7MaxVStatus,
 }
