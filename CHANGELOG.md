@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.14.1 (2023-05-09)
+### Fix
+* Add types for S8 ([#56](https://github.com/humbertogontijo/python-roborock/issues/56)) ([`125b6e7`](https://github.com/humbertogontijo/python-roborock/commit/125b6e728145fde39f49fa6b80168bb985f2cc43))
+
 ## v0.14.0 (2023-05-08)
 ### Feature
 * Add more codes for status ([#55](https://github.com/humbertogontijo/python-roborock/issues/55)) ([`cddd765`](https://github.com/humbertogontijo/python-roborock/commit/cddd765aa15e31ae50db5a6b29ff6988050aa5cc))
