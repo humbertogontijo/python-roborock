@@ -257,6 +257,8 @@ class RoborockClient:
                     clean_count=clean_count,
                     records=records,
                 )
+            elif isinstance(clean_summary, int):
+                return CleanSummary(clean_time=clean_summary)
         except RoborockTimeout as e:
             _LOGGER.error(e)
         return None
