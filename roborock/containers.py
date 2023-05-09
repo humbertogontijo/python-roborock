@@ -40,10 +40,10 @@ from .const import (
     ROBOROCK_S6_PURE,
     ROBOROCK_S7,
     ROBOROCK_S7_MAXV,
+    ROBOROCK_S8,
     ROBOROCK_S8_PRO_ULTRA,
     SENSOR_DIRTY_REPLACE_TIME,
     SIDE_BRUSH_REPLACE_TIME,
-    ROBOROCK_S8,
 )
 
 _LOGGER = logging.getLogger(__name__)
