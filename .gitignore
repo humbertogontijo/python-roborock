@@ -6,3 +6,9 @@ roborock/__pycache__
 poetry.lock
 *.pyc
 .coverage
+
+# Sphinx documentation
+docs/_build/
+
+# mkdocs documentation
+/site
