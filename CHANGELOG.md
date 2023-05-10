@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.16.0 (2023-05-10)
+### Feature
+* Adding pcap file parser to cli ([`798287a`](https://github.com/humbertogontijo/python-roborock/commit/798287a5100a3e973524aae6dd9404c0af354c11))
+
 ## v0.15.0 (2023-05-09)
 ### Feature
 * Add docs ([#58](https://github.com/humbertogontijo/python-roborock/issues/58)) ([`959abe1`](https://github.com/humbertogontijo/python-roborock/commit/959abe1f3b2be0bfb8705d1bc1f9cbe966577540))
