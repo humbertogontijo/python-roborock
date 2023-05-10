@@ -48,6 +48,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         async with self._mutex:
             try:
                 if not self.is_connected():
+                    self.sync_disconnect()
                     async with async_timeout.timeout(QUEUE_TIMEOUT):
                         _LOGGER.info(f"Connecting to {self.host}")
                         self.transport, _ = await self.loop.create_connection(  # type: ignore
@@ -55,10 +56,11 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
                         )
                         _LOGGER.info(f"Connected to {self.host}")
             except Exception as e:
+                _LOGGER.warning(f"Failed connecting to {self.host}: {e}")
                 raise RoborockConnectionException(f"Failed connecting to {self.host}") from e
 
     def sync_disconnect(self) -> None:
-        if self.transport and not self.loop.is_closed():
+        if self.transport:
             self.transport.close()
 
     async def async_disconnect(self) -> None:
