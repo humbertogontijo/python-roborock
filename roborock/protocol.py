@@ -9,7 +9,7 @@ import logging
 from asyncio import BaseTransport, Lock
 from typing import Callable
 
-from construct import (
+from construct import (  # type: ignore
     Bytes,
     Checksum,
     ChecksumError,

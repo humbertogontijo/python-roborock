@@ -6,11 +6,15 @@ from pathlib import Path
 from typing import Any, Dict
 
 import click
+from pyshark import FileCapture  # type: ignore
+from pyshark.capture.live_capture import LiveCapture, UnknownInterfaceException  # type: ignore
+from pyshark.packet.packet import Packet  # type: ignore
 
 from roborock import RoborockException
 from roborock.api import RoborockApiClient
 from roborock.cloud_api import RoborockMqttClient
 from roborock.containers import DeviceData, LoginData
+from roborock.protocol import MessageParser
 from roborock.util import run_sync
 
 _LOGGER = logging.getLogger(__name__)
@@ -135,10 +139,60 @@ async def command(ctx, cmd, device_id, params):
     mqtt_client.__del__()
 
 
+@click.command()
+@click.option("--local_key", required=True)
+@click.option("--device_ip", required=True)
+@click.option("--file", required=False)
+@click.pass_context
+@run_sync()
+async def parser(_, local_key, device_ip, file):
+    file_provided = file is not None
+    if file_provided:
+        capture = FileCapture(file)
+    else:
+        _LOGGER.info("Listen for interface rvi0 since no file was provided")
+        capture = LiveCapture(interface="rvi0")
+    buffer = {"data": bytes()}
+
+    def on_package(packet: Packet):
+        if hasattr(packet, "ip"):
+            if packet.transport_layer == "TCP" and (packet.ip.dst == device_ip or packet.ip.src == device_ip):
+                if hasattr(packet, "DATA"):
+                    if hasattr(packet.DATA, "data"):
+                        if packet.ip.dst == device_ip:
+                            try:
+                                f, buffer["data"] = MessageParser.parse(
+                                    buffer["data"] + bytes.fromhex(packet.DATA.data),
+                                    local_key,
+                                )
+                                print(f"Received request: {f}")
+                            except BaseException as e:
+                                print(e)
+                                pass
+                        elif packet.ip.src == device_ip:
+                            try:
+                                f, buffer["data"] = MessageParser.parse(
+                                    buffer["data"] + bytes.fromhex(packet.DATA.data),
+                                    local_key,
+                                )
+                                print(f"Received response: {f}")
+                            except BaseException as e:
+                                print(e)
+                                pass
+
+    try:
+        await capture.packets_from_tshark(on_package, close_tshark=not file_provided)
+    except UnknownInterfaceException:
+        raise RoborockException(
+            "You need to run 'rvictl -s XXXXXXXX-XXXXXXXXXXXXXXXX' first, with an iPhone connected to usb port"
+        )
+
+
 cli.add_command(login)
 cli.add_command(discover)
 cli.add_command(list_devices)
 cli.add_command(command)
+cli.add_command(parser)
 
 
 def main():
