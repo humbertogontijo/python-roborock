@@ -1,9 +1,9 @@
 import logging
 
 import click
-import pyshark
-from pyshark.capture.live_capture import UnknownInterfaceException
-from pyshark.packet.packet import Packet
+from pyshark import FileCapture  # type: ignore
+from pyshark.capture.live_capture import LiveCapture, UnknownInterfaceException  # type: ignore
+from pyshark.packet.packet import Packet  # type: ignore
 
 from roborock import RoborockException
 from roborock.protocol import MessageParser
@@ -29,17 +29,15 @@ def cli(debug: int):
 async def parser(_, local_key, device_ip, file):
     file_provided = file is not None
     if file_provided:
-        capture = pyshark.FileCapture(file)
+        capture = FileCapture(file)
     else:
         _LOGGER.info("Listen for interface rvi0 since no file was provided")
-        capture = pyshark.LiveCapture(interface="rvi0")
+        capture = LiveCapture(interface="rvi0")
     buffer = {"data": bytes()}
 
     def on_package(packet: Packet):
         if hasattr(packet, "ip"):
-            if packet.transport_layer == "TCP" and (
-                packet.ip.dst == device_ip or packet.ip.src == device_ip
-            ):
+            if packet.transport_layer == "TCP" and (packet.ip.dst == device_ip or packet.ip.src == device_ip):
                 if hasattr(packet, "DATA"):
                     if hasattr(packet.DATA, "data"):
                         if packet.ip.dst == device_ip:
@@ -66,9 +64,7 @@ async def parser(_, local_key, device_ip, file):
     try:
         await capture.packets_from_tshark(on_package, close_tshark=not file_provided)
     except UnknownInterfaceException:
-        raise RoborockException(
-            "You need to run 'rvictl -s XXXXXXXX-XXXXXXXXXXXXXXXX' first, with an iPhone connected"
-        )
+        raise RoborockException("You need to run 'rvictl -s XXXXXXXX-XXXXXXXXXXXXXXXX' first, with an iPhone connected")
 
 
 cli.add_command(parser)
