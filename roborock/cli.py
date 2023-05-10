@@ -122,9 +122,7 @@ async def command(ctx, cmd, device_id, params):
         login_data = context.login_data()
     home_data = login_data.home_data
     devices = home_data.devices + home_data.received_devices
-    device = next((device for device in devices if device.duid == device_id), None)
-    if device is None:
-        raise RoborockException("No device found")
+    device = next(device for device in devices if device.duid == device_id)
     model = next(
         (product.model for product in home_data.products if device is not None and product.did == device.duid),
         None,

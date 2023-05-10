@@ -52,6 +52,7 @@ class RoborockProtocol(asyncio.DatagramProtocol):
     def datagram_received(self, data, _):
         [broadcast_message], _ = BroadcastParser.parse(data)
         parsed_message = BroadcastMessage.from_dict(json.loads(broadcast_message.payload))
+        _LOGGER.debug(f"Received broadcast: {parsed_message}")
         self.devices_found.append(parsed_message)
 
     async def discover(self):

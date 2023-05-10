@@ -25,7 +25,7 @@ class RoborockCommand(str, Enum):
     APP_RC_END = "app_rc_end"
     APP_RC_MOVE = "app_rc_move"
     APP_RC_START = "app_rc_start"
-    APP_RC_STOP = "APP_RC_STOP"
+    APP_RC_STOP = "app_rc_stop"
     APP_SEGMENT_CLEAN = "app_segment_clean"
     APP_SET_DRYER_SETTING = "app_set_dryer_setting"
     APP_SET_SMART_CLIFF_FORBIDDEN = "app_set_smart_cliff_forbidden"

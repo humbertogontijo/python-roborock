@@ -15,7 +15,7 @@ class RoborockEnum(IntEnum):
         if hasattr(cls, "missing"):
             _LOGGER.warning(f"Missing {cls.__name__} code: {key} - defaulting to 'missing'")
             return cls.missing  # type: ignore
-        default_value = next((item for item in cls))
+        default_value = next(item for item in cls)
         _LOGGER.warning(f"Missing {cls.__name__} code: {key} - defaulting to {default_value}")
         return default_value
 
