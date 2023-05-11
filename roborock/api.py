@@ -77,11 +77,11 @@ class PreparedRequest:
         _headers = {**self.base_headers, **(headers or {})}
         async with aiohttp.ClientSession() as session:
             async with session.request(
-                    method,
-                    _url,
-                    params=params,
-                    data=data,
-                    headers=_headers,
+                method,
+                _url,
+                params=params,
+                data=data,
+                headers=_headers,
             ) as resp:
                 return await resp.json()
 
@@ -173,7 +173,7 @@ class RoborockClient:
     def should_keepalive(self) -> bool:
         now = self.time_func()
         # noinspection PyUnresolvedReferences
-        if now - self._last_disconnection > self.keep_alive ** 2 and now - self._last_device_msg_in > self.keep_alive:
+        if now - self._last_disconnection > self.keep_alive**2 and now - self._last_device_msg_in > self.keep_alive:
             return False
         return True
 
@@ -194,10 +194,10 @@ class RoborockClient:
             del self._waiting_queue[request_id]
 
     def _get_payload(
-            self,
-            method: RoborockCommand,
-            params: Optional[list | dict] = None,
-            secured=False,
+        self,
+        method: RoborockCommand,
+        params: Optional[list | dict] = None,
+        secured=False,
     ):
         timestamp = math.floor(time.time())
         request_id = randint(10000, 99999)
