@@ -85,7 +85,8 @@ async def _discover(ctx):
         raise Exception("You need to login first")
     client = RoborockApiClient(login_data.email)
     home_data = await client.get_home_data(login_data.user_data)
-    context.update(LoginData(**login_data.as_dict(), home_data=home_data))
+    login_data.home_data = home_data
+    context.update(login_data)
     click.echo(f"Discovered devices {', '.join([device.name for device in home_data.get_all_devices()])}")
 
 
@@ -128,7 +129,7 @@ async def command(ctx, cmd, device_id, params):
     devices = home_data.devices + home_data.received_devices
     device = next(device for device in devices if device.duid == device_id)
     model = next(
-        (product.model for product in home_data.products if device is not None and product.did == device.duid),
+        (product.model for product in home_data.products if device is not None and product.id == device.product_id),
         None,
     )
     if model is None:

@@ -5,7 +5,6 @@ import math
 import time
 from dataclasses import dataclass
 from random import randint
-from typing import Optional
 
 from .roborock_typing import RoborockCommand
 
@@ -15,7 +14,6 @@ class RoborockMessage:
     protocol: int
     payload: bytes
     seq: int = randint(100000, 999999)
-    prefix: Optional[bytes] = None
     version: bytes = b"1.0"
     random: int = randint(10000, 99999)
     timestamp: int = math.floor(time.time())

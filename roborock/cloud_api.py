@@ -156,7 +156,7 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
         response_protocol = 301 if method in COMMANDS_SECURED else 102
         roborock_message = RoborockMessage(timestamp=timestamp, protocol=request_protocol, payload=payload)
         local_key = self.device_info.device.local_key
-        msg = MessageParser.build(roborock_message, local_key)
+        msg = MessageParser.build(roborock_message, local_key, False)
         self._send_msg_raw(msg)
         (response, err) = await self._async_response(request_id, response_protocol)
         if err:

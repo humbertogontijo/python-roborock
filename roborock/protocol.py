@@ -25,6 +25,8 @@ from construct import (  # type: ignore
     RawCopy,
     Struct,
     bytestringtype,
+    stream_seek,
+    stream_tell,
 )
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
@@ -223,43 +225,51 @@ class OptionalChecksum(Checksum):
         return hash1
 
 
-class OptionalPrefix(Construct):
+class PrefixedStruct(Struct):
     def _parse(self, stream, context, path):
         subcon1 = Peek(Optional(Const(b"1.0")))
         peek_version = subcon1.parse_stream(stream, **context)
         if peek_version is None:
             subcon2 = Bytes(4)
-            return subcon2.parse_stream(stream, **context)
-        return b""
+            subcon2.parse_stream(stream, **context)
+        return super()._parse(stream, context, path)
 
     def _build(self, obj, stream, context, path):
-        if obj is not None:
-            subcon1 = Bytes(4)
-            subcon1.build_stream(obj, stream, **context)
+        prefixed = context.search("prefixed")
+        if not prefixed:
+            return super()._build(obj, stream, context, path)
+        offset = stream_tell(stream, path)
+        stream_seek(stream, offset + 4, 0, path)
+        super()._build(obj, stream, context, path)
+        new_offset = stream_tell(stream, path)
+        subcon1 = Bytes(4)
+        stream_seek(stream, offset, 0, path)
+        subcon1.build_stream(new_offset - offset - subcon1.sizeof(**context), stream, **context)
+        stream_seek(stream, new_offset + 4, 0, path)
         return obj
 
+
+_Message = RawCopy(
+    Struct(
+        "version" / Const(b"1.0"),
+        "seq" / Int32ub,
+        "random" / Int32ub,
+        "timestamp" / Int32ub,
+        "protocol" / Int16ub,
+        "payload"
+        / EncryptionAdapter(
+            lambda ctx: Utils.md5(
+                Utils.encode_timestamp(ctx.timestamp) + Utils.ensure_bytes(ctx.search("local_key")) + SALT
+            ),
+        ),
+    )
+)
 
 _Messages = Struct(
     "messages"
     / GreedyRange(
-        Struct(
-            "prefix" / OptionalPrefix(),
-            "message"
-            / RawCopy(
-                Struct(
-                    "version" / Const(b"1.0"),
-                    "seq" / Int32ub,
-                    "random" / Int32ub,
-                    "timestamp" / Int32ub,
-                    "protocol" / Int16ub,
-                    "payload"
-                    / EncryptionAdapter(
-                        lambda ctx: Utils.md5(
-                            Utils.encode_timestamp(ctx.timestamp) + Utils.ensure_bytes(ctx.search("local_key")) + SALT
-                        ),
-                    ),
-                )
-            ),
+        PrefixedStruct(
+            "message" / _Message,
             "checksum" / OptionalChecksum(Optional(Int32ub), Utils.crc, lambda ctx: ctx.message.data),
         )
     ),
@@ -294,7 +304,6 @@ class _Parser:
         for message in parsed_messages:
             messages.append(
                 RoborockMessage(
-                    prefix=message.get("prefix"),
                     version=message.message.value.version,
                     seq=message.message.value.seq,
                     random=message.message.value.get("random"),
@@ -306,14 +315,15 @@ class _Parser:
         remaining = parsed.get("remaining") or b""
         return messages, remaining
 
-    def build(self, roborock_messages: list[RoborockMessage] | RoborockMessage, local_key: str) -> bytes:
+    def build(
+        self, roborock_messages: list[RoborockMessage] | RoborockMessage, local_key: str, prefixed: bool = True
+    ) -> bytes:
         if isinstance(roborock_messages, RoborockMessage):
             roborock_messages = [roborock_messages]
         messages = []
         for roborock_message in roborock_messages:
             messages.append(
                 {
-                    "prefix": roborock_message.prefix,
                     "message": {
                         "value": {
                             "version": roborock_message.version,
@@ -326,7 +336,7 @@ class _Parser:
                     },
                 }
             )
-        return self.con.build({"messages": [message for message in messages]}, local_key=local_key)
+        return self.con.build({"messages": [message for message in messages]}, local_key=local_key, prefixed=prefixed)
 
 
 MessageParser: _Parser = _Parser(_Messages, True)

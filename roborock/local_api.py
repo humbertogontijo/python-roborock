@@ -60,7 +60,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
                 raise RoborockConnectionException(f"Failed connecting to {self.host}") from e
 
     def sync_disconnect(self) -> None:
-        if self.transport:
+        if self.transport and self.loop.is_running():
             self.transport.close()
 
     async def async_disconnect(self) -> None:
@@ -77,18 +77,15 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         command = CommandInfoMap.get(method)
         if command is None:
             raise RoborockException(f"No prefix found for {method}")
-        prefix = command.prefix
         request_protocol = 4
         return RoborockMessage(
-            prefix=prefix,
             timestamp=timestamp,
             protocol=request_protocol,
             payload=payload,
         )
 
     async def ping(self):
-        command_info = CommandInfoMap[RoborockCommand.NONE]
-        roborock_message = RoborockMessage(prefix=command_info.prefix, protocol=AP_CONFIG, payload=b"")
+        roborock_message = RoborockMessage(protocol=AP_CONFIG, payload=b"")
         return (await self.send_message(roborock_message))[0]
 
     async def send_command(self, method: RoborockCommand, params: Optional[list | dict] = None):
