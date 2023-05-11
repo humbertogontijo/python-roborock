@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.17.1 (2023-05-11)
+### Fix
+* Improving logs ([`cdd0ea7`](https://github.com/humbertogontijo/python-roborock/commit/cdd0ea75d4e336c8f918a79574fd7b642eaffeec))
+
 ## v0.17.0 (2023-05-11)
 ### Feature
 * Dynamic calculated prefixes ([`d57a0a7`](https://github.com/humbertogontijo/python-roborock/commit/d57a0a7d31f851b6bf4381233a84187d19e5782f))
