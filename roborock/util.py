@@ -32,3 +32,26 @@ def run_sync():
         return wrapped
 
     return decorator
+
+
+class CacheableResult:
+    last_run_result = None
+
+
+def fallback_cache():
+    _run_sync = run_sync()
+    cache = CacheableResult()
+
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapped(*args, **kwargs):
+            try:
+                cache.last_run_result = _run_sync(func(*args, **kwargs))
+            except Exception as e:
+                if cache.last_run_result is None:
+                    raise e
+            return cache.last_run_result
+
+        return wrapped
+
+    return decorator
