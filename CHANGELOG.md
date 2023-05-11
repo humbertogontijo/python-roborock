@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.17.0 (2023-05-11)
+### Feature
+* Dynamic calculated prefixes ([`d57a0a7`](https://github.com/humbertogontijo/python-roborock/commit/d57a0a7d31f851b6bf4381233a84187d19e5782f))
+
 ## v0.16.1 (2023-05-10)
 ### Fix
 * Connection timeouts ([`36a7295`](https://github.com/humbertogontijo/python-roborock/commit/36a7295ce878dd0649505dd4a5b5ad662f0655fd))
