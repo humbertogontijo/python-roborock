@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v0.17.2 (2023-05-11)
+### Fix
+* Fallback_cache func ([`8048d84`](https://github.com/humbertogontijo/python-roborock/commit/8048d843f669b06960967918570201498e4ae051))
+* Adding fallback cache (to be tested) ([`0e214cd`](https://github.com/humbertogontijo/python-roborock/commit/0e214cd0633e9b9baca3323cc505a4f787aa08fb))
+
 ## v0.17.1 (2023-05-11)
 ### Fix
 * Improving logs ([`cdd0ea7`](https://github.com/humbertogontijo/python-roborock/commit/cdd0ea75d4e336c8f918a79574fd7b642eaffeec))
