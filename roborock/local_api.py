@@ -85,8 +85,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         )
 
     async def ping(self):
-        roborock_message = RoborockMessage(protocol=AP_CONFIG, payload=b"")
-        return (await self.send_message(roborock_message))[0]
+        return await self.send_command(RoborockCommand.APP_WAKEUP_ROBOT)
 
     async def send_command(self, method: RoborockCommand, params: Optional[list | dict] = None):
         roborock_message = self.build_roborock_message(method, params)

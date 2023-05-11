@@ -56,19 +56,19 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
         _, __, ___, rc, ____ = args
         connection_queue = self._waiting_queue.get(CONNECT_REQUEST_ID)
         if rc != mqtt.MQTT_ERR_SUCCESS:
-            message = f"Failed to connect (rc: {rc})"
+            message = f"Failed to connect ({mqtt.error_string(rc)})"
             _LOGGER.error(message)
             if connection_queue:
-                connection_queue.resolve((None, VacuumError(rc, message)))
+                connection_queue.resolve((None, VacuumError(message)))
             return
         _LOGGER.info(f"Connected to mqtt {self._mqtt_host}:{self._mqtt_port}")
         topic = f"rr/m/o/{self._mqtt_user}/{self._hashed_user}/{self.device_info.device.duid}"
         (result, mid) = self.subscribe(topic)
         if result != 0:
-            message = f"Failed to subscribe (rc: {result})"
+            message = f"Failed to subscribe ({mqtt.error_string(rc)})"
             _LOGGER.error(message)
             if connection_queue:
-                connection_queue.resolve((None, VacuumError(rc, message)))
+                connection_queue.resolve((None, VacuumError(message)))
             return
         _LOGGER.info(f"Subscribed to topic {topic}")
         if connection_queue:
@@ -85,7 +85,7 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
     def on_disconnect(self, *args, **kwargs):
         _, __, rc, ___ = args
         try:
-            super().on_connection_lost(RoborockException(f"(rc: {rc})"))
+            super().on_connection_lost(RoborockException(mqtt.error_string(rc)))
             if rc == mqtt.MQTT_ERR_PROTOCOL:
                 self.update_client_id()
             connection_queue = self._waiting_queue.get(DISCONNECT_REQUEST_ID)
@@ -114,7 +114,7 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
             _LOGGER.info("Disconnecting from mqtt")
             rc = super().disconnect()
             if rc not in [mqtt.MQTT_ERR_SUCCESS, mqtt.MQTT_ERR_NO_CONN]:
-                raise RoborockException(f"Failed to disconnect (rc:{rc})")
+                raise RoborockException(f"Failed to disconnect ({mqtt.error_string(rc)})")
         return rc == mqtt.MQTT_ERR_SUCCESS
 
     def sync_connect(self) -> bool:
@@ -146,7 +146,7 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
     def _send_msg_raw(self, msg: bytes) -> None:
         info = self.publish(f"rr/m/i/{self._mqtt_user}/{self._hashed_user}/{self.device_info.device.duid}", msg)
         if info.rc != mqtt.MQTT_ERR_SUCCESS:
-            raise RoborockException(f"Failed to publish (rc: {info.rc})")
+            raise RoborockException(f"Failed to publish ({mqtt.error_string(info.rc)})")
 
     async def send_command(self, method: RoborockCommand, params: Optional[list | dict] = None):
         await self.validate_connection()

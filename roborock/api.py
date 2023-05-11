@@ -189,7 +189,7 @@ class RoborockClient:
             (response, err) = await queue.async_get(QUEUE_TIMEOUT)
             return response, err
         except (asyncio.TimeoutError, asyncio.CancelledError):
-            raise RoborockTimeout(f"Timeout after {QUEUE_TIMEOUT} seconds waiting for response") from None
+            raise RoborockTimeout(f"id={request_id} Timeout after {QUEUE_TIMEOUT} seconds") from None
         finally:
             del self._waiting_queue[request_id]
 
