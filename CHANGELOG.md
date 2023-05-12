@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.17.3 (2023-05-12)
+### Fix
+* Trigger new release ([`270a65c`](https://github.com/humbertogontijo/python-roborock/commit/270a65c24a847cdc58a630e6d6c8e296910de8ea))
+
 ## v0.17.2 (2023-05-11)
 ### Fix
 * Fallback_cache func ([`8048d84`](https://github.com/humbertogontijo/python-roborock/commit/8048d843f669b06960967918570201498e4ae051))
