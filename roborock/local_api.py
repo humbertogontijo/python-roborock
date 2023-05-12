@@ -39,6 +39,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         self.on_message_received(parser_msg)
 
     def connection_lost(self, exc: Optional[Exception]):
+        self.sync_disconnect()
         self.on_connection_lost(exc)
 
     def is_connected(self):
@@ -61,6 +62,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
 
     def sync_disconnect(self) -> None:
         if self.transport and self.loop.is_running():
+            _LOGGER.debug(f"Disconnecting from {self.host}")
             self.transport.close()
 
     async def async_disconnect(self) -> None:
@@ -123,7 +125,6 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         local_key = self.device_info.device.local_key
         msg = MessageParser.build(roborock_messages, local_key=local_key)
         # Send the command to the Roborock device
-        _LOGGER.debug(f"Requesting device with {roborock_messages}")
         self._send_msg_raw(msg)
 
         responses = await asyncio.gather(
