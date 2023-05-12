@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.17.4 (2023-05-12)
+### Fix
+* Pycharm typing ([`12d7c0b`](https://github.com/humbertogontijo/python-roborock/commit/12d7c0b71bdeae90e9abbc6a16de3e07ebaa82da))
+
 ## v0.17.3 (2023-05-12)
 ### Fix
 * Trigger new release ([`270a65c`](https://github.com/humbertogontijo/python-roborock/commit/270a65c24a847cdc58a630e6d6c8e296910de8ea))
