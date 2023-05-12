@@ -318,6 +318,7 @@ class RoborockClient:
 
     @fallback_cache()
     async def get_prop(self) -> DeviceProp | None:
+        """Gets device general properties."""
         [status, dnd_timer, clean_summary, consumable] = await asyncio.gather(
             *[
                 self.get_status(),
