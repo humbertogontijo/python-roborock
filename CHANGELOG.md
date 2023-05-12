@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.17.5 (2023-05-12)
+### Fix
+* Adding log for local disconnection ([`3001798`](https://github.com/humbertogontijo/python-roborock/commit/300179839ec6a25e4ab8172f2c11e8beb0ff17ce))
+
 ## v0.17.4 (2023-05-12)
 ### Fix
 * Pycharm typing ([`12d7c0b`](https://github.com/humbertogontijo/python-roborock/commit/12d7c0b71bdeae90e9abbc6a16de3e07ebaa82da))
