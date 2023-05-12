@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 import functools
 from asyncio import AbstractEventLoop
-from typing import Any, Awaitable, Callable, Optional, TypeVar
+from typing import Callable, Coroutine, Optional, TypeVar
 
 T = TypeVar("T")
 
@@ -38,19 +38,19 @@ class CacheableResult:
     last_run_result = None
 
 
-def fallback_cache():
+RT = TypeVar("RT", bound=Callable[..., Coroutine])
+
+
+def fallback_cache(func: RT) -> RT:
     cache = CacheableResult()
 
-    def decorator(func: Callable[[Any, Any], Awaitable[Any]]):
-        @functools.wraps(func)
-        async def wrapped(*args, **kwargs):
-            try:
-                cache.last_run_result = await func(*args, **kwargs)
-            except Exception as e:
-                if cache.last_run_result is None:
-                    raise e
-            return cache.last_run_result
+    @functools.wraps(func)
+    async def wrapped(*args, **kwargs):
+        try:
+            cache.last_run_result = await func(*args, **kwargs)
+        except Exception as e:
+            if cache.last_run_result is None:
+                raise e
+        return cache.last_run_result
 
-        return wrapped
-
-    return decorator
+    return wrapped  # type: ignore
