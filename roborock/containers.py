@@ -76,6 +76,7 @@ def decamelize_obj(d: dict | list, ignore_keys: list[str]):
 @dataclass
 class RoborockBase:
     _ignore_keys = []  # type: ignore
+    is_cached = False
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]):

@@ -7,7 +7,7 @@ from typing import Optional
 
 import async_timeout
 
-from . import DeviceData
+from . import DeviceData, RoborockBase
 from .api import COMMANDS_SECURED, QUEUE_TIMEOUT, RoborockClient
 from .exceptions import CommandVacuumError, RoborockConnectionException, RoborockException
 from .protocol import MessageParser
@@ -135,4 +135,9 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         if exception:
             await self.async_disconnect()
             raise exception
+        is_cached = next(
+            (response for response in responses if isinstance(response, RoborockBase) and response.is_cached), None
+        )
+        if is_cached:
+            await self.async_disconnect()
         return responses
