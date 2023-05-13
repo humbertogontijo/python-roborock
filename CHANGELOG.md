@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.17.6 (2023-05-13)
+### Fix
+* Using cache only a single time ([`1ebfb35`](https://github.com/humbertogontijo/python-roborock/commit/1ebfb35b9fe9ec50d4abeb60c695d33a37818768))
+
 ## v0.17.5 (2023-05-12)
 ### Fix
 * Adding log for local disconnection ([`3001798`](https://github.com/humbertogontijo/python-roborock/commit/300179839ec6a25e4ab8172f2c11e8beb0ff17ce))
