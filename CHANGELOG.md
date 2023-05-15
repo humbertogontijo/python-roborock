@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.18.1 (2023-05-15)
+### Fix
+* Type checks ([`58b3322`](https://github.com/humbertogontijo/python-roborock/commit/58b33225b50a221a5f3100055fe28461f5cff884))
+
 ## v0.18.0 (2023-05-15)
 ### Feature
 * Keep connection alive ([`691b04b`](https://github.com/humbertogontijo/python-roborock/commit/691b04b0135a38cc6b150e284d96e217f18f7f46))
