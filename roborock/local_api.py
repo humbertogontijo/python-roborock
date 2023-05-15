@@ -48,7 +48,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
 
     async def keep_alive_func(self, _=None):
         await self.ping()
-        self.keep_alive_task = self.loop.call_later(10, lambda: self.keep_alive_func())
+        self.keep_alive_task = self.loop.call_later(10, lambda: asyncio.create_task(self.keep_alive_func()))
 
     async def async_connect(self) -> None:
         async with self._mutex:
