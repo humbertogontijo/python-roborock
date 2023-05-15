@@ -63,6 +63,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
                         self.transport, _ = await self.loop.create_connection(  # type: ignore
                             lambda: self, self.host, 58867
                         )
+                        await self.hello()
                         _LOGGER.info(f"Connected to {self.host}")
             except Exception as e:
                 _LOGGER.warning(f"Failed connecting to {self.host}: {e}")
@@ -93,6 +94,16 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
             protocol=request_protocol,
             payload=payload,
         )
+
+    async def hello(self):
+        request_id = 1
+        _LOGGER.debug(f"id={request_id} Requesting method hello with None")
+        try:
+            return await self.send_message(
+                RoborockMessage(protocol=0, payload=None, seq=request_id, version=b"1.0", random=22)
+            )
+        except Exception as e:
+            _LOGGER.error(e)
 
     async def ping(self):
         request_id = 2
