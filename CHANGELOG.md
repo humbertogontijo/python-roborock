@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.17.7 (2023-05-15)
+### Fix
+* Ignoring get_room_mapping for int list response ([`c71d3b5`](https://github.com/humbertogontijo/python-roborock/commit/c71d3b549a8dd09d08d1d27cde6882298875269c))
+
 ## v0.17.6 (2023-05-13)
 ### Fix
 * Using cache only a single time ([`1ebfb35`](https://github.com/humbertogontijo/python-roborock/commit/1ebfb35b9fe9ec50d4abeb60c695d33a37818768))
