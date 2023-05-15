@@ -30,6 +30,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         self.remaining = b""
         self.transport: Transport | None = None
         self._mutex = Lock()
+        self.keep_alive_func()
 
     def data_received(self, message):
         if self.remaining:
@@ -44,6 +45,13 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
 
     def is_connected(self):
         return self.transport and self.transport.is_reading()
+
+    def keep_alive_func(self, _=None):
+        keep_alive_task = asyncio.gather(
+            asyncio.sleep(10),
+            self.ping(),
+        )
+        keep_alive_task.add_done_callback(self.keep_alive_func)
 
     async def async_connect(self) -> None:
         async with self._mutex:
@@ -87,7 +95,18 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         )
 
     async def ping(self):
-        return await self.send_command(RoborockCommand.APP_WAKEUP_ROBOT)
+        request_id = 2
+        _LOGGER.debug(f"id={request_id} Requesting method ping with None")
+        try:
+            return await self.send_message(RoborockMessage(
+                                protocol=2,
+                                payload=None,
+                                seq=request_id,
+                                version=b'1.0',
+                                random=23
+                                ))
+        except Exception as e:
+            _LOGGER.error(e)
 
     async def send_command(self, method: RoborockCommand, params: Optional[list | dict] = None):
         roborock_message = self.build_roborock_message(method, params)
@@ -96,9 +115,9 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
     async def async_local_response(self, roborock_message: RoborockMessage):
         method = roborock_message.get_method()
         request_id: int | None
-        if method and not method.startswith("get"):
+        if not method or not method.startswith("get"):
             request_id = roborock_message.seq
-            response_protocol = 5
+            response_protocol = request_id + 1
         else:
             request_id = roborock_message.get_request_id()
             response_protocol = 4
@@ -107,7 +126,8 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         (response, err) = await self._async_response(request_id, response_protocol)
         if err:
             raise CommandVacuumError("", err) from err
-        _LOGGER.debug(f"id={request_id} Response from {roborock_message.get_method()}: {response}")
+        method = roborock_message.get_method() if roborock_message.protocol != 2 else "ping"
+        _LOGGER.debug(f"id={request_id} Response from method {method}: {response}")
         return response
 
     def _send_msg_raw(self, data: bytes):

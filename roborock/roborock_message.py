@@ -12,7 +12,7 @@ from .roborock_typing import RoborockCommand
 @dataclass
 class RoborockMessage:
     protocol: int
-    payload: bytes
+    payload: bytes | None
     seq: int = randint(100000, 999999)
     version: bytes = b"1.0"
     random: int = randint(10000, 99999)

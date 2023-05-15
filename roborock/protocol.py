@@ -176,19 +176,21 @@ class EncryptionAdapter(Construct):
         subcon1 = Optional(Int16ub)
         length = subcon1.parse_stream(stream, **context)
         if not length:
-            subcon1.parse_stream(stream, **context)  # seek 2
+            if length == 0:
+                subcon1.parse_stream(stream, **context)  # seek 2
             return None
         subcon2 = Bytes(length)
         obj = subcon2.parse_stream(stream, **context)
         return self._decode(obj, context, path)
 
     def _build(self, obj, stream, context, path):
-        obj2 = self._encode(obj, context, path)
-        subcon1 = Int16ub
-        length = len(obj2)
-        subcon1.build_stream(length, stream, **context)
-        subcon2 = Bytes(length)
-        subcon2.build_stream(obj2, stream, **context)
+        if obj is not None:
+            obj2 = self._encode(obj, context, path)
+            subcon1 = Int16ub
+            length = len(obj2)
+            subcon1.build_stream(length, stream, **context)
+            subcon2 = Bytes(length)
+            subcon2.build_stream(obj2, stream, **context)
         return obj
 
     def _encode(self, obj, context, _):
