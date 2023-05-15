@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v0.18.2 (2023-05-15)
+### Fix
+* Improving new protocols ([`08c6f95`](https://github.com/humbertogontijo/python-roborock/commit/08c6f9530b202d17ef80047c2d60836f9f9b8422))
+* Adding hello command ([`dfa44ff`](https://github.com/humbertogontijo/python-roborock/commit/dfa44ff56a794f30e7c93d0a9a270f2a02da7e65))
+
 ## v0.18.1 (2023-05-15)
 ### Fix
 * Type checks ([`58b3322`](https://github.com/humbertogontijo/python-roborock/commit/58b33225b50a221a5f3100055fe28461f5cff884))
