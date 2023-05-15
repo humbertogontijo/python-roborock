@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.17.8 (2023-05-15)
+### Fix
+* Trying to fix connection leaks ([`a66482a`](https://github.com/humbertogontijo/python-roborock/commit/a66482a22cba9a6e7cc449c3f35acc1f230cd211))
+
 ## v0.17.7 (2023-05-15)
 ### Fix
 * Ignoring get_room_mapping for int list response ([`c71d3b5`](https://github.com/humbertogontijo/python-roborock/commit/c71d3b549a8dd09d08d1d27cde6882298875269c))
