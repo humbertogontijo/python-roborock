@@ -196,6 +196,6 @@ def test_no_value():
     modified_status = STATUS.copy()
     modified_status["dock_type"] = 9999
     s = S7MaxVStatus.from_dict(modified_status)
-    assert s.dock_type == RoborockDockTypeCode.missing
+    assert s.dock_type == RoborockDockTypeCode.unknown
     assert -9999 not in RoborockDockTypeCode.keys()
     assert "missing" not in RoborockDockTypeCode.values()

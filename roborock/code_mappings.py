@@ -12,9 +12,9 @@ class RoborockEnum(IntEnum):
 
     @classmethod
     def _missing_(cls: Type[RoborockEnum], key) -> RoborockEnum:
-        if hasattr(cls, "missing"):
-            _LOGGER.warning(f"Missing {cls.__name__} code: {key} - defaulting to 'missing'")
-            return cls.missing  # type: ignore
+        if hasattr(cls, "unknown"):
+            _LOGGER.warning(f"Missing {cls.__name__} code: {key} - defaulting to 'unknown'")
+            return cls.unknown  # type: ignore
         default_value = next(item for item in cls)
         _LOGGER.warning(f"Missing {cls.__name__} code: {key} - defaulting to {default_value}")
         return default_value
@@ -221,8 +221,9 @@ class RoborockDockErrorCode(RoborockEnum):
 
 
 class RoborockDockTypeCode(RoborockEnum):
-    missing = -9999
+    unknown = -9999
     no_dock = 0
+    auto_empty_dock = 1
     empty_wash_fill_dock = 3
     auto_empty_dock_pure = 5
     s8_dock = 7
@@ -232,7 +233,7 @@ class RoborockDockDustCollectionModeCode(RoborockEnum):
     """Describes the dust collection mode of the vacuum cleaner."""
 
     # TODO: Get the correct values for various different docks
-    missing = -9999
+    unknown = -9999
     smart = 0
     light = 1
     balanced = 2
@@ -243,7 +244,7 @@ class RoborockDockWashTowelModeCode(RoborockEnum):
     """Describes the wash towel mode of the vacuum cleaner."""
 
     # TODO: Get the correct values for various different docks
-    missing = -9999
+    unknown = -9999
     light = 0
     balanced = 1
     deep = 2

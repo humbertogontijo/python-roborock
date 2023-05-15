@@ -365,7 +365,7 @@ class RoborockClient:
         if isinstance(mapping, list):
             return [
                 RoomMapping(segment_id=segment_id, iot_id=iot_id)  # type: ignore
-                for segment_id, iot_id in [unpack_list(room, 2) for room in mapping]
+                for segment_id, iot_id in [unpack_list(room, 2) for room in mapping if isinstance(room, list)]
             ]
         return None
 
