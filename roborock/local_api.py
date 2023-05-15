@@ -119,25 +119,28 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
             raise RoborockException(e) from e
 
     async def send_message(self, roborock_messages: list[RoborockMessage] | RoborockMessage):
-        await self.validate_connection()
-        if isinstance(roborock_messages, RoborockMessage):
-            roborock_messages = [roborock_messages]
-        local_key = self.device_info.device.local_key
-        msg = MessageParser.build(roborock_messages, local_key=local_key)
-        # Send the command to the Roborock device
-        self._send_msg_raw(msg)
+        try:
+            await self.validate_connection()
+            if isinstance(roborock_messages, RoborockMessage):
+                roborock_messages = [roborock_messages]
+            local_key = self.device_info.device.local_key
+            msg = MessageParser.build(roborock_messages, local_key=local_key)
+            # Send the command to the Roborock device
+            self._send_msg_raw(msg)
 
-        responses = await asyncio.gather(
-            *[self.async_local_response(roborock_message) for roborock_message in roborock_messages],
-            return_exceptions=True,
-        )
-        exception = next((response for response in responses if isinstance(response, BaseException)), None)
-        if exception:
+            responses = await asyncio.gather(
+                *[self.async_local_response(roborock_message) for roborock_message in roborock_messages],
+                return_exceptions=True,
+            )
+            exception = next((response for response in responses if isinstance(response, BaseException)), None)
+            if exception:
+                raise exception
+            is_cached = next(
+                (response for response in responses if isinstance(response, RoborockBase) and response.is_cached), None
+            )
+            if is_cached:
+                await self.async_disconnect()
+            return responses
+        except Exception:
             await self.async_disconnect()
-            raise exception
-        is_cached = next(
-            (response for response in responses if isinstance(response, RoborockBase) and response.is_cached), None
-        )
-        if is_cached:
-            await self.async_disconnect()
-        return responses
+            raise
