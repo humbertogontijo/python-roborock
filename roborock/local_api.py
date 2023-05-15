@@ -98,13 +98,9 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         request_id = 2
         _LOGGER.debug(f"id={request_id} Requesting method ping with None")
         try:
-            return await self.send_message(RoborockMessage(
-                                protocol=2,
-                                payload=None,
-                                seq=request_id,
-                                version=b'1.0',
-                                random=23
-                                ))
+            return await self.send_message(
+                RoborockMessage(protocol=2, payload=None, seq=request_id, version=b"1.0", random=23)
+            )
         except Exception as e:
             _LOGGER.error(e)
 

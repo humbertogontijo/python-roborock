@@ -122,7 +122,7 @@ class RoborockClient:
             self._last_device_msg_in = self.time_func()
             for data in messages:
                 protocol = data.protocol
-                if protocol == 102 or protocol == 4:
+                if data.payload and (protocol == 102 or protocol == 4):
                     payload = json.loads(data.payload.decode())
                     for data_point_number, data_point in payload.get("dps").items():
                         if data_point_number == "102":
@@ -146,7 +146,7 @@ class RoborockClient:
                                     if isinstance(result, list) and len(result) == 1:
                                         result = result[0]
                                     queue.resolve((result, None))
-                elif protocol == 301:
+                elif data.payload and protocol == 301:
                     payload = data.payload[0:24]
                     [endpoint, _, request_id, _] = struct.unpack("<15sBH6s", payload)
                     if endpoint.decode().startswith(self._endpoint):
