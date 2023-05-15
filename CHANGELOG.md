@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.18.3 (2023-05-15)
+### Fix
+* Keep_alive_func ([`e4aeebc`](https://github.com/humbertogontijo/python-roborock/commit/e4aeebc16317a5c9fe3ffcd3bff89be1f2070dbb))
+
 ## v0.18.2 (2023-05-15)
 ### Fix
 * Improving new protocols ([`08c6f95`](https://github.com/humbertogontijo/python-roborock/commit/08c6f9530b202d17ef80047c2d60836f9f9b8422))
