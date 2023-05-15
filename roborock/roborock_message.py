@@ -6,6 +6,17 @@ import time
 from dataclasses import dataclass
 from random import randint
 
+from roborock import RoborockEnum
+
+
+class RoborockMessageProtocol(RoborockEnum):
+    HELLO_REQUEST = 0
+    HELLO_RESPONSE = 1
+    PING_REQUEST = 2
+    PING_RESPONSE = 3
+    GENERAL_REQUEST = 4
+    GENERAL_RESPONSE = 5
+
 
 @dataclass
 class RoborockMessage:

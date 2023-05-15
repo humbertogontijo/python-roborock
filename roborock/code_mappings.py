@@ -10,6 +10,10 @@ _LOGGER = logging.getLogger(__name__)
 class RoborockEnum(IntEnum):
     """Roborock Enum for codes with int values"""
 
+    @property
+    def name(self) -> str:
+        return super().name.lower()
+
     @classmethod
     def _missing_(cls: Type[RoborockEnum], key) -> RoborockEnum:
         if hasattr(cls, "unknown"):
