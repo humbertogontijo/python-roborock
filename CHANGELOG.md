@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.18.0 (2023-05-15)
+### Feature
+* Keep connection alive ([`691b04b`](https://github.com/humbertogontijo/python-roborock/commit/691b04b0135a38cc6b150e284d96e217f18f7f46))
+
 ## v0.17.8 (2023-05-15)
 ### Fix
 * Trying to fix connection leaks ([`a66482a`](https://github.com/humbertogontijo/python-roborock/commit/a66482a22cba9a6e7cc449c3f35acc1f230cd211))
