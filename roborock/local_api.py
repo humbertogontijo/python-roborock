@@ -40,7 +40,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         self.on_message_received(parser_msg)
 
     def connection_lost(self, exc: Optional[Exception]):
-        self.loop.run_until_complete(self.async_disconnect())
+        self.sync_disconnect()
         self.on_connection_lost(exc)
 
     def is_connected(self):
@@ -53,27 +53,29 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
     async def async_connect(self) -> None:
         async with self._mutex:
             try:
-                is_connected = self.is_connected()
-                if not is_connected:
+                if not self.is_connected():
+                    self.sync_disconnect()
                     async with async_timeout.timeout(QUEUE_TIMEOUT):
                         _LOGGER.info(f"Connecting to {self.host}")
                         self.transport, _ = await self.loop.create_connection(  # type: ignore
                             lambda: self, self.host, 58867
                         )
                         _LOGGER.info(f"Connected to {self.host}")
+                        await self.hello()
+                        await self.keep_alive_func()
             except Exception as e:
                 raise RoborockConnectionException(f"Failed connecting to {self.host}") from e
-        if not is_connected:
-            await self.hello()
-            await self.keep_alive_func()
+
+    def sync_disconnect(self) -> None:
+        if self.transport and self.loop.is_running():
+            _LOGGER.debug(f"Disconnecting from {self.host}")
+            self.transport.close()
+        if self.keep_alive_task:
+            self.keep_alive_task.cancel()
 
     async def async_disconnect(self) -> None:
         async with self._mutex:
-            if self.transport and self.loop.is_running():
-                _LOGGER.debug(f"Disconnecting from {self.host}")
-                self.transport.close()
-            if self.keep_alive_task:
-                self.keep_alive_task.cancel()
+            self.sync_disconnect()
 
     def build_roborock_message(self, method: RoborockCommand, params: Optional[list | dict] = None) -> RoborockMessage:
         secured = True if method in COMMANDS_SECURED else False
@@ -98,7 +100,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
             protocol = RoborockMessageProtocol.HELLO_REQUEST
             _LOGGER.debug(f"id={request_id} Requesting protocol {protocol.name}")
             try:
-                return await self.send_message(
+                return await self._send_message(
                     RoborockMessage(protocol=protocol, payload=None, seq=request_id, version=b"1.0", random=22)
                 )
             except Exception as e:
@@ -110,7 +112,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
             protocol = RoborockMessageProtocol.PING_REQUEST
             _LOGGER.debug(f"id={request_id} Requesting protocol {protocol.name}")
             try:
-                return await self.send_message(
+                return await self._send_message(
                     RoborockMessage(protocol=protocol, payload=None, seq=request_id, version=b"1.0", random=23)
                 )
             except Exception as e:
@@ -150,8 +152,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         except Exception as e:
             raise RoborockException(e) from e
 
-    async def send_message(self, roborock_messages: list[RoborockMessage] | RoborockMessage):
-        await self.validate_connection()
+    async def _send_message(self, roborock_messages: list[RoborockMessage] | RoborockMessage):
         if isinstance(roborock_messages, RoborockMessage):
             roborock_messages = [roborock_messages]
         local_key = self.device_info.device.local_key
@@ -170,3 +171,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         if exception:
             raise exception
         return responses
+
+    async def send_message(self, roborock_messages: list[RoborockMessage] | RoborockMessage):
+        await self.validate_connection()
+        return await self._send_message(roborock_messages)
