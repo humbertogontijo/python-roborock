@@ -87,7 +87,6 @@ class RoborockCommand(str, Enum):
     GET_WASH_TOWEL_MODE = "get_wash_towel_mode"
     LOAD_MULTI_MAP = "load_multi_map"
     NAME_SEGMENT = "name_segment"
-    NONE = ""
     RESET_CONSUMABLE = "reset_consumable"
     RESUME_SEGMENT_CLEAN = "resume_segment_clean"
     RESUME_ZONED_CLEAN = "resume_zoned_clean"
@@ -232,7 +231,6 @@ CommandInfoMap: dict[RoborockCommand | None, CommandInfo] = {
     RoborockCommand.GET_WASH_TOWEL_MODE: CommandInfo(params=None),
     RoborockCommand.LOAD_MULTI_MAP: CommandInfo(params=None),
     RoborockCommand.NAME_SEGMENT: CommandInfo(params=None),
-    RoborockCommand.NONE: CommandInfo(params=None),
     RoborockCommand.RESET_CONSUMABLE: CommandInfo(params=None),
     RoborockCommand.RESUME_SEGMENT_CLEAN: CommandInfo(params=None),
     RoborockCommand.RESUME_ZONED_CLEAN: CommandInfo(params=None),

@@ -85,7 +85,8 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
     def on_disconnect(self, *args, **kwargs):
         _, __, rc, ___ = args
         try:
-            super().on_connection_lost(RoborockException(mqtt.error_string(rc)))
+            exc = RoborockException(mqtt.error_string(rc)) if rc != mqtt.MQTT_ERR_SUCCESS else None
+            super().on_connection_lost(exc)
             if rc == mqtt.MQTT_ERR_PROTOCOL:
                 self.update_client_id()
             connection_queue = self._waiting_queue.get(DISCONNECT_REQUEST_ID)

@@ -40,7 +40,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         self.on_message_received(parser_msg)
 
     def connection_lost(self, exc: Optional[Exception]):
-        self.sync_disconnect()
+        self.loop.run_until_complete(self.async_disconnect())
         self.on_connection_lost(exc)
 
     def is_connected(self):
@@ -55,7 +55,6 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
             try:
                 is_connected = self.is_connected()
                 if not is_connected:
-                    self.sync_disconnect()
                     async with async_timeout.timeout(QUEUE_TIMEOUT):
                         _LOGGER.info(f"Connecting to {self.host}")
                         self.transport, _ = await self.loop.create_connection(  # type: ignore
@@ -68,16 +67,13 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
             await self.hello()
             await self.keep_alive_func()
 
-    def sync_disconnect(self) -> None:
-        if self.transport and self.loop.is_running():
-            _LOGGER.debug(f"Disconnecting from {self.host}")
-            self.transport.close()
-        if self.keep_alive_task:
-            self.keep_alive_task.cancel()
-
     async def async_disconnect(self) -> None:
         async with self._mutex:
-            self.sync_disconnect()
+            if self.transport and self.loop.is_running():
+                _LOGGER.debug(f"Disconnecting from {self.host}")
+                self.transport.close()
+            if self.keep_alive_task:
+                self.keep_alive_task.cancel()
 
     def build_roborock_message(self, method: RoborockCommand, params: Optional[list | dict] = None) -> RoborockMessage:
         secured = True if method in COMMANDS_SECURED else False

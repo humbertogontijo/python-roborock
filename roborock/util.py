@@ -36,7 +36,6 @@ def run_sync():
 
 class CacheableResult:
     last_run_result = None
-    use_count = 0
 
 
 RT = TypeVar("RT", bound=Callable[..., Coroutine])
@@ -48,13 +47,14 @@ def fallback_cache(func: RT) -> RT:
     @functools.wraps(func)
     async def wrapped(*args, **kwargs):
         try:
-            cache.last_run_result = await func(*args, **kwargs)
-            cache.use_count = 0
+            last_run_result = await func(*args, **kwargs)
+            cache.last_run_result = last_run_result
         except Exception as e:
-            if cache.last_run_result is None or cache.use_count > 0:
+            if cache.last_run_result is None:
                 raise e
-            cache.last_run_result.is_cached = True
-            cache.use_count += 1
-        return cache.last_run_result
+            last_run_result = cache.last_run_result
+            cache.last_run_result = None
+            return last_run_result
+        return last_run_result
 
     return wrapped  # type: ignore
