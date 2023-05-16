@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.18.5 (2023-05-16)
+### Fix
+* Connection_lost ([`c2ba673`](https://github.com/humbertogontijo/python-roborock/commit/c2ba673f2c198bc78e75e1cf6fc9844e385e85bb))
+
 ## v0.18.4 (2023-05-16)
 ### Fix
 * Minor fixes ([`e4a291d`](https://github.com/humbertogontijo/python-roborock/commit/e4a291dd2b011e5852c992dbb23068ef5dde0e52))
