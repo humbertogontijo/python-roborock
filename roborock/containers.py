@@ -380,13 +380,17 @@ class Consumable(RoborockBase):
 
     def __post_init__(self):
         self.main_brush_time_left = (
-            MAIN_BRUSH_REPLACE_TIME - self.main_brush_work_time if self.main_brush_work_time else None
+            MAIN_BRUSH_REPLACE_TIME - self.main_brush_work_time if self.main_brush_work_time is not None else None
         )
         self.side_brush_time_left = (
-            SIDE_BRUSH_REPLACE_TIME - self.side_brush_work_time if self.side_brush_work_time else None
+            SIDE_BRUSH_REPLACE_TIME - self.side_brush_work_time if self.side_brush_work_time is not None else None
         )
-        self.filter_time_left = FILTER_REPLACE_TIME - self.filter_work_time if self.filter_work_time else None
-        self.sensor_time_left = SENSOR_DIRTY_REPLACE_TIME - self.sensor_dirty_time if self.sensor_dirty_time else None
+        self.filter_time_left = (
+            FILTER_REPLACE_TIME - self.filter_work_time if self.filter_work_time is not None else None
+        )
+        self.sensor_time_left = (
+            SENSOR_DIRTY_REPLACE_TIME - self.sensor_dirty_time if self.sensor_dirty_time is not None else None
+        )
 
 
 @dataclass
