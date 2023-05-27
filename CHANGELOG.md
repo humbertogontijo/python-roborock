@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.18.7 (2023-05-27)
+### Fix
+* Change e2 fan codes ([#62](https://github.com/humbertogontijo/python-roborock/issues/62)) ([`7231f1e`](https://github.com/humbertogontijo/python-roborock/commit/7231f1efc412f93bfb5719091337536bcb6185d6))
+
 ## v0.18.6 (2023-05-19)
 ### Fix
 * Consumables with time equals 0 ([`ccab5f0`](https://github.com/humbertogontijo/python-roborock/commit/ccab5f0724854ae27bbc51b9ee33f2a96ce709f1))
