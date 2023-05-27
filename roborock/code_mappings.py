@@ -131,12 +131,11 @@ class RoborockFanSpeedV3(RoborockFanPowerCode):
 
 
 class RoborockFanSpeedE2(RoborockFanPowerCode):
-    gentle = 41
-    silent = 50
-    standard = 68
-    medium = 79
-    turbo = 100
-
+    quiet = 101
+    balanced = 203
+    turbo = 103
+    max = 104
+    gentle = 105
 
 class RoborockFanSpeedS7(RoborockFanPowerCode):
     off = 105
