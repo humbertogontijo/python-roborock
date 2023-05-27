@@ -137,6 +137,7 @@ class RoborockFanSpeedE2(RoborockFanPowerCode):
     max = 104
     gentle = 105
 
+
 class RoborockFanSpeedS7(RoborockFanPowerCode):
     off = 105
     quiet = 101
