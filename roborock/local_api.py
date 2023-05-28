@@ -9,7 +9,11 @@ import async_timeout
 
 from . import DeviceData
 from .api import COMMANDS_SECURED, QUEUE_TIMEOUT, RoborockClient
-from .exceptions import CommandVacuumError, RoborockConnectionException, RoborockException
+from .exceptions import (
+    CommandVacuumError,
+    RoborockConnectionException,
+    RoborockException,
+)
 from .protocol import MessageParser
 from .roborock_message import RoborockMessage, RoborockMessageProtocol
 from .roborock_typing import CommandInfoMap, RoborockCommand
@@ -47,10 +51,14 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         return self.transport and self.transport.is_reading()
 
     async def keep_alive_func(self, _=None):
-        await self.ping()
+        try:
+            await self.ping()
+        except RoborockException:
+            pass
         self.keep_alive_task = self.loop.call_later(10, lambda: asyncio.create_task(self.keep_alive_func()))
 
     async def async_connect(self) -> None:
+        should_ping = False
         async with self._mutex:
             try:
                 if not self.is_connected():
@@ -61,10 +69,12 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
                             lambda: self, self.host, 58867
                         )
                         _LOGGER.info(f"Connected to {self.host}")
-                        await self.hello()
-                        await self.keep_alive_func()
-            except Exception as e:
+                        should_ping = True
+            except BaseException as e:
                 raise RoborockConnectionException(f"Failed connecting to {self.host}") from e
+        if should_ping:
+            await self.hello()
+            await self.keep_alive_func()
 
     def sync_disconnect(self) -> None:
         if self.transport and self.loop.is_running():
@@ -95,28 +105,33 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         )
 
     async def hello(self):
-        if self.is_connected():
-            request_id = 1
-            protocol = RoborockMessageProtocol.HELLO_REQUEST
-            _LOGGER.debug(f"id={request_id} Requesting protocol {protocol.name}")
-            try:
-                return await self._send_message(
-                    RoborockMessage(protocol=protocol, payload=None, seq=request_id, version=b"1.0", random=22)
+        request_id = 1
+        protocol = RoborockMessageProtocol.HELLO_REQUEST
+        try:
+            return await self.send_message(
+                RoborockMessage(
+                    protocol=protocol,
+                    payload=None,
+                    seq=request_id,
+                    version=b"1.0",
+                    random=22,
                 )
-            except Exception as e:
-                _LOGGER.error(e)
+            )
+        except Exception as e:
+            _LOGGER.error(e)
 
     async def ping(self):
-        if self.is_connected():
-            request_id = 2
-            protocol = RoborockMessageProtocol.PING_REQUEST
-            _LOGGER.debug(f"id={request_id} Requesting protocol {protocol.name}")
-            try:
-                return await self._send_message(
-                    RoborockMessage(protocol=protocol, payload=None, seq=request_id, version=b"1.0", random=23)
-                )
-            except Exception as e:
-                _LOGGER.error(e)
+        request_id = 2
+        protocol = RoborockMessageProtocol.PING_REQUEST
+        return await self.send_message(
+            RoborockMessage(
+                protocol=protocol,
+                payload=None,
+                seq=request_id,
+                version=b"1.0",
+                random=23,
+            )
+        )
 
     async def send_command(self, method: RoborockCommand, params: Optional[list | dict] = None):
         roborock_message = self.build_roborock_message(method, params)
@@ -136,12 +151,8 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         (response, err) = await self._async_response(request_id, response_protocol)
         if err:
             raise CommandVacuumError("", err) from err
-        method = (
-            f"method {roborock_message.get_method()}"
-            if roborock_message.protocol == 4
-            else f"protocol {RoborockMessageProtocol(roborock_message.protocol).name}"
-        )
-        _LOGGER.debug(f"id={request_id} Response from {method}: {response}")
+        if roborock_message.protocol == 4:
+            _LOGGER.debug(f"id={request_id} Response from method {roborock_message.get_method()}: {response}")
         return response
 
     def _send_msg_raw(self, data: bytes):
