@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.18.9 (2023-05-28)
+### Fix
+* Mqtt reconnections ([`462d4e4`](https://github.com/humbertogontijo/python-roborock/commit/462d4e4a30372c143c9198c7008808ca11800af5))
+
 ## v0.18.8 (2023-05-28)
 ### Fix
 * Improve device ping ([`56e4469`](https://github.com/humbertogontijo/python-roborock/commit/56e4469c95ac9255604025df99f0d6ac1940dd19))
