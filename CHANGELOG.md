@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.18.8 (2023-05-28)
+### Fix
+* Improve device ping ([`56e4469`](https://github.com/humbertogontijo/python-roborock/commit/56e4469c95ac9255604025df99f0d6ac1940dd19))
+
 ## v0.18.7 (2023-05-27)
 ### Fix
 * Change e2 fan codes ([#62](https://github.com/humbertogontijo/python-roborock/issues/62)) ([`7231f1e`](https://github.com/humbertogontijo/python-roborock/commit/7231f1efc412f93bfb5719091337536bcb6185d6))
