@@ -254,6 +254,9 @@ class Status(RoborockBase):
     unsave_map_reason: Optional[int] = None
     unsave_map_flag: Optional[int] = None
 
+    def __post_init__(self):
+        self.clean_area = round(self.clean_area / 1000000, 1) if self.clean_area is not None else None
+
 
 @dataclass
 class S4MaxStatus(Status):
@@ -345,6 +348,9 @@ class CleanSummary(RoborockBase):
     dust_collection_count: Optional[int] = None
     records: Optional[list[int]] = None
 
+    def __post_init__(self):
+        self.clean_area = round(self.clean_area / 1000000, 1) if self.clean_area is not None else None
+
 
 @dataclass
 class CleanRecord(RoborockBase):
@@ -361,6 +367,9 @@ class CleanRecord(RoborockBase):
     avoid_count: Optional[int] = None
     wash_count: Optional[int] = None
     map_flag: Optional[int] = None
+
+    def __post_init__(self):
+        self.area = round(self.area / 1000000, 1) if self.area is not None else None
 
 
 @dataclass
