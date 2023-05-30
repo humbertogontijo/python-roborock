@@ -86,7 +86,11 @@ class RoborockBase:
     def as_dict(self) -> dict:
         return asdict(
             self,
-            dict_factory=lambda _fields: {camelize(key): value for (key, value) in _fields if value is not None},
+            dict_factory=lambda _fields: {
+                camelize(key): value.value if isinstance(value, Enum) else value
+                for (key, value) in _fields
+                if value is not None
+            },
         )
 
 

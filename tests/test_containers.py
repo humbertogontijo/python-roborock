@@ -2,6 +2,7 @@ from roborock import CleanRecord, CleanSummary, Consumable, DnDTimer, HomeData, 
 from roborock.code_mappings import (
     RoborockDockErrorCode,
     RoborockDockTypeCode,
+    RoborockEnum,
     RoborockErrorCode,
     RoborockFanSpeedS7MaxV,
     RoborockMopIntensityS7,
@@ -93,6 +94,11 @@ def test_serialize_and_unserialize():
     ud = UserData.from_dict(USER_DATA)
     ud_dict = ud.as_dict()
     assert ud_dict == USER_DATA
+    s7_maxv_status = S7MaxVStatus.from_dict(STATUS)
+    s7_maxv_status_dict = s7_maxv_status.as_dict()
+    assert not isinstance(s7_maxv_status_dict.get("fanPower"), RoborockEnum)
+    s7_maxv_status = S7MaxVStatus.from_dict(s7_maxv_status_dict)
+    assert s7_maxv_status.__dict__ == STATUS
 
 
 def test_consumable():
