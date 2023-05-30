@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.18.10 (2023-05-30)
+### Fix
+* Dict with enum instead of value ([`9653c50`](https://github.com/humbertogontijo/python-roborock/commit/9653c50f31b03ce2d3d21e2042d5c194924f4aca))
+
 ## v0.18.9 (2023-05-28)
 ### Fix
 * Mqtt reconnections ([`462d4e4`](https://github.com/humbertogontijo/python-roborock/commit/462d4e4a30372c143c9198c7008808ca11800af5))
