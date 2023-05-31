@@ -221,6 +221,7 @@ class Status(RoborockBase):
     battery: Optional[int] = None
     clean_time: Optional[int] = None
     clean_area: Optional[float] = None
+    square_meter_clean_area: Optional[float] = None
     error_code: Optional[RoborockErrorCode] = None
     map_present: Optional[int] = None
     in_cleaning: Optional[int] = None
@@ -259,7 +260,7 @@ class Status(RoborockBase):
     unsave_map_flag: Optional[int] = None
 
     def __post_init__(self) -> None:
-        self.clean_area = round(self.clean_area / 1000000, 1) if self.clean_area is not None else None
+        self.square_meter_clean_area = round(self.clean_area / 1000000, 1) if self.clean_area is not None else None
 
 
 @dataclass
@@ -348,12 +349,13 @@ class DnDTimer(RoborockBase):
 class CleanSummary(RoborockBase):
     clean_time: Optional[int] = None
     clean_area: Optional[float] = None
+    square_meter_clean_area: Optional[float] = None
     clean_count: Optional[int] = None
     dust_collection_count: Optional[int] = None
     records: Optional[list[int]] = None
 
     def __post_init__(self) -> None:
-        self.clean_area = round(self.clean_area / 1000000, 1) if self.clean_area is not None else None
+        self.square_meter_clean_area = round(self.clean_area / 1000000, 1) if self.clean_area is not None else None
 
 
 @dataclass
@@ -362,6 +364,7 @@ class CleanRecord(RoborockBase):
     end: Optional[int] = None
     duration: Optional[int] = None
     area: Optional[float] = None
+    square_meter_area: Optional[float] = None
     error: Optional[int] = None
     complete: Optional[int] = None
     start_type: Optional[int] = None
@@ -373,7 +376,7 @@ class CleanRecord(RoborockBase):
     map_flag: Optional[int] = None
 
     def __post_init__(self) -> None:
-        self.area = round(self.area / 1000000, 1) if self.area is not None else None
+        self.square_meter_area = round(self.area / 1000000, 1) if self.area is not None else None
 
 
 @dataclass
