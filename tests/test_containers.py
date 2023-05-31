@@ -114,7 +114,7 @@ def test_status():
     assert s.state == RoborockStateCode.charging
     assert s.battery == 100
     assert s.clean_time == 1176
-    assert s.clean_area == 20965000
+    assert s.clean_area == 21.0
     assert s.error_code == RoborockErrorCode.none
     assert s.map_present == 1
     assert s.in_cleaning == 0
@@ -168,7 +168,7 @@ def test_dnd_timer():
 def test_clean_summary():
     cs = CleanSummary.from_dict(CLEAN_SUMMARY)
     assert cs.clean_time == 74382
-    assert cs.clean_area == 1159182500
+    assert cs.clean_area == 1159.2
     assert cs.clean_count == 31
     assert cs.dust_collection_count == 25
     assert len(cs.records) == 2
@@ -180,7 +180,7 @@ def test_clean_record():
     assert cr.begin == 1672543330
     assert cr.end == 1672544638
     assert cr.duration == 1176
-    assert cr.area == 20965000
+    assert cr.area == 21.0
     assert cr.error == 0
     assert cr.complete == 1
     assert cr.start_type == 2
