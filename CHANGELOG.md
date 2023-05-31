@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.20.0 (2023-05-31)
+### Feature
+* Adds code for duct blockage ([#64](https://github.com/humbertogontijo/python-roborock/issues/64)) ([`84dd5fb`](https://github.com/humbertogontijo/python-roborock/commit/84dd5fbdefebe4b33c6bae6879137847522b1bfb))
+
 ## v0.19.0 (2023-05-31)
 ### Feature
 * Moving clean area to api ([#63](https://github.com/humbertogontijo/python-roborock/issues/63)) ([`7ade218`](https://github.com/humbertogontijo/python-roborock/commit/7ade218e3efd44159c6ad40cd88933385bbd1496))
