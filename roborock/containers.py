@@ -216,7 +216,7 @@ class Status(RoborockBase):
     state: Optional[RoborockStateCode] = None
     battery: Optional[int] = None
     clean_time: Optional[int] = None
-    clean_area: Optional[int] = None
+    clean_area: Optional[float] = None
     error_code: Optional[RoborockErrorCode] = None
     map_present: Optional[int] = None
     in_cleaning: Optional[int] = None
@@ -254,7 +254,7 @@ class Status(RoborockBase):
     unsave_map_reason: Optional[int] = None
     unsave_map_flag: Optional[int] = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.clean_area = round(self.clean_area / 1000000, 1) if self.clean_area is not None else None
 
 
@@ -343,12 +343,12 @@ class DnDTimer(RoborockBase):
 @dataclass
 class CleanSummary(RoborockBase):
     clean_time: Optional[int] = None
-    clean_area: Optional[int] = None
+    clean_area: Optional[float] = None
     clean_count: Optional[int] = None
     dust_collection_count: Optional[int] = None
     records: Optional[list[int]] = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.clean_area = round(self.clean_area / 1000000, 1) if self.clean_area is not None else None
 
 
@@ -357,7 +357,7 @@ class CleanRecord(RoborockBase):
     begin: Optional[int] = None
     end: Optional[int] = None
     duration: Optional[int] = None
-    area: Optional[int] = None
+    area: Optional[float] = None
     error: Optional[int] = None
     complete: Optional[int] = None
     start_type: Optional[int] = None
@@ -368,7 +368,7 @@ class CleanRecord(RoborockBase):
     wash_count: Optional[int] = None
     map_flag: Optional[int] = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.area = round(self.area / 1000000, 1) if self.area is not None else None
 
 
@@ -387,7 +387,7 @@ class Consumable(RoborockBase):
     filter_time_left: Optional[int] = None
     sensor_time_left: Optional[int] = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.main_brush_time_left = (
             MAIN_BRUSH_REPLACE_TIME - self.main_brush_work_time if self.main_brush_work_time is not None else None
         )
