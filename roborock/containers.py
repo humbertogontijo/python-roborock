@@ -220,7 +220,7 @@ class Status(RoborockBase):
     state: Optional[RoborockStateCode] = None
     battery: Optional[int] = None
     clean_time: Optional[int] = None
-    clean_area: Optional[float] = None
+    clean_area: Optional[int] = None
     square_meter_clean_area: Optional[float] = None
     error_code: Optional[RoborockErrorCode] = None
     map_present: Optional[int] = None
@@ -348,7 +348,7 @@ class DnDTimer(RoborockBase):
 @dataclass
 class CleanSummary(RoborockBase):
     clean_time: Optional[int] = None
-    clean_area: Optional[float] = None
+    clean_area: Optional[int] = None
     square_meter_clean_area: Optional[float] = None
     clean_count: Optional[int] = None
     dust_collection_count: Optional[int] = None
@@ -363,7 +363,7 @@ class CleanRecord(RoborockBase):
     begin: Optional[int] = None
     end: Optional[int] = None
     duration: Optional[int] = None
-    area: Optional[float] = None
+    area: Optional[int] = None
     square_meter_area: Optional[float] = None
     error: Optional[int] = None
     complete: Optional[int] = None
