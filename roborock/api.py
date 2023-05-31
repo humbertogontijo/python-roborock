@@ -200,7 +200,7 @@ class RoborockClient:
         secured=False,
     ):
         timestamp = math.floor(time.time())
-        request_id = randint(10000, 99999)
+        request_id = randint(10000, 32767)
         inner = {
             "id": request_id,
             "method": method,
