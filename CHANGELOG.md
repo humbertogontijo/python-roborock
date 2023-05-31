@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.19.0 (2023-05-31)
+### Feature
+* Moving clean area to api ([#63](https://github.com/humbertogontijo/python-roborock/issues/63)) ([`7ade218`](https://github.com/humbertogontijo/python-roborock/commit/7ade218e3efd44159c6ad40cd88933385bbd1496))
+
 ## v0.18.10 (2023-05-30)
 ### Fix
 * Dict with enum instead of value ([`9653c50`](https://github.com/humbertogontijo/python-roborock/commit/9653c50f31b03ce2d3d21e2042d5c194924f4aca))
