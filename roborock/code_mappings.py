@@ -222,6 +222,7 @@ class RoborockDockErrorCode(RoborockEnum):
     ok = 0
     water_empty = 38
     waste_water_tank_full = 39
+    duct_blockage = 34
 
 
 class RoborockDockTypeCode(RoborockEnum):
