@@ -32,8 +32,7 @@ ROBOROCK_E2 = "roborock.vacuum.e2"
 ROBOROCK_1S = "roborock.vacuum.m1s"
 ROBOROCK_C1 = "roborock.vacuum.c1"
 ROBOROCK_S8_PRO_ULTRA = "roborock.vacuum.a70"
-ROBOROCK_S8 = "roborock.vacuum.a60"  # CHECK THIS
-ROBOROCK_WILD = "roborock.vacuum.*"  # wildcard
+ROBOROCK_S8 = "roborock.vacuum.a51"
 
 SUPPORTED_VACUUMS = (
     [  # These are the devices that show up when you add a device - more could be supported and just not show up

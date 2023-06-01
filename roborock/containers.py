@@ -475,6 +475,11 @@ class RoomMapping(RoborockBase):
 
 
 @dataclass
+class ChildLockStatus(RoborockBase):
+    lock_status: int
+
+
+@dataclass
 class BroadcastMessage(RoborockBase):
     duid: str
     ip: str

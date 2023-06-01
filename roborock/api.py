@@ -19,6 +19,7 @@ import aiohttp
 
 from .code_mappings import RoborockDockTypeCode
 from .containers import (
+    ChildLockStatus,
     CleanRecord,
     CleanSummary,
     Consumable,
@@ -368,6 +369,19 @@ class RoborockClient:
                 for segment_id, iot_id in [unpack_list(room, 2) for room in mapping if isinstance(room, list)]
             ]
         return None
+
+    @fallback_cache
+    async def get_child_lock_status(self) -> ChildLockStatus | None:
+        """Gets current child lock status."""
+        child_lock_status = await self.send_command(RoborockCommand.GET_CHILD_LOCK_STATUS)
+        if isinstance(child_lock_status, dict):
+            return ChildLockStatus.from_dict(child_lock_status)
+        return None
+
+    @fallback_cache
+    async def get_sound_volume(self) -> int | None:
+        """Gets current volume level."""
+        return await self.send_command(RoborockCommand.GET_SOUND_VOLUME)
 
 
 class RoborockApiClient:
