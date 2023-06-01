@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.20.1 (2023-06-01)
+### Fix
+* S8 model name and adding api methods get_child_lock_status and get_sound_volume ([`a3b7cee`](https://github.com/humbertogontijo/python-roborock/commit/a3b7cee63a70746ac3db5e5cee37c5b507b99478))
+
 ## v0.20.0 (2023-05-31)
 ### Feature
 * Adds code for duct blockage ([#64](https://github.com/humbertogontijo/python-roborock/issues/64)) ([`84dd5fb`](https://github.com/humbertogontijo/python-roborock/commit/84dd5fbdefebe4b33c6bae6879137847522b1bfb))
