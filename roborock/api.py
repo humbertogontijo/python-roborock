@@ -59,6 +59,7 @@ KEEPALIVE = 60
 QUEUE_TIMEOUT = 4
 COMMANDS_SECURED = [
     RoborockCommand.GET_MAP_V1,
+    RoborockCommand.GET_MULTI_MAP,
 ]
 
 
@@ -149,7 +150,7 @@ class RoborockClient:
                                     queue.resolve((result, None))
                 elif data.payload and protocol == 301:
                     payload = data.payload[0:24]
-                    [endpoint, _, request_id, _] = struct.unpack("<15sBH6s", payload)
+                    [endpoint, _, request_id, _] = struct.unpack("<8s8sH6s", payload)
                     if endpoint.decode().startswith(self._endpoint):
                         decrypted = Utils.decrypt_cbc(data.payload[24:], self._nonce)
                         decompressed = Utils.decompress(decrypted)

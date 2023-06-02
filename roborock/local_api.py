@@ -12,7 +12,7 @@ from .api import COMMANDS_SECURED, QUEUE_TIMEOUT, RoborockClient
 from .exceptions import CommandVacuumError, RoborockConnectionException, RoborockException
 from .protocol import MessageParser
 from .roborock_message import RoborockMessage, RoborockMessageProtocol
-from .roborock_typing import CommandInfoMap, RoborockCommand
+from .roborock_typing import RoborockCommand
 from .util import get_running_loop_or_create_one
 
 _LOGGER = logging.getLogger(__name__)
@@ -87,12 +87,6 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         secured = True if method in COMMANDS_SECURED else False
         request_id, timestamp, payload = self._get_payload(method, params, secured)
         _LOGGER.debug(f"id={request_id} Requesting method {method} with {params}")
-        command_info = CommandInfoMap.get(method)
-        if not command_info:
-            raise RoborockException(f"Request {method} have unknown prefix. Can't execute in offline mode")
-        command = CommandInfoMap.get(method)
-        if command is None:
-            raise RoborockException(f"No prefix found for {method}")
         request_protocol = 4
         return RoborockMessage(
             timestamp=timestamp,

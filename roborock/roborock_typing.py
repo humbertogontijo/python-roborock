@@ -127,6 +127,16 @@ class RoborockCommand(str, Enum):
     UPD_SERVER_TIMER = "upd_server_timer"
 
 
+CacheableCommands = [
+    attribute
+    for attribute in [
+        command.removeprefix("get_").removeprefix("set_").removeprefix("change_").upper() for command in RoborockCommand
+    ]
+    if "GET_" + attribute in RoborockCommand.__members__
+    and ("SET_" + attribute in RoborockCommand.__members__ or "CHANGE_" + attribute in RoborockCommand.__members__)
+]
+
+
 @dataclass
 class CommandInfo:
     params: Optional[list | dict] = None

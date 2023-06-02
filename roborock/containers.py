@@ -15,7 +15,6 @@ from .code_mappings import (
     RoborockDockWashTowelModeCode,
     RoborockErrorCode,
     RoborockFanPowerCode,
-    RoborockFanSpeedE2,
     RoborockFanSpeedQ7Max,
     RoborockFanSpeedS6Pure,
     RoborockFanSpeedS7,
@@ -284,8 +283,8 @@ class Q7MaxStatus(Status):
 
 @dataclass
 class S6MaxVStatus(Status):
-    fan_power: Optional[RoborockFanSpeedE2] = None
-    water_box_mode: Optional[RoborockMopIntensityV2] = None
+    fan_power: Optional[RoborockFanSpeedS7MaxV] = None
+    water_box_mode: Optional[RoborockMopIntensityS7] = None
 
 
 @dataclass

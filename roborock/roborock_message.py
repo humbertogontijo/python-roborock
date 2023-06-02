@@ -28,8 +28,7 @@ class RoborockMessage:
     timestamp: int = math.floor(time.time())
 
     def get_request_id(self) -> int | None:
-        protocol = self.protocol
-        if self.payload and protocol in [4, 101, 102]:
+        if self.payload:
             payload = json.loads(self.payload.decode())
             for data_point_number, data_point in payload.get("dps").items():
                 if data_point_number in ["101", "102"]:
