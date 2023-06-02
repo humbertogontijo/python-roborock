@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.20.2 (2023-06-02)
+### Fix
+* S6MaxVStatus and minor changes ([`01f84ae`](https://github.com/humbertogontijo/python-roborock/commit/01f84ae741dd3c9fa3bc5932b718abebcc8e3f0f))
+
 ## v0.20.1 (2023-06-01)
 ### Fix
 * S8 model name and adding api methods get_child_lock_status and get_sound_volume ([`a3b7cee`](https://github.com/humbertogontijo/python-roborock/commit/a3b7cee63a70746ac3db5e5cee37c5b507b99478))
