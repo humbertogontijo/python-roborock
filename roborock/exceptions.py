@@ -28,6 +28,9 @@ class CommandVacuumError(RoborockException):
         self.message = f"{command}: {str(vacuum_error)}"
         super().__init__(self.message)
 
+class UnknownMethodError(RoborockException):
+    """Class for an invalid method being sent."""
+
 
 class RoborockAccountDoesNotExist(RoborockException):
     """Class for Roborock account does not exist exceptions."""

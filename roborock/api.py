@@ -36,6 +36,7 @@ from .containers import (
     Status,
     UserData,
     WashTowelMode,
+    ValleyElectricityTimer,
 )
 from .exceptions import (
     RoborockAccountDoesNotExist,
@@ -47,6 +48,7 @@ from .exceptions import (
     RoborockTimeout,
     RoborockUrlException,
     VacuumError,
+    UnknownMethodError,
 )
 from .protocol import Utils
 from .roborock_future import RoborockFuture
@@ -189,6 +191,8 @@ class RoborockClient:
             queue = RoborockFuture(protocol_id)
             self._waiting_queue[request_id] = queue
             (response, err) = await queue.async_get(QUEUE_TIMEOUT)
+            if response == "unknown_method":
+                raise UnknownMethodError(f"Unknown method")
             return response, err
         except (asyncio.TimeoutError, asyncio.CancelledError):
             raise RoborockTimeout(f"id={request_id} Timeout after {QUEUE_TIMEOUT} seconds") from None
@@ -242,6 +246,13 @@ class RoborockClient:
         dnd_timer = await self.send_command(RoborockCommand.GET_DND_TIMER)
         if isinstance(dnd_timer, dict):
             return DnDTimer.from_dict(dnd_timer)
+        return None
+
+    @fallback_cache
+    async def get_valley_electricity_timer(self) -> ValleyElectricityTimer | None:
+        valley_electricity_timer = await self.send_command(RoborockCommand.GET_VALLEY_ELECTRICITY_TIMER)
+        if isinstance(valley_electricity_timer, dict):
+            return ValleyElectricityTimer.from_dict(valley_electricity_timer)
         return None
 
     @fallback_cache
