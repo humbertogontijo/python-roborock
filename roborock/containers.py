@@ -347,8 +347,15 @@ class DnDTimer(RoborockBase):
     end_time: Optional[time] = None
 
     def __post_init__(self) -> None:
-        self.start_time = time(hour=self.start_hour, minute=self.start_minute)
-        self.end_time = time(hour=self.end_hour, minute=self.end_minute)
+        self.start_time = (
+            time(hour=self.start_hour, minute=self.start_minute) if self.start_hour and self.start_minute else None
+        )
+        self.end_time = (
+            time(hour=self.end_hour, minute=self.end_minute)
+            if self.end_hour is not None and self.end_minute is not None
+            else None
+        )
+
 
 @dataclass
 class ValleyElectricityTimer(RoborockBase):
@@ -361,8 +368,14 @@ class ValleyElectricityTimer(RoborockBase):
     end_time: Optional[time] = None
 
     def __post_init__(self) -> None:
-        self.start_time = time(hour=self.start_hour, minute=self.start_minute)
-        self.end_time = time(hour=self.end_hour, minute=self.end_minute)
+        self.start_time = (
+            time(hour=self.start_hour, minute=self.start_minute) if self.start_hour and self.start_minute else None
+        )
+        self.end_time = (
+            time(hour=self.end_hour, minute=self.end_minute)
+            if self.end_hour is not None and self.end_minute is not None
+            else None
+        )
 
 
 @dataclass

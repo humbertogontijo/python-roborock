@@ -28,6 +28,7 @@ class CommandVacuumError(RoborockException):
         self.message = f"{command}: {str(vacuum_error)}"
         super().__init__(self.message)
 
+
 class UnknownMethodError(RoborockException):
     """Class for an invalid method being sent."""
 

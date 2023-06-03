@@ -35,8 +35,8 @@ from .containers import (
     SmartWashParams,
     Status,
     UserData,
-    WashTowelMode,
     ValleyElectricityTimer,
+    WashTowelMode,
 )
 from .exceptions import (
     RoborockAccountDoesNotExist,
@@ -47,8 +47,8 @@ from .exceptions import (
     RoborockNoUserAgreement,
     RoborockTimeout,
     RoborockUrlException,
-    VacuumError,
     UnknownMethodError,
+    VacuumError,
 )
 from .protocol import Utils
 from .roborock_future import RoborockFuture
@@ -192,7 +192,7 @@ class RoborockClient:
             self._waiting_queue[request_id] = queue
             (response, err) = await queue.async_get(QUEUE_TIMEOUT)
             if response == "unknown_method":
-                raise UnknownMethodError(f"Unknown method")
+                raise UnknownMethodError("Unknown method")
             return response, err
         except (asyncio.TimeoutError, asyncio.CancelledError):
             raise RoborockTimeout(f"id={request_id} Timeout after {QUEUE_TIMEOUT} seconds") from None
