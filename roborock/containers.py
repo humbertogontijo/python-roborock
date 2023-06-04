@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 import re
 from dataclasses import asdict, dataclass
+from datetime import time
 from enum import Enum
 from typing import Any, Optional, Type
 
@@ -342,6 +343,39 @@ class DnDTimer(RoborockBase):
     end_hour: Optional[int] = None
     end_minute: Optional[int] = None
     enabled: Optional[int] = None
+    start_time: Optional[time] = None
+    end_time: Optional[time] = None
+
+    def __post_init__(self) -> None:
+        self.start_time = (
+            time(hour=self.start_hour, minute=self.start_minute) if self.start_hour and self.start_minute else None
+        )
+        self.end_time = (
+            time(hour=self.end_hour, minute=self.end_minute)
+            if self.end_hour is not None and self.end_minute is not None
+            else None
+        )
+
+
+@dataclass
+class ValleyElectricityTimer(RoborockBase):
+    start_hour: Optional[int] = None
+    start_minute: Optional[int] = None
+    end_hour: Optional[int] = None
+    end_minute: Optional[int] = None
+    enabled: Optional[int] = None
+    start_time: Optional[time] = None
+    end_time: Optional[time] = None
+
+    def __post_init__(self) -> None:
+        self.start_time = (
+            time(hour=self.start_hour, minute=self.start_minute) if self.start_hour and self.start_minute else None
+        )
+        self.end_time = (
+            time(hour=self.end_hour, minute=self.end_minute)
+            if self.end_hour is not None and self.end_minute is not None
+            else None
+        )
 
 
 @dataclass
