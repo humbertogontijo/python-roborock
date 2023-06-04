@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.21.0 (2023-06-04)
+### Feature
+* Add time datetime for valley ([#65](https://github.com/humbertogontijo/python-roborock/issues/65)) ([`c965862`](https://github.com/humbertogontijo/python-roborock/commit/c965862f5b8b1f4dfbc83738cdebc1e11122c387))
+
 ## v0.20.2 (2023-06-02)
 ### Fix
 * S6MaxVStatus and minor changes ([`01f84ae`](https://github.com/humbertogontijo/python-roborock/commit/01f84ae741dd3c9fa3bc5932b718abebcc8e3f0f))
