@@ -34,7 +34,10 @@ def parse_time_to_datetime(
         hour=end_time.hour, minute=end_time.minute, second=0, microsecond=0
     )
 
-    if end_datetime < datetime.datetime.now(DEFAULT_TIME_ZONE):
+    now = datetime.datetime.now(DEFAULT_TIME_ZONE)
+    if start_datetime > now > end_datetime:
+        end_datetime += datetime.timedelta(days=1)
+    elif end_datetime < now:
         start_datetime += datetime.timedelta(days=1)
         end_datetime += datetime.timedelta(days=1)
 
