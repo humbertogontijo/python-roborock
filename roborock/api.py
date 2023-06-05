@@ -373,10 +373,7 @@ class RoborockClient:
     @fallback_cache
     async def get_flow_led_status(self) -> FlowLedStatus | None:
         """Gets current flow led status."""
-        flow_led_status = await self.send_command(RoborockCommand.GET_FLOW_LED_STATUS)
-        if isinstance(flow_led_status, dict):
-            return FlowLedStatus.from_dict(flow_led_status)
-        return None
+        return await self.send_command(RoborockCommand.GET_FLOW_LED_STATUS, return_type=FlowLedStatus)
 
     @fallback_cache
     async def get_sound_volume(self) -> int | None:
