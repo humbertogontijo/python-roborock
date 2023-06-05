@@ -12,7 +12,7 @@ def validate(start: datetime.datetime, end: datetime.datetime) -> bool:
 
 
 # start_date < now < end_date
-def test_start_date_lower_than_end_date_lower_than_now():
+def test_start_date_lower_than_now_lower_than_end_date():
     start, end = parse_time_to_datetime(
         (datetime.datetime.now() - datetime.timedelta(hours=2)).time(),
         (datetime.datetime.now() - datetime.timedelta(hours=1)).time(),
