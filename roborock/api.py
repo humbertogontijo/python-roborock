@@ -26,6 +26,7 @@ from .containers import (
     DeviceData,
     DnDTimer,
     DustCollectionMode,
+    FlowLedStatus,
     HomeData,
     ModelStatus,
     MultiMapsList,
@@ -101,9 +102,14 @@ class RoborockClient:
         self._last_device_msg_in = self.time_func()
         self._last_disconnection = self.time_func()
         self.keep_alive = KEEPALIVE
+        self._diagnostic_data: dict[str, dict[str, Any]] = {}
 
     def __del__(self) -> None:
         self.sync_disconnect()
+
+    @property
+    def diagnostic_data(self) -> dict:
+        return self._diagnostic_data
 
     @property
     def time_func(self) -> Callable[[], float]:
@@ -363,6 +369,11 @@ class RoborockClient:
     async def get_child_lock_status(self) -> ChildLockStatus | None:
         """Gets current child lock status."""
         return await self.send_command(RoborockCommand.GET_CHILD_LOCK_STATUS, return_type=ChildLockStatus)
+
+    @fallback_cache
+    async def get_flow_led_status(self) -> FlowLedStatus | None:
+        """Gets current flow led status."""
+        return await self.send_command(RoborockCommand.GET_FLOW_LED_STATUS, return_type=FlowLedStatus)
 
     @fallback_cache
     async def get_sound_volume(self) -> int | None:

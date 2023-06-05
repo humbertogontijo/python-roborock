@@ -10,6 +10,7 @@ from .containers import (
     Consumable,
     DnDTimer,
     DustCollectionMode,
+    RoborockBase,
     SmartWashParams,
     Status,
     WashTowelMode,
@@ -301,14 +302,14 @@ CommandInfoMap: dict[RoborockCommand | None, CommandInfo] = {
 
 
 @dataclass
-class DockSummary:
+class DockSummary(RoborockBase):
     dust_collection_mode: Optional[DustCollectionMode] = None
     wash_towel_mode: Optional[WashTowelMode] = None
     smart_wash_params: Optional[SmartWashParams] = None
 
 
 @dataclass
-class DeviceProp:
+class DeviceProp(RoborockBase):
     status: Optional[Status] = None
     dnd_timer: Optional[DnDTimer] = None
     clean_summary: Optional[CleanSummary] = None

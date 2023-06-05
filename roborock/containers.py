@@ -506,6 +506,11 @@ class ChildLockStatus(RoborockBase):
 
 
 @dataclass
+class FlowLedStatus(RoborockBase):
+    status: int
+
+
+@dataclass
 class BroadcastMessage(RoborockBase):
     duid: str
     ip: str
