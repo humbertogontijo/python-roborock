@@ -136,7 +136,7 @@ async def command(ctx, cmd, device_id, params):
         raise RoborockException(f"Could not find model for device {device.name}")
     device_info = DeviceData(device=device, model=model)
     mqtt_client = RoborockMqttClient(login_data.user_data, device_info)
-    await mqtt_client.send_command(cmd, params)
+    await mqtt_client.send_command(cmd, json.loads(params) if params is not None else None)
     mqtt_client.__del__()
 
 
