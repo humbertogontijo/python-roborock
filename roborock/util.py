@@ -4,10 +4,10 @@ import asyncio
 import datetime
 import functools
 from asyncio import AbstractEventLoop
-from typing import Callable, Coroutine, Optional, TypeVar
+from typing import Callable, Coroutine, Optional, Tuple, TypeVar
 
 T = TypeVar("T")
-DEFAULT_TIME_ZONE: datetime.tzinfo = datetime.timezone.utc
+DEFAULT_TIME_ZONE: Optional[datetime.tzinfo] = datetime.datetime.now().astimezone().tzinfo
 
 
 def unpack_list(value: list[T], size: int) -> list[Optional[T]]:
@@ -23,16 +23,22 @@ def get_running_loop_or_create_one() -> AbstractEventLoop:
     return loop
 
 
-def parse_time_to_datetime(initial_time: datetime.time) -> datetime.datetime:
+def parse_time_to_datetime(
+    start_time: datetime.time, end_time: datetime.time
+) -> Tuple[datetime.datetime, datetime.datetime]:
     """Help to handle time data."""
-    time = datetime.datetime.now(DEFAULT_TIME_ZONE).replace(
-        hour=initial_time.hour, minute=initial_time.minute, second=0, microsecond=0
+    start_datetime = datetime.datetime.now(DEFAULT_TIME_ZONE).replace(
+        hour=start_time.hour, minute=start_time.minute, second=0, microsecond=0
+    )
+    end_datetime = datetime.datetime.now(DEFAULT_TIME_ZONE).replace(
+        hour=end_time.hour, minute=end_time.minute, second=0, microsecond=0
     )
 
-    if time < datetime.datetime.now(DEFAULT_TIME_ZONE):
-        time += datetime.timedelta(days=1)
+    if end_datetime < datetime.datetime.now(DEFAULT_TIME_ZONE):
+        start_datetime += datetime.timedelta(days=1)
+        end_datetime += datetime.timedelta(days=1)
 
-    return time
+    return start_datetime, end_datetime
 
 
 def run_sync():

@@ -107,15 +107,16 @@ class RoborockBaseTimer(RoborockBase):
     end_time: Optional[datetime.datetime] = None
 
     def __post_init__(self) -> None:
-        self.start_time = (
-            parse_time_to_datetime(datetime.time(hour=self.start_hour, minute=self.start_minute))
-            if self.start_hour is not None and self.start_minute is not None
-            else None
-        )
-        self.end_time = (
-            parse_time_to_datetime(datetime.time(hour=self.end_hour, minute=self.end_minute))
-            if self.end_hour is not None and self.end_minute is not None
-            else None
+        self.start_time, self.end_time = (
+            parse_time_to_datetime(
+                datetime.time(hour=self.start_hour, minute=self.start_minute),
+                datetime.time(hour=self.end_hour, minute=self.end_minute),
+            )
+            if self.start_hour is not None
+            and self.start_minute is not None
+            and self.end_hour is not None
+            and self.end_minute is not None
+            else (None, None)
         )
 
 
