@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v0.23.0 (2023-06-05)
+### Feature
+* Add diagnostic data and extra containers ([#67](https://github.com/humbertogontijo/python-roborock/issues/67)) ([`59ef6f4`](https://github.com/humbertogontijo/python-roborock/commit/59ef6f4d5366859ba5d02ba66ec1aa2288564179))
+
+### Fix
+* Merging timer entities ([`22ff7f4`](https://github.com/humbertogontijo/python-roborock/commit/22ff7f451166bcfda360552e92d661d0520886ae))
+
 ## v0.22.0 (2023-06-05)
 ### Feature
 * Adding type cast for send_command ([`4a0b709`](https://github.com/humbertogontijo/python-roborock/commit/4a0b70997080012e3059150da2b12fb47f6ef43a))
