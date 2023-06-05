@@ -80,8 +80,9 @@ class RoborockBase:
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]):
-        ignore_keys = cls._ignore_keys
-        return from_dict(cls, decamelize_obj(data, ignore_keys), config=Config(cast=[Enum]))
+        if isinstance(data, dict):
+            ignore_keys = cls._ignore_keys
+            return from_dict(cls, decamelize_obj(data, ignore_keys), config=Config(cast=[Enum]))
 
     def as_dict(self) -> dict:
         return asdict(
@@ -348,7 +349,9 @@ class DnDTimer(RoborockBase):
 
     def __post_init__(self) -> None:
         self.start_time = (
-            time(hour=self.start_hour, minute=self.start_minute) if self.start_hour and self.start_minute else None
+            time(hour=self.start_hour, minute=self.start_minute)
+            if self.start_hour is not None and self.start_minute is not None
+            else None
         )
         self.end_time = (
             time(hour=self.end_hour, minute=self.end_minute)
@@ -369,7 +372,9 @@ class ValleyElectricityTimer(RoborockBase):
 
     def __post_init__(self) -> None:
         self.start_time = (
-            time(hour=self.start_hour, minute=self.start_minute) if self.start_hour and self.start_minute else None
+            time(hour=self.start_hour, minute=self.start_minute)
+            if self.start_hour is not None and self.start_minute is not None
+            else None
         )
         self.end_time = (
             time(hour=self.end_hour, minute=self.end_minute)
