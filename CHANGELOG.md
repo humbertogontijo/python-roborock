@@ -2,6 +2,14 @@
 
 <!--next-version-placeholder-->
 
+## v0.22.0 (2023-06-05)
+### Feature
+* Adding type cast for send_command ([`4a0b709`](https://github.com/humbertogontijo/python-roborock/commit/4a0b70997080012e3059150da2b12fb47f6ef43a))
+
+## v0.21.1 (2023-06-05)
+### Fix
+* Cli json serializing ([#66](https://github.com/humbertogontijo/python-roborock/issues/66)) ([`ab13b53`](https://github.com/humbertogontijo/python-roborock/commit/ab13b53a15822067112edda285c6feddf389a8b8))
+
 ## v0.21.0 (2023-06-04)
 ### Feature
 * Add time datetime for valley ([#65](https://github.com/humbertogontijo/python-roborock/issues/65)) ([`c965862`](https://github.com/humbertogontijo/python-roborock/commit/c965862f5b8b1f4dfbc83738cdebc1e11122c387))

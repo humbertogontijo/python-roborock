@@ -5,12 +5,12 @@ import logging
 import threading
 import uuid
 from asyncio import Lock
-from typing import Optional
+from typing import Optional, Type
 from urllib.parse import urlparse
 
 import paho.mqtt.client as mqtt
 
-from .api import COMMANDS_SECURED, KEEPALIVE, RoborockClient, md5hex
+from .api import COMMANDS_SECURED, KEEPALIVE, RT, RoborockClient, md5hex
 from .containers import DeviceData, UserData
 from .exceptions import CommandVacuumError, RoborockException, VacuumError
 from .protocol import MessageParser, Utils
@@ -149,7 +149,12 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
         if info.rc != mqtt.MQTT_ERR_SUCCESS:
             raise RoborockException(f"Failed to publish ({mqtt.error_string(info.rc)})")
 
-    async def send_command(self, method: RoborockCommand, params: Optional[list | dict] = None):
+    async def send_command(
+        self,
+        method: RoborockCommand,
+        params: Optional[list | dict] = None,
+        return_type: Optional[Type[RT]] = None,
+    ):
         await self.validate_connection()
         request_id, timestamp, payload = super()._get_payload(method, params, True)
         _LOGGER.debug(f"id={request_id} Requesting method {method} with {params}")
@@ -167,11 +172,9 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
             _LOGGER.debug(f"id={request_id} Response from {method}: {len(response)} bytes")
         else:
             _LOGGER.debug(f"id={request_id} Response from {method}: {response}")
+        if return_type:
+            return return_type.from_dict(response)
         return response
 
     async def get_map_v1(self):
-        try:
-            return await self.send_command(RoborockCommand.GET_MAP_V1)
-        except RoborockException as e:
-            _LOGGER.error(e)
-        return None
+        return await self.send_command(RoborockCommand.GET_MAP_V1)
