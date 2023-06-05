@@ -160,6 +160,11 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
         msg = MessageParser.build(roborock_message, local_key, False)
         self._send_msg_raw(msg)
         (response, err) = await self._async_response(request_id, response_protocol)
+        self._diagnostic_data[method.name] = {
+            "params": params,
+            "response": response,
+            "error": err
+        }
         if err:
             raise CommandVacuumError(method, err) from err
         if response_protocol == 301:

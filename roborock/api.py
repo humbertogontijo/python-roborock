@@ -37,6 +37,7 @@ from .containers import (
     UserData,
     ValleyElectricityTimer,
     WashTowelMode,
+    FlowLedStatus,
 )
 from .exceptions import (
     RoborockAccountDoesNotExist,
@@ -99,9 +100,14 @@ class RoborockClient:
         self._last_device_msg_in = self.time_func()
         self._last_disconnection = self.time_func()
         self.keep_alive = KEEPALIVE
+        self._diagnostic_data = {}
 
     def __del__(self) -> None:
         self.sync_disconnect()
+
+    @property
+    def diagnostic_data(self) -> dict:
+        return self._diagnostic_data
 
     @property
     def time_func(self) -> Callable[[], float]:
@@ -388,6 +394,14 @@ class RoborockClient:
         child_lock_status = await self.send_command(RoborockCommand.GET_CHILD_LOCK_STATUS)
         if isinstance(child_lock_status, dict):
             return ChildLockStatus.from_dict(child_lock_status)
+        return None
+
+    @fallback_cache
+    async def get_flow_led_status(self) -> FlowLedStatus | None:
+        """Gets current flow led status."""
+        flow_led_status = await self.send_command(RoborockCommand.GET_FLOW_LED_STATUS)
+        if isinstance(flow_led_status, dict):
+            return FlowLedStatus.from_dict(flow_led_status)
         return None
 
     @fallback_cache
