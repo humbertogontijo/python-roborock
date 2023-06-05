@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import asyncio
+import datetime
 import functools
 from asyncio import AbstractEventLoop
 from typing import Callable, Coroutine, Optional, TypeVar
 
 T = TypeVar("T")
+DEFAULT_TIME_ZONE: datetime.tzinfo = datetime.timezone.utc
 
 
 def unpack_list(value: list[T], size: int) -> list[Optional[T]]:
@@ -19,6 +21,18 @@ def get_running_loop_or_create_one() -> AbstractEventLoop:
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
     return loop
+
+
+def parse_time_to_datetime(initial_time: datetime.time) -> datetime.datetime:
+    """Help to handle time data."""
+    time = datetime.datetime.now(DEFAULT_TIME_ZONE).replace(
+        hour=initial_time.hour, minute=initial_time.minute, second=0, microsecond=0
+    )
+
+    if time < datetime.datetime.now(DEFAULT_TIME_ZONE):
+        time += datetime.timedelta(days=1)
+
+    return time
 
 
 def run_sync():

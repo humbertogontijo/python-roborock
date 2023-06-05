@@ -1,9 +1,9 @@
 from __future__ import annotations
 
+import datetime
 import logging
 import re
 from dataclasses import asdict, dataclass
-from datetime import time
 from enum import Enum
 from typing import Any, Optional, Type
 
@@ -45,6 +45,7 @@ from .const import (
     SENSOR_DIRTY_REPLACE_TIME,
     SIDE_BRUSH_REPLACE_TIME,
 )
+from .util import parse_time_to_datetime
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -92,6 +93,29 @@ class RoborockBase:
                 for (key, value) in _fields
                 if value is not None
             },
+        )
+
+
+@dataclass
+class RoborockBaseTimer(RoborockBase):
+    start_hour: Optional[int] = None
+    start_minute: Optional[int] = None
+    end_hour: Optional[int] = None
+    end_minute: Optional[int] = None
+    enabled: Optional[int] = None
+    start_time: Optional[datetime.datetime] = None
+    end_time: Optional[datetime.datetime] = None
+
+    def __post_init__(self) -> None:
+        self.start_time = (
+            parse_time_to_datetime(datetime.time(hour=self.start_hour, minute=self.start_minute))
+            if self.start_hour is not None and self.start_minute is not None
+            else None
+        )
+        self.end_time = (
+            parse_time_to_datetime(datetime.time(hour=self.end_hour, minute=self.end_minute))
+            if self.end_hour is not None and self.end_minute is not None
+            else None
         )
 
 
@@ -338,49 +362,13 @@ ModelStatus: dict[str, Type[Status]] = {
 
 
 @dataclass
-class DnDTimer(RoborockBase):
-    start_hour: Optional[int] = None
-    start_minute: Optional[int] = None
-    end_hour: Optional[int] = None
-    end_minute: Optional[int] = None
-    enabled: Optional[int] = None
-    start_time: Optional[time] = None
-    end_time: Optional[time] = None
-
-    def __post_init__(self) -> None:
-        self.start_time = (
-            time(hour=self.start_hour, minute=self.start_minute)
-            if self.start_hour is not None and self.start_minute is not None
-            else None
-        )
-        self.end_time = (
-            time(hour=self.end_hour, minute=self.end_minute)
-            if self.end_hour is not None and self.end_minute is not None
-            else None
-        )
+class DnDTimer(RoborockBaseTimer):
+    """DnDTimer"""
 
 
 @dataclass
-class ValleyElectricityTimer(RoborockBase):
-    start_hour: Optional[int] = None
-    start_minute: Optional[int] = None
-    end_hour: Optional[int] = None
-    end_minute: Optional[int] = None
-    enabled: Optional[int] = None
-    start_time: Optional[time] = None
-    end_time: Optional[time] = None
-
-    def __post_init__(self) -> None:
-        self.start_time = (
-            time(hour=self.start_hour, minute=self.start_minute)
-            if self.start_hour is not None and self.start_minute is not None
-            else None
-        )
-        self.end_time = (
-            time(hour=self.end_hour, minute=self.end_minute)
-            if self.end_hour is not None and self.end_minute is not None
-            else None
-        )
+class ValleyElectricityTimer(RoborockBaseTimer):
+    """ValleyElectricityTimer"""
 
 
 @dataclass
