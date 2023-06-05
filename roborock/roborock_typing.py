@@ -10,6 +10,7 @@ from .containers import (
     Consumable,
     DnDTimer,
     DustCollectionMode,
+    RoborockBase,
     SmartWashParams,
     Status,
     WashTowelMode,
@@ -301,23 +302,10 @@ CommandInfoMap: dict[RoborockCommand | None, CommandInfo] = {
 
 
 @dataclass
-class DockSummary:
+class DockSummary(RoborockBase):
     dust_collection_mode: Optional[DustCollectionMode] = None
     wash_towel_mode: Optional[WashTowelMode] = None
     smart_wash_params: Optional[SmartWashParams] = None
-
-    def as_dict(self) -> dict:
-        return {
-            "dust_collection_mode": self.dust_collection_mode.mode.as_dict()
-            if self.dust_collection_mode is not None and self.dust_collection_mode.mode is not None
-            else None,
-            "wash_towel_mode": self.wash_towel_mode.wash_mode.as_dict()
-            if self.wash_towel_mode is not None and self.wash_towel_mode.wash_mode is not None
-            else None,
-            "smart_wash_params": self.smart_wash_params.as_dict()
-            if self.smart_wash_params is not None and self.smart_wash_params.smart_wash is not None
-            else None,
-        }
 
 
 @dataclass
