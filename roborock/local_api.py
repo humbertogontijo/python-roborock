@@ -9,11 +9,7 @@ import async_timeout
 
 from . import DeviceData
 from .api import COMMANDS_SECURED, QUEUE_TIMEOUT, RT, RoborockClient
-from .exceptions import (
-    CommandVacuumError,
-    RoborockConnectionException,
-    RoborockException,
-)
+from .exceptions import CommandVacuumError, RoborockConnectionException, RoborockException
 from .protocol import MessageParser
 from .roborock_message import RoborockMessage, RoborockMessageProtocol
 from .roborock_typing import RoborockCommand
