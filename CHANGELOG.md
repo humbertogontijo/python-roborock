@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.23.1 (2023-06-05)
+### Fix
+* Parse_time_to_datetime method ([`1c39216`](https://github.com/humbertogontijo/python-roborock/commit/1c39216c0ee6a29d350d08adc5d662d8669f85cf))
+
 ## v0.23.0 (2023-06-05)
 ### Feature
 * Add diagnostic data and extra containers ([#67](https://github.com/humbertogontijo/python-roborock/issues/67)) ([`59ef6f4`](https://github.com/humbertogontijo/python-roborock/commit/59ef6f4d5366859ba5d02ba66ec1aa2288564179))
