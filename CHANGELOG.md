@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.21.1 (2023-06-05)
+### Fix
+* Cli json serializing ([#66](https://github.com/humbertogontijo/python-roborock/issues/66)) ([`ab13b53`](https://github.com/humbertogontijo/python-roborock/commit/ab13b53a15822067112edda285c6feddf389a8b8))
+
 ## v0.21.0 (2023-06-04)
 ### Feature
 * Add time datetime for valley ([#65](https://github.com/humbertogontijo/python-roborock/issues/65)) ([`c965862`](https://github.com/humbertogontijo/python-roborock/commit/c965862f5b8b1f4dfbc83738cdebc1e11122c387))
