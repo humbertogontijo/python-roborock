@@ -511,9 +511,11 @@ class RoomMapping(RoborockBase):
 class ChildLockStatus(RoborockBase):
     lock_status: int
 
+
 @dataclass
 class FlowLedStatus(RoborockBase):
     status: int
+
 
 @dataclass
 class BroadcastMessage(RoborockBase):

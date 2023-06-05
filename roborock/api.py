@@ -26,6 +26,7 @@ from .containers import (
     DeviceData,
     DnDTimer,
     DustCollectionMode,
+    FlowLedStatus,
     HomeData,
     ModelStatus,
     MultiMapsList,
@@ -37,7 +38,6 @@ from .containers import (
     UserData,
     ValleyElectricityTimer,
     WashTowelMode,
-    FlowLedStatus,
 )
 from .exceptions import (
     RoborockAccountDoesNotExist,
@@ -100,7 +100,7 @@ class RoborockClient:
         self._last_device_msg_in = self.time_func()
         self._last_disconnection = self.time_func()
         self.keep_alive = KEEPALIVE
-        self._diagnostic_data = {}
+        self._diagnostic_data: dict[str, dict[str, Any]] = {}
 
     def __del__(self) -> None:
         self.sync_disconnect()

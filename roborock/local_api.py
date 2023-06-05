@@ -139,10 +139,10 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         if request_id is None:
             raise RoborockException(f"Failed build message {roborock_message}")
         (response, err) = await self._async_response(request_id, response_protocol)
-        self._diagnostic_data[method] = {
+        self._diagnostic_data[method if method is not None else "unknown"] = {
             "params": roborock_message.get_params(),
             "response": response,
-            "error": err
+            "error": err,
         }
         if err:
             raise CommandVacuumError("", err) from err

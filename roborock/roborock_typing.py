@@ -309,16 +309,15 @@ class DockSummary:
     def as_dict(self) -> dict:
         return {
             "dust_collection_mode": self.dust_collection_mode.mode.as_dict()
-            if self.dust_collection_mode is not None
+            if self.dust_collection_mode is not None and self.dust_collection_mode.mode is not None
             else None,
             "wash_towel_mode": self.wash_towel_mode.wash_mode.as_dict()
-            if self.smart_wash_params is not None
+            if self.wash_towel_mode is not None and self.wash_towel_mode.wash_mode is not None
             else None,
             "smart_wash_params": self.smart_wash_params.as_dict()
-            if self.smart_wash_params is not None
+            if self.smart_wash_params is not None and self.smart_wash_params.smart_wash is not None
             else None,
         }
-
 
 
 @dataclass
@@ -347,19 +346,9 @@ class DeviceProp:
     def as_dict(self) -> dict:
         return {
             "status": self.status.as_dict() if self.status is not None else None,
-            "dnd_timer": self.dnd_timer.as_dict()
-            if self.dnd_timer is not None
-            else None,
-            "clean_summary": self.clean_summary.as_dict()
-            if self.clean_summary is not None
-            else None,
-            "consumable": self.consumable.as_dict()
-            if self.consumable is not None
-            else None,
-            "last_clean_record": self.last_clean_record.as_dict()
-            if self.last_clean_record is not None
-            else None,
-            "dock_summary": self.dock_summary.as_dict()
-            if self.dock_summary is not None
-            else None,
+            "dnd_timer": self.dnd_timer.as_dict() if self.dnd_timer is not None else None,
+            "clean_summary": self.clean_summary.as_dict() if self.clean_summary is not None else None,
+            "consumable": self.consumable.as_dict() if self.consumable is not None else None,
+            "last_clean_record": self.last_clean_record.as_dict() if self.last_clean_record is not None else None,
+            "dock_summary": self.dock_summary.as_dict() if self.dock_summary is not None else None,
         }
