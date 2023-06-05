@@ -309,7 +309,7 @@ class DockSummary(RoborockBase):
 
 
 @dataclass
-class DeviceProp:
+class DeviceProp(RoborockBase):
     status: Optional[Status] = None
     dnd_timer: Optional[DnDTimer] = None
     clean_summary: Optional[CleanSummary] = None
@@ -330,13 +330,3 @@ class DeviceProp:
             self.last_clean_record = device_prop.last_clean_record
         if device_prop.dock_summary:
             self.dock_summary = device_prop.dock_summary
-
-    def as_dict(self) -> dict:
-        return {
-            "status": self.status.as_dict() if self.status is not None else None,
-            "dnd_timer": self.dnd_timer.as_dict() if self.dnd_timer is not None else None,
-            "clean_summary": self.clean_summary.as_dict() if self.clean_summary is not None else None,
-            "consumable": self.consumable.as_dict() if self.consumable is not None else None,
-            "last_clean_record": self.last_clean_record.as_dict() if self.last_clean_record is not None else None,
-            "dock_summary": self.dock_summary.as_dict() if self.dock_summary is not None else None,
-        }
