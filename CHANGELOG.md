@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.23.3 (2023-06-05)
+### Fix
+* Parse_time_to_datetime method ([`d0fc149`](https://github.com/humbertogontijo/python-roborock/commit/d0fc1498e20217d28703455937f760ba45053c61))
+
 ## v0.23.2 (2023-06-05)
 ### Fix
 * Parse_time_to_datetime method ([`bcbc211`](https://github.com/humbertogontijo/python-roborock/commit/bcbc2117dd306c21495c1f3364aa3205b3c5cfce))
