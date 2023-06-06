@@ -18,6 +18,25 @@ class RoborockMessageProtocol(RoborockEnum):
     GENERAL_RESPONSE = 5
 
 
+class RoborockDataProtocol(RoborockEnum):
+    RPC_REQUEST = 101
+    RPC_RESPONSE = 102
+    ERROR_CODE = 120
+    STATE = 121
+    BATTERY = 122
+    FAN_POWER = 123
+    WATER_BOX_MODE = 124
+    MAIN_BRUSH_LIFE = 125
+    SIDE_BRUSH_LIFE = 126
+    FILTER_LIFE = 127
+    ADDITIONAL_PROPS = 128
+    TASK_COMPLETE = 130
+    TASK_CANCEL_LOW_POWER = 131
+    TASK_CANCEL_IN_MOTION = 132
+    CHARGE_STATUS = 133
+    DRYING_STATUS = 134
+
+
 @dataclass
 class RoborockMessage:
     protocol: int

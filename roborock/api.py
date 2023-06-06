@@ -54,7 +54,7 @@ from .exceptions import (
 )
 from .protocol import Utils
 from .roborock_future import RoborockFuture
-from .roborock_message import RoborockMessage
+from .roborock_message import RoborockDataProtocol, RoborockMessage
 from .roborock_typing import DeviceProp, DockSummary, RoborockCommand
 from .util import fallback_cache, unpack_list
 
@@ -169,6 +169,8 @@ class RoborockClient:
                             if isinstance(decompressed, list):
                                 decompressed = decompressed[0]
                             queue.resolve((decompressed, None))
+                elif data.payload and protocol in RoborockDataProtocol:
+                    _LOGGER.debug(f"Got device update for {RoborockDataProtocol(protocol).name}: {data.payload!r}")
                 else:
                     queue = self._waiting_queue.get(data.seq)
                     if queue:

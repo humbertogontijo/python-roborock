@@ -23,6 +23,25 @@ def get_running_loop_or_create_one() -> AbstractEventLoop:
     return loop
 
 
+def parse_datetime_to_roborock_datetime(
+    start_datetime: datetime.datetime, end_datetime: datetime.datetime
+) -> Tuple[datetime.datetime, datetime.datetime]:
+    now = datetime.datetime.now(DEFAULT_TIME_ZONE)
+    start_datetime = start_datetime.replace(
+        year=now.year, month=now.month, day=now.day, second=0, microsecond=0, tzinfo=DEFAULT_TIME_ZONE
+    )
+    end_datetime = end_datetime.replace(
+        year=now.year, month=now.month, day=now.day, second=0, microsecond=0, tzinfo=DEFAULT_TIME_ZONE
+    )
+    if start_datetime > end_datetime:
+        end_datetime += datetime.timedelta(days=1)
+    elif end_datetime < now:
+        start_datetime += datetime.timedelta(days=1)
+        end_datetime += datetime.timedelta(days=1)
+
+    return start_datetime, end_datetime
+
+
 def parse_time_to_datetime(
     start_time: datetime.time, end_time: datetime.time
 ) -> Tuple[datetime.datetime, datetime.datetime]:
@@ -34,13 +53,7 @@ def parse_time_to_datetime(
         hour=end_time.hour, minute=end_time.minute, second=0, microsecond=0
     )
 
-    if start_datetime > end_datetime:
-        end_datetime += datetime.timedelta(days=1)
-    elif end_datetime < datetime.datetime.now(DEFAULT_TIME_ZONE):
-        start_datetime += datetime.timedelta(days=1)
-        end_datetime += datetime.timedelta(days=1)
-
-    return start_datetime, end_datetime
+    return parse_datetime_to_roborock_datetime(start_datetime, end_datetime)
 
 
 def run_sync():

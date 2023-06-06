@@ -119,14 +119,14 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
         return rc == mqtt.MQTT_ERR_SUCCESS
 
     def sync_connect(self) -> bool:
-        self.sync_start_loop()
-        if not self.is_connected():
+        should_connect = not self.is_connected()
+        if should_connect:
             if self._mqtt_port is None or self._mqtt_host is None:
                 raise RoborockException("Mqtt information was not entered. Cannot connect.")
             _LOGGER.info("Connecting to mqtt")
             super().connect(host=self._mqtt_host, port=self._mqtt_port, keepalive=KEEPALIVE)
-            return True
-        return False
+        self.sync_start_loop()
+        return should_connect
 
     async def async_disconnect(self) -> None:
         async with self._mutex:
@@ -154,7 +154,7 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
         method: RoborockCommand,
         params: Optional[list | dict] = None,
         return_type: Optional[Type[RT]] = None,
-    ):
+    ) -> RT:
         await self.validate_connection()
         request_id, timestamp, payload = super()._get_payload(method, params, True)
         _LOGGER.debug(f"id={request_id} Requesting method {method} with {params}")
