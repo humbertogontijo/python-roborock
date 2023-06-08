@@ -2,7 +2,7 @@ import datetime
 
 import pytest
 
-from roborock import parse_time_to_datetime
+from roborock.util import parse_time_to_datetime
 
 
 @pytest.mark.skip

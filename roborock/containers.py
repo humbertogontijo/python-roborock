@@ -45,7 +45,6 @@ from .const import (
     SENSOR_DIRTY_REPLACE_TIME,
     SIDE_BRUSH_REPLACE_TIME,
 )
-from .util import parse_time_to_datetime
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -103,20 +102,19 @@ class RoborockBaseTimer(RoborockBase):
     end_hour: Optional[int] = None
     end_minute: Optional[int] = None
     enabled: Optional[int] = None
-    start_time: Optional[datetime.datetime] = None
-    end_time: Optional[datetime.datetime] = None
+    start_time: Optional[datetime.time] = None
+    end_time: Optional[datetime.time] = None
 
     def __post_init__(self) -> None:
-        self.start_time, self.end_time = (
-            parse_time_to_datetime(
-                datetime.time(hour=self.start_hour, minute=self.start_minute),
-                datetime.time(hour=self.end_hour, minute=self.end_minute),
-            )
-            if self.start_hour is not None
-            and self.start_minute is not None
-            and self.end_hour is not None
-            and self.end_minute is not None
-            else (None, None)
+        self.start_time = (
+            datetime.time(hour=self.start_hour, minute=self.start_minute)
+            if self.start_hour is not None and self.start_minute is not None
+            else None
+        )
+        self.end_time = (
+            datetime.time(hour=self.end_hour, minute=self.end_minute)
+            if self.end_hour is not None and self.end_minute is not None
+            else None
         )
 
 
