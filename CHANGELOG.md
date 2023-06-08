@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.23.6 (2023-06-08)
+### Fix
+* Add datetime_time back ([#68](https://github.com/humbertogontijo/python-roborock/issues/68)) ([`a3461dd`](https://github.com/humbertogontijo/python-roborock/commit/a3461dd0a08702add2625df8616ba20d239805ce))
+
 ## v0.23.5 (2023-06-08)
 ### Fix
 * Issue building roborock message ([`89e1f28`](https://github.com/humbertogontijo/python-roborock/commit/89e1f28461baaf03029679aed5f91200bb7dac4e))
