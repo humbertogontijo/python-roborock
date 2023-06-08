@@ -9,6 +9,8 @@ import logging
 from asyncio import BaseTransport, Lock
 from typing import Callable
 
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad, unpad
 from construct import (  # type: ignore
     Bytes,
     Checksum,
@@ -28,8 +30,6 @@ from construct import (  # type: ignore
     stream_seek,
     stream_tell,
 )
-from Crypto.Cipher import AES
-from Crypto.Util.Padding import pad, unpad
 
 from roborock import BroadcastMessage, RoborockException
 from roborock.roborock_message import RoborockMessage
@@ -339,7 +339,9 @@ class _Parser:
                     },
                 }
             )
-        return self.con.build({"messages": [message for message in messages]}, local_key=local_key, prefixed=prefixed)
+        return self.con.build(
+            {"messages": [message for message in messages], "remaining": b""}, local_key=local_key, prefixed=prefixed
+        )
 
 
 MessageParser: _Parser = _Parser(_Messages, True)
