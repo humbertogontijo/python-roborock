@@ -9,8 +9,6 @@ import logging
 from asyncio import BaseTransport, Lock
 from typing import Callable
 
-from Crypto.Cipher import AES
-from Crypto.Util.Padding import pad, unpad
 from construct import (  # type: ignore
     Bytes,
     Checksum,
@@ -30,6 +28,8 @@ from construct import (  # type: ignore
     stream_seek,
     stream_tell,
 )
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad, unpad
 
 from roborock import BroadcastMessage, RoborockException
 from roborock.roborock_message import RoborockMessage
