@@ -13,7 +13,7 @@ from .containers import (
     RoborockBase,
     SmartWashParams,
     Status,
-    WashTowelMode,
+    ValleyElectricityTimer, WashTowelMode,
 )
 
 
@@ -311,9 +311,10 @@ class DockSummary(RoborockBase):
 @dataclass
 class DeviceProp(RoborockBase):
     status: Optional[Status] = None
-    dnd_timer: Optional[DnDTimer] = None
     clean_summary: Optional[CleanSummary] = None
     consumable: Optional[Consumable] = None
+    dnd_timer: Optional[DnDTimer] = None
+    valley_electricity_timer: Optional[ValleyElectricityTimer] = None
     last_clean_record: Optional[CleanRecord] = None
     dock_summary: Optional[DockSummary] = None
 
