@@ -13,7 +13,8 @@ from .containers import (
     RoborockBase,
     SmartWashParams,
     Status,
-    ValleyElectricityTimer, WashTowelMode,
+    ValleyElectricityTimer,
+    WashTowelMode,
 )
 
 
