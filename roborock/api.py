@@ -323,13 +323,11 @@ class RoborockClient:
     @fallback_cache
     async def get_prop(self) -> DeviceProp | None:
         """Gets device general properties."""
-        [status, clean_summary, consumable, dnd_timer, valley_electricity_timer] = await asyncio.gather(
+        [status, clean_summary, consumable] = await asyncio.gather(
             *[
                 self.get_status(),
                 self.get_clean_summary(),
                 self.get_consumable(),
-                self.get_dnd_timer(),
-                self.get_valley_electricity_timer(),
             ]
         )
         last_clean_record = None
@@ -338,13 +336,11 @@ class RoborockClient:
         dock_summary = None
         if status and status.dock_type is not None and status.dock_type != RoborockDockTypeCode.no_dock:
             dock_summary = await self.get_dock_summary(status.dock_type)
-        if any([status, dnd_timer, clean_summary, consumable]):
+        if any([status, clean_summary, consumable]):
             return DeviceProp(
                 status,
                 clean_summary,
                 consumable,
-                dnd_timer,
-                valley_electricity_timer,
                 last_clean_record,
                 dock_summary,
             )
