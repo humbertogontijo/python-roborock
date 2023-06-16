@@ -51,8 +51,6 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
             await self.ping()
         except RoborockException:
             pass
-        if self.keep_alive_task is not None:
-            self.keep_alive_task.cancel()
         self.keep_alive_task = self.loop.call_later(10, lambda: asyncio.create_task(self.keep_alive_func()))
 
     async def async_connect(self) -> None:
