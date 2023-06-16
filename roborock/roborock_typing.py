@@ -8,12 +8,10 @@ from .containers import (
     CleanRecord,
     CleanSummary,
     Consumable,
-    DnDTimer,
     DustCollectionMode,
     RoborockBase,
     SmartWashParams,
     Status,
-    ValleyElectricityTimer,
     WashTowelMode,
 )
 
@@ -314,8 +312,6 @@ class DeviceProp(RoborockBase):
     status: Optional[Status] = None
     clean_summary: Optional[CleanSummary] = None
     consumable: Optional[Consumable] = None
-    dnd_timer: Optional[DnDTimer] = None
-    valley_electricity_timer: Optional[ValleyElectricityTimer] = None
     last_clean_record: Optional[CleanRecord] = None
     dock_summary: Optional[DockSummary] = None
 
@@ -326,10 +322,6 @@ class DeviceProp(RoborockBase):
             self.clean_summary = device_prop.clean_summary
         if device_prop.consumable:
             self.consumable = device_prop.consumable
-        if device_prop.dnd_timer:
-            self.dnd_timer = device_prop.dnd_timer
-        if device_prop.valley_electricity_timer:
-            self.valley_electricity_timer = device_prop.valley_electricity_timer
         if device_prop.last_clean_record:
             self.last_clean_record = device_prop.last_clean_record
         if device_prop.dock_summary:
