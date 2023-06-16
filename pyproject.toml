@@ -19,7 +19,7 @@ packages = [{include = "roborock"}]
 roborock = "roborock.cli:main"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.10"
 click = ">=8"
 aiohttp = "^3.8.2"
 async-timeout = "*"
