@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.25.1 (2023-06-16)
+
+### Fix
+
+* Python-semantic-release python version ([`845da45`](https://github.com/humbertogontijo/python-roborock/commit/845da456a0d59765d08962fee007b63c8d0c50eb))
+
 ## v0.25.0 (2023-06-16)
 
 ### Feature
