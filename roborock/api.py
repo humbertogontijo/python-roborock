@@ -103,6 +103,8 @@ class RoborockClient:
         self._last_disconnection = self.time_func()
         self.keep_alive = KEEPALIVE
         self._diagnostic_data: dict[str, dict[str, Any]] = {}
+        self.dnd_timer: DnDTimer | None = None
+        self.valley_timer: ValleyElectricityTimer | None = None
 
     def __del__(self) -> None:
         self.sync_disconnect()
@@ -255,11 +257,19 @@ class RoborockClient:
 
     @fallback_cache
     async def get_dnd_timer(self) -> DnDTimer | None:
-        return await self.send_command(RoborockCommand.GET_DND_TIMER, return_type=DnDTimer)
+        result = await self.send_command(RoborockCommand.GET_DND_TIMER, return_type=DnDTimer)
+        if result is not None:
+            self.dnd_timer = result
+        return result
 
     @fallback_cache
     async def get_valley_electricity_timer(self) -> ValleyElectricityTimer | None:
-        return await self.send_command(RoborockCommand.GET_VALLEY_ELECTRICITY_TIMER, return_type=ValleyElectricityTimer)
+        result = await self.send_command(
+            RoborockCommand.GET_VALLEY_ELECTRICITY_TIMER, return_type=ValleyElectricityTimer
+        )
+        if result is not None:
+            self.valley_timer = result
+        return result
 
     @fallback_cache
     async def get_clean_summary(self) -> CleanSummary | None:
