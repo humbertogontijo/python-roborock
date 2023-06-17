@@ -2,6 +2,14 @@
 
 <!--next-version-placeholder-->
 
+## v0.25.2 (2023-06-17)
+
+### Fix
+
+* Removing python 10 tests ([`46e258b`](https://github.com/humbertogontijo/python-roborock/commit/46e258bc495123c8e8325a731e353f3bc5ce3e0c))
+* Downgrading construct version ([`d5148ce`](https://github.com/humbertogontijo/python-roborock/commit/d5148ce8fc553f73819a9f03c7688d53100bdcd9))
+* Moving back to python 3.10 due to python-semantic-release incompatibility ([`8ab9352`](https://github.com/humbertogontijo/python-roborock/commit/8ab9352adb2cb82c24057bef3107b28d3a157087))
+
 ## v0.25.1 (2023-06-16)
 
 ### Fix
