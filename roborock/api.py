@@ -18,7 +18,7 @@ from typing import Any, Callable, Coroutine, Optional, Type, TypeVar, final
 import aiohttp
 
 from .code_mappings import RoborockDockTypeCode
-from .command_cache import CacheableAttribute, CommandType, parse_method
+from .command_cache import AttributeCache, CacheableAttribute, CommandType, parse_method
 from .containers import (
     ChildLockStatus,
     CleanRecord,
@@ -104,7 +104,9 @@ class RoborockClient:
         self._last_disconnection = self.time_func()
         self.keep_alive = KEEPALIVE
         self._diagnostic_data: dict[str, dict[str, Any]] = {}
-        self.cache: dict[CacheableAttribute, Any] = {}
+        self.cache: dict[CacheableAttribute, AttributeCache] = {
+            cacheable_attribute: AttributeCache(cacheable_attribute) for cacheable_attribute in CacheableAttribute
+        }
 
     def __del__(self) -> None:
         self.sync_disconnect()
@@ -256,7 +258,7 @@ class RoborockClient:
     ) -> RT:
         parsed_method = parse_method(method)
         if parsed_method is not None and parsed_method.type == CommandType.GET:
-            cache = self.cache.get(parsed_method.attribute)
+            cache = self.cache[parsed_method.attribute].value
             if cache is not None:
                 if return_type:
                     return return_type.from_dict(cache)
@@ -266,9 +268,9 @@ class RoborockClient:
 
         if parsed_method is not None:
             if parsed_method.type == CommandType.SET:
-                self.cache[parsed_method.attribute] = None
+                self.cache[parsed_method.attribute].evict()
             elif parsed_method.type == CommandType.GET:
-                self.cache[parsed_method.attribute] = response
+                self.cache[parsed_method.attribute].load(response)
         if return_type:
             return return_type.from_dict(response)
         return response
