@@ -3,12 +3,12 @@ from __future__ import annotations
 import asyncio
 import logging
 from asyncio import Lock, TimerHandle, Transport
-from typing import Optional, Type
+from typing import Optional
 
 import async_timeout
 
 from . import DeviceData
-from .api import COMMANDS_SECURED, QUEUE_TIMEOUT, RT, RoborockClient
+from .api import COMMANDS_SECURED, QUEUE_TIMEOUT, RoborockClient
 from .exceptions import CommandVacuumError, RoborockConnectionException, RoborockException
 from .protocol import MessageParser
 from .roborock_message import RoborockMessage, RoborockMessageProtocol
@@ -123,17 +123,13 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
             )
         )
 
-    async def send_command(
+    async def _send_command(
         self,
         method: RoborockCommand,
         params: Optional[list | dict] = None,
-        return_type: Optional[Type[RT]] = None,
     ):
         roborock_message = self.build_roborock_message(method, params)
-        response = (await self.send_message(roborock_message))[0]
-        if return_type:
-            return return_type.from_dict(response)
-        return response
+        return (await self.send_message(roborock_message))[0]
 
     async def async_local_response(self, roborock_message: RoborockMessage):
         method = roborock_message.get_method()
