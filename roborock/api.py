@@ -254,9 +254,9 @@ class RoborockClient:
         params: Optional[list | dict] = None,
         return_type: Optional[Type[RT]] = None,
     ) -> RT:
-        parser_method = parse_method(method)
-        if parser_method is not None and parser_method.type == CommandType.GET:
-            cache = self.cache.get(parser_method.attribute)
+        parsed_method = parse_method(method)
+        if parsed_method is not None and parsed_method.type == CommandType.GET:
+            cache = self.cache.get(parsed_method.attribute)
             if cache is not None:
                 if return_type:
                     return return_type.from_dict(cache)
@@ -264,11 +264,11 @@ class RoborockClient:
 
         response = await self._send_command(method, params)
 
-        if parser_method is not None:
-            if parser_method.type == CommandType.SET:
-                self.cache[parser_method.attribute] = None
-            elif parser_method.type == CommandType.GET:
-                self.cache[parser_method.attribute] = response
+        if parsed_method is not None:
+            if parsed_method.type == CommandType.SET:
+                self.cache[parsed_method.attribute] = None
+            elif parsed_method.type == CommandType.GET:
+                self.cache[parsed_method.attribute] = response
         if return_type:
             return return_type.from_dict(response)
         return response
