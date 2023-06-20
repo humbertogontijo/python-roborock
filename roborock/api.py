@@ -13,11 +13,12 @@ import secrets
 import struct
 import time
 from random import randint
-from typing import Any, Callable, Coroutine, Optional, Type, TypeVar
+from typing import Any, Callable, Coroutine, Optional, Type, TypeVar, final
 
 import aiohttp
 
 from .code_mappings import RoborockDockTypeCode
+from .command_cache import AttributeCache, CacheableAttribute, CommandType, parse_method
 from .containers import (
     ChildLockStatus,
     CleanRecord,
@@ -56,7 +57,7 @@ from .protocol import Utils
 from .roborock_future import RoborockFuture
 from .roborock_message import RoborockDataProtocol, RoborockMessage
 from .roborock_typing import DeviceProp, DockSummary, RoborockCommand
-from .util import fallback_cache, unpack_list
+from .util import unpack_list
 
 _LOGGER = logging.getLogger(__name__)
 KEEPALIVE = 60
@@ -103,8 +104,9 @@ class RoborockClient:
         self._last_disconnection = self.time_func()
         self.keep_alive = KEEPALIVE
         self._diagnostic_data: dict[str, dict[str, Any]] = {}
-        self.dnd_timer: DnDTimer | None = None
-        self.valley_timer: ValleyElectricityTimer | None = None
+        self.cache: dict[CacheableAttribute, AttributeCache] = {
+            cacheable_attribute: AttributeCache(cacheable_attribute) for cacheable_attribute in CacheableAttribute
+        }
 
     def __del__(self) -> None:
         self.sync_disconnect()
@@ -240,38 +242,51 @@ class RoborockClient:
         )
         return request_id, timestamp, payload
 
+    async def _send_command(
+        self,
+        method: RoborockCommand,
+        params: Optional[list | dict] = None,
+    ):
+        raise NotImplementedError
+
+    @final
     async def send_command(
         self,
         method: RoborockCommand,
         params: Optional[list | dict] = None,
         return_type: Optional[Type[RT]] = None,
     ) -> RT:
-        raise NotImplementedError
+        parsed_method = parse_method(method)
+        if parsed_method is not None and parsed_method.type == CommandType.GET:
+            cache = self.cache[parsed_method.attribute].value
+            if cache is not None:
+                if return_type:
+                    return return_type.from_dict(cache)
+                return cache
 
-    @fallback_cache
+        response = await self._send_command(method, params)
+
+        if parsed_method is not None:
+            if parsed_method.type == CommandType.SET:
+                self.cache[parsed_method.attribute].evict()
+            elif parsed_method.type == CommandType.GET:
+                self.cache[parsed_method.attribute].load(response)
+        if return_type:
+            return return_type.from_dict(response)
+        return response
+
     async def get_status(self) -> Status | None:
         _cls: Type[Status] = ModelStatus.get(
             self.device_info.model, S7MaxVStatus
         )  # Default to S7 MAXV if we don't have the data
         return await self.send_command(RoborockCommand.GET_STATUS, return_type=_cls)
 
-    @fallback_cache
     async def get_dnd_timer(self) -> DnDTimer | None:
-        result = await self.send_command(RoborockCommand.GET_DND_TIMER, return_type=DnDTimer)
-        if result is not None:
-            self.dnd_timer = result
-        return result
+        return await self.send_command(RoborockCommand.GET_DND_TIMER, return_type=DnDTimer)
 
-    @fallback_cache
     async def get_valley_electricity_timer(self) -> ValleyElectricityTimer | None:
-        result = await self.send_command(
-            RoborockCommand.GET_VALLEY_ELECTRICITY_TIMER, return_type=ValleyElectricityTimer
-        )
-        if result is not None:
-            self.valley_timer = result
-        return result
+        return await self.send_command(RoborockCommand.GET_VALLEY_ELECTRICITY_TIMER, return_type=ValleyElectricityTimer)
 
-    @fallback_cache
     async def get_clean_summary(self) -> CleanSummary | None:
         clean_summary: dict | list | int = await self.send_command(RoborockCommand.GET_CLEAN_SUMMARY)
         if isinstance(clean_summary, dict):
@@ -288,27 +303,21 @@ class RoborockClient:
             return CleanSummary(clean_time=clean_summary)
         return None
 
-    @fallback_cache
     async def get_clean_record(self, record_id: int) -> CleanRecord | None:
         return await self.send_command(RoborockCommand.GET_CLEAN_RECORD, [record_id], return_type=CleanRecord)
 
-    @fallback_cache
     async def get_consumable(self) -> Consumable | None:
         return await self.send_command(RoborockCommand.GET_CONSUMABLE, return_type=Consumable)
 
-    @fallback_cache
     async def get_wash_towel_mode(self) -> WashTowelMode | None:
         return await self.send_command(RoborockCommand.GET_WASH_TOWEL_MODE, return_type=WashTowelMode)
 
-    @fallback_cache
     async def get_dust_collection_mode(self) -> DustCollectionMode | None:
         return await self.send_command(RoborockCommand.GET_DUST_COLLECTION_MODE, return_type=DustCollectionMode)
 
-    @fallback_cache
     async def get_smart_wash_params(self) -> SmartWashParams | None:
         return await self.send_command(RoborockCommand.GET_SMART_WASH_PARAMS, return_type=SmartWashParams)
 
-    @fallback_cache
     async def get_dock_summary(self, dock_type: RoborockDockTypeCode) -> DockSummary | None:
         """Gets the status summary from the dock with the methods available for a given dock.
 
@@ -330,7 +339,6 @@ class RoborockClient:
         )
         return DockSummary(dust_collection_mode, wash_towel_mode, smart_wash_params)
 
-    @fallback_cache
     async def get_prop(self) -> DeviceProp | None:
         """Gets device general properties."""
         [status, clean_summary, consumable] = await asyncio.gather(
@@ -356,15 +364,12 @@ class RoborockClient:
             )
         return None
 
-    @fallback_cache
     async def get_multi_maps_list(self) -> MultiMapsList | None:
         return await self.send_command(RoborockCommand.GET_MULTI_MAPS_LIST, return_type=MultiMapsList)
 
-    @fallback_cache
     async def get_networking(self) -> NetworkInfo | None:
         return await self.send_command(RoborockCommand.GET_NETWORK_INFO, return_type=NetworkInfo)
 
-    @fallback_cache
     async def get_room_mapping(self) -> list[RoomMapping] | None:
         """Gets the mapping from segment id -> iot id. Only works on local api."""
         mapping: list = await self.send_command(RoborockCommand.GET_ROOM_MAPPING)
@@ -375,17 +380,14 @@ class RoborockClient:
             ]
         return None
 
-    @fallback_cache
     async def get_child_lock_status(self) -> ChildLockStatus | None:
         """Gets current child lock status."""
         return await self.send_command(RoborockCommand.GET_CHILD_LOCK_STATUS, return_type=ChildLockStatus)
 
-    @fallback_cache
     async def get_flow_led_status(self) -> FlowLedStatus | None:
         """Gets current flow led status."""
         return await self.send_command(RoborockCommand.GET_FLOW_LED_STATUS, return_type=FlowLedStatus)
 
-    @fallback_cache
     async def get_sound_volume(self) -> int | None:
         """Gets current volume level."""
         return await self.send_command(RoborockCommand.GET_SOUND_VOLUME)

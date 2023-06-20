@@ -4,7 +4,7 @@ import asyncio
 import datetime
 import functools
 from asyncio import AbstractEventLoop
-from typing import Callable, Coroutine, Optional, Tuple, TypeVar
+from typing import Optional, Tuple, TypeVar
 
 T = TypeVar("T")
 DEFAULT_TIME_ZONE: Optional[datetime.tzinfo] = datetime.datetime.now().astimezone().tzinfo
@@ -67,29 +67,3 @@ def run_sync():
         return wrapped
 
     return decorator
-
-
-class CacheableResult:
-    last_run_result = None
-
-
-RT = TypeVar("RT", bound=Callable[..., Coroutine])
-
-
-def fallback_cache(func: RT) -> RT:
-    cache = CacheableResult()
-
-    @functools.wraps(func)
-    async def wrapped(*args, **kwargs):
-        try:
-            last_run_result = await func(*args, **kwargs)
-            cache.last_run_result = last_run_result
-        except Exception as e:
-            if cache.last_run_result is None:
-                raise e
-            last_run_result = cache.last_run_result
-            cache.last_run_result = None
-            return last_run_result
-        return last_run_result
-
-    return wrapped  # type: ignore
