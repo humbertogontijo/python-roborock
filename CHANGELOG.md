@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.26.1 (2023-06-20)
+
+### Fix
+
+* Changelog ([#80](https://github.com/humbertogontijo/python-roborock/issues/80)) ([`5c4928b`](https://github.com/humbertogontijo/python-roborock/commit/5c4928b2d414b9decc1a454348e38d29aeb505fa))
+
 ## v0.26.0 (2023-06-20)
 
 ### Feature
