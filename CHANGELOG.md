@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.26.0 (2023-06-20)
+
+### Feature
+
+* Adding command cache ([#77](https://github.com/humbertogontijo/python-roborock/issues/77)) ([`505f5e4`](https://github.com/humbertogontijo/python-roborock/commit/505f5e45a56e98c248a38236ae3f02908583de12))
+
 ## v0.25.2 (2023-06-17)
 
 ### Fix
