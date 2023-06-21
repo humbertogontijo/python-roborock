@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.26.2 (2023-06-21)
+
+### Fix
+
+* #81 - cli raising exception for diagnostic data ([`690b316`](https://github.com/humbertogontijo/python-roborock/commit/690b316de35c970454a45418682c82d752b81201))
+
 ## v0.26.1 (2023-06-20)
 
 ### Fix
