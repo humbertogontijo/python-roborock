@@ -18,7 +18,7 @@ from typing import Any, Callable, Coroutine, Optional, Type, TypeVar, final
 import aiohttp
 
 from .code_mappings import RoborockDockTypeCode
-from .command_cache import AttributeCache, CacheableAttribute, CommandType, parse_method
+from .command_cache import CacheableAttribute, CommandType, RoborockAttribute, create_cache_map, parse_method
 from .containers import (
     ChildLockStatus,
     CleanRecord,
@@ -55,9 +55,9 @@ from .exceptions import (
 )
 from .protocol import Utils
 from .roborock_future import RoborockFuture
-from .roborock_message import RoborockDataProtocol, RoborockMessage
+from .roborock_message import RoborockDataProtocol, RoborockMessage, RoborockMessageProtocol
 from .roborock_typing import DeviceProp, DockSummary, RoborockCommand
-from .util import unpack_list
+from .util import RepeatableTask, get_running_loop_or_create_one, unpack_list
 
 _LOGGER = logging.getLogger(__name__)
 KEEPALIVE = 60
@@ -94,8 +94,42 @@ class PreparedRequest:
                 return await resp.json()
 
 
+EVICT_TIME = 60
+
+
+class AttributeCache:
+    def __init__(self, attribute: RoborockAttribute, api: RoborockClient):
+        self.attribute = attribute
+        self.api = api
+        self.attribute = attribute
+        self.task = RepeatableTask(self.api.event_loop, self._async_value, EVICT_TIME)
+        self._value: Any = None
+
+    @property
+    def value(self):
+        return self._value
+
+    async def _async_value(self):
+        self._value = await self.api._send_command(self.attribute.get_command)
+        return self._value
+
+    async def async_value(self):
+        if self._value is None:
+            return await self.task.reset()
+        return self._value
+
+    def stop(self):
+        self.task.cancel()
+
+    async def update_value(self, params):
+        response = await self.api._send_command(self.attribute.set_command, params)
+        await self._async_value()
+        return response
+
+
 class RoborockClient:
     def __init__(self, endpoint: str, device_info: DeviceData) -> None:
+        self.event_loop = get_running_loop_or_create_one()
         self.device_info = device_info
         self._endpoint = endpoint
         self._nonce = secrets.token_bytes(16)
@@ -105,11 +139,15 @@ class RoborockClient:
         self.keep_alive = KEEPALIVE
         self._diagnostic_data: dict[str, dict[str, Any]] = {}
         self.cache: dict[CacheableAttribute, AttributeCache] = {
-            cacheable_attribute: AttributeCache(cacheable_attribute) for cacheable_attribute in CacheableAttribute
+            cacheable_attribute: AttributeCache(attr, self) for cacheable_attribute, attr in create_cache_map().items()
         }
 
     def __del__(self) -> None:
+        self.release()
+
+    def release(self):
         self.sync_disconnect()
+        [item.stop() for item in self.cache.values()]
 
     @property
     def diagnostic_data(self) -> dict:
@@ -138,7 +176,10 @@ class RoborockClient:
             self._last_device_msg_in = self.time_func()
             for data in messages:
                 protocol = data.protocol
-                if data.payload and (protocol == 102 or protocol == 4):
+                if data.payload and protocol in [
+                    RoborockMessageProtocol.RPC_RESPONSE,
+                    RoborockMessageProtocol.GENERAL_REQUEST,
+                ]:
                     payload = json.loads(data.payload.decode())
                     for data_point_number, data_point in payload.get("dps").items():
                         if data_point_number == "102":
@@ -162,7 +203,7 @@ class RoborockClient:
                                     if isinstance(result, list) and len(result) == 1:
                                         result = result[0]
                                     queue.resolve((result, None))
-                elif data.payload and protocol == 301:
+                elif data.payload and protocol == RoborockMessageProtocol.MAP_RESPONSE:
                     payload = data.payload[0:24]
                     [endpoint, _, request_id, _] = struct.unpack("<8s8sH6s", payload)
                     if endpoint.decode().startswith(self._endpoint):
@@ -242,6 +283,9 @@ class RoborockClient:
         )
         return request_id, timestamp, payload
 
+    async def send_message(self, roborock_message: RoborockMessage):
+        raise NotImplementedError
+
     async def _send_command(
         self,
         method: RoborockCommand,
@@ -257,20 +301,17 @@ class RoborockClient:
         return_type: Optional[Type[RT]] = None,
     ) -> RT:
         parsed_method = parse_method(method)
-        if parsed_method is not None and parsed_method.type == CommandType.GET:
-            cache = self.cache[parsed_method.attribute].value
-            if cache is not None:
-                if return_type:
-                    return return_type.from_dict(cache)
-                return cache
-
-        response = await self._send_command(method, params)
-
+        cache = None
         if parsed_method is not None:
-            if parsed_method.type == CommandType.SET:
-                self.cache[parsed_method.attribute].evict()
-            elif parsed_method.type == CommandType.GET:
-                self.cache[parsed_method.attribute].load(response)
+            cache = self.cache[parsed_method.attribute]
+        response: Any = None
+        if cache is not None:
+            if parsed_method.type == CommandType.GET:
+                response = await cache.async_value()
+            elif parsed_method.type == CommandType.SET:
+                response = await cache.update_value(params)
+        else:
+            response = await self._send_command(method, params)
         if return_type:
             return return_type.from_dict(response)
         return response

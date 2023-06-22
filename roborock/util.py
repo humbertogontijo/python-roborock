@@ -3,8 +3,10 @@ from __future__ import annotations
 import asyncio
 import datetime
 import functools
-from asyncio import AbstractEventLoop
-from typing import Optional, Tuple, TypeVar
+from asyncio import AbstractEventLoop, TimerHandle
+from typing import Callable, Coroutine, Optional, Tuple, TypeVar
+
+from roborock import RoborockException
 
 T = TypeVar("T")
 DEFAULT_TIME_ZONE: Optional[datetime.tzinfo] = datetime.datetime.now().astimezone().tzinfo
@@ -67,3 +69,31 @@ def run_sync():
         return wrapped
 
     return decorator
+
+
+class RepeatableTask:
+    def __init__(self, loop: AbstractEventLoop, callback: Callable[[], Coroutine], interval: int):
+        self.loop = loop
+        self.callback = callback
+        self.interval = interval
+        self._task: Optional[TimerHandle] = None
+
+    async def _run_task(self):
+        response = None
+        try:
+            response = await self.callback()
+        except RoborockException:
+            pass
+        self._task = self.loop.call_later(self.interval, self._run_task_soon)
+        return response
+
+    def _run_task_soon(self):
+        asyncio.create_task(self._run_task())
+
+    def cancel(self):
+        if self._task:
+            self._task.cancel()
+
+    async def reset(self):
+        self.cancel()
+        return await self._run_task()

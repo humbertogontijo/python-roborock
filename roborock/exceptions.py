@@ -1,4 +1,5 @@
 """Roborock exceptions."""
+from __future__ import annotations
 
 
 class RoborockException(Exception):
@@ -24,8 +25,8 @@ class VacuumError(RoborockException):
 class CommandVacuumError(RoborockException):
     """Class for command vacuum errors."""
 
-    def __init__(self, command: str, vacuum_error: VacuumError):
-        self.message = f"{command}: {str(vacuum_error)}"
+    def __init__(self, command: str | None, vacuum_error: VacuumError):
+        self.message = f"{command or 'unknown'}: {str(vacuum_error)}"
         super().__init__(self.message)
 
 

@@ -5,6 +5,7 @@ import math
 import time
 from dataclasses import dataclass
 from random import randint
+from typing import Optional
 
 from roborock import RoborockEnum
 
@@ -16,11 +17,12 @@ class RoborockMessageProtocol(RoborockEnum):
     PING_RESPONSE = 3
     GENERAL_REQUEST = 4
     GENERAL_RESPONSE = 5
+    RPC_REQUEST = 101
+    RPC_RESPONSE = 102
+    MAP_RESPONSE = 301
 
 
 class RoborockDataProtocol(RoborockEnum):
-    RPC_REQUEST = 101
-    RPC_RESPONSE = 102
     ERROR_CODE = 120
     STATE = 121
     BATTERY = 122
@@ -39,8 +41,8 @@ class RoborockDataProtocol(RoborockEnum):
 
 @dataclass
 class RoborockMessage:
-    protocol: int
-    payload: bytes | None
+    protocol: RoborockMessageProtocol
+    payload: Optional[bytes] = None
     seq: int = randint(100000, 999999)
     version: bytes = b"1.0"
     random: int = randint(10000, 99999)
