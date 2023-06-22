@@ -126,6 +126,13 @@ class AttributeCache:
         await self._async_value()
         return response
 
+    async def close_value(self, params):
+        if self.attribute.close_command is None:
+            raise RoborockException(f"{self.attribute.attribute} is not closeable")
+        response = await self.api._send_command(self.attribute.close_command, params)
+        await self._async_value()
+        return response
+
 
 class RoborockClient:
     def __init__(self, endpoint: str, device_info: DeviceData) -> None:

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Mapping
+from typing import Mapping, Optional
 
 from roborock import RoborockCommand
 
@@ -37,6 +37,7 @@ class RoborockAttribute:
     attribute: str
     get_command: RoborockCommand
     set_command: RoborockCommand
+    close_command: Optional[RoborockCommand] = None
 
 
 def create_cache_map():
@@ -82,7 +83,10 @@ def create_cache_map():
             set_command=RoborockCommand.SET_CUSTOM_MODE,
         ),
         CacheableAttribute.dnd_timer: RoborockAttribute(
-            attribute="dnd_timer", get_command=RoborockCommand.GET_DND_TIMER, set_command=RoborockCommand.SET_DND_TIMER
+            attribute="dnd_timer",
+            get_command=RoborockCommand.GET_DND_TIMER,
+            set_command=RoborockCommand.SET_DND_TIMER,
+            close_command=RoborockCommand.CLOSE_DND_TIMER,
         ),
         CacheableAttribute.dust_collection_mode: RoborockAttribute(
             attribute="dust_collection_mode",
@@ -126,6 +130,7 @@ def create_cache_map():
             attribute="valley_electricity_timer",
             get_command=RoborockCommand.GET_VALLEY_ELECTRICITY_TIMER,
             set_command=RoborockCommand.SET_VALLEY_ELECTRICITY_TIMER,
+            close_command=RoborockCommand.CLOSE_VALLEY_ELECTRICITY_TIMER,
         ),
         CacheableAttribute.wash_towel_mode: RoborockAttribute(
             attribute="wash_towel_mode",
