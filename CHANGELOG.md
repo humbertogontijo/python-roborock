@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.27.2 (2023-06-22)
+
+### Fix
+
+* Cache concurrency ([`7dd3aa4`](https://github.com/humbertogontijo/python-roborock/commit/7dd3aa4933248ede6230a82e6d14e30e8009e27c))
+
 ## v0.27.1 (2023-06-22)
 
 ### Fix
