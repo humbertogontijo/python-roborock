@@ -104,6 +104,7 @@ class AttributeCache:
         self.attribute = attribute
         self.task = RepeatableTask(self.api.event_loop, self._async_value, EVICT_TIME)
         self._value: Any = None
+        self._mutex = asyncio.Lock()
 
     @property
     def value(self):
@@ -114,9 +115,10 @@ class AttributeCache:
         return self._value
 
     async def async_value(self):
-        if self._value is None:
-            return await self.task.reset()
-        return self._value
+        async with self._mutex:
+            if self._value is None:
+                return await self.task.reset()
+            return self._value
 
     def stop(self):
         self.task.cancel()
@@ -126,10 +128,10 @@ class AttributeCache:
         await self._async_value()
         return response
 
-    async def close_value(self, params):
+    async def close_value(self):
         if self.attribute.close_command is None:
             raise RoborockException(f"{self.attribute.attribute} is not closeable")
-        response = await self.api._send_command(self.attribute.close_command, params)
+        response = await self.api._send_command(self.attribute.close_command)
         await self._async_value()
         return response
 
