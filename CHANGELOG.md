@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.27.0 (2023-06-22)
+
+### Feature
+
+* Improving cache and refactoring ([#82](https://github.com/humbertogontijo/python-roborock/issues/82)) ([`e6d48af`](https://github.com/humbertogontijo/python-roborock/commit/e6d48af4e1c83fe79104d368918613ac0b332cbb))
+
 ## v0.26.2 (2023-06-21)
 
 ### Fix
