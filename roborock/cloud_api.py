@@ -15,7 +15,7 @@ from .containers import DeviceData, UserData
 from .exceptions import CommandVacuumError, RoborockException, VacuumError
 from .protocol import MessageParser, Utils
 from .roborock_future import RoborockFuture
-from .roborock_message import RoborockMessage
+from .roborock_message import RoborockMessage, RoborockMessageProtocol
 from .roborock_typing import RoborockCommand
 
 _LOGGER = logging.getLogger(__name__)
@@ -149,33 +149,44 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
         if info.rc != mqtt.MQTT_ERR_SUCCESS:
             raise RoborockException(f"Failed to publish ({mqtt.error_string(info.rc)})")
 
-    async def _send_command(
-        self,
-        method: RoborockCommand,
-        params: Optional[list | dict] = None,
-    ):
+    async def send_message(self, roborock_message: RoborockMessage):
         await self.validate_connection()
-        request_id, timestamp, payload = super()._get_payload(method, params, True)
-        _LOGGER.debug(f"id={request_id} Requesting method {method} with {params}")
-        request_protocol = 101
-        response_protocol = 301 if method in COMMANDS_SECURED else 102
-        roborock_message = RoborockMessage(timestamp=timestamp, protocol=request_protocol, payload=payload)
+        method = roborock_message.get_method()
+        params = roborock_message.get_params()
+        request_id = roborock_message.get_request_id()
+        if request_id is None:
+            raise RoborockException(f"Failed build message {roborock_message}")
+        response_protocol = (
+            RoborockMessageProtocol.MAP_RESPONSE if method in COMMANDS_SECURED else RoborockMessageProtocol.RPC_RESPONSE
+        )
+
         local_key = self.device_info.device.local_key
         msg = MessageParser.build(roborock_message, local_key, False)
+        _LOGGER.debug(f"id={request_id} Requesting method {method} with {params}")
         self._send_msg_raw(msg)
         (response, err) = await self._async_response(request_id, response_protocol)
         self._diagnostic_data[method if method is not None else "unknown"] = {
-            "params": params,
+            "params": roborock_message.get_params(),
             "response": response,
             "error": err,
         }
         if err:
             raise CommandVacuumError(method, err) from err
-        if response_protocol == 301:
+        if response_protocol == RoborockMessageProtocol.MAP_RESPONSE:
             _LOGGER.debug(f"id={request_id} Response from {method}: {len(response)} bytes")
         else:
             _LOGGER.debug(f"id={request_id} Response from {method}: {response}")
         return response
+
+    async def _send_command(
+        self,
+        method: RoborockCommand,
+        params: Optional[list | dict] = None,
+    ):
+        request_id, timestamp, payload = super()._get_payload(method, params, True)
+        request_protocol = RoborockMessageProtocol.RPC_REQUEST
+        roborock_message = RoborockMessage(timestamp=timestamp, protocol=request_protocol, payload=payload)
+        return await self.send_message(roborock_message)
 
     async def get_map_v1(self):
         return await self.send_command(RoborockCommand.GET_MAP_V1)
