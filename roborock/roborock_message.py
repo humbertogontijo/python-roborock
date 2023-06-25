@@ -28,15 +28,31 @@ class RoborockDataProtocol(RoborockEnum):
     BATTERY = 122
     FAN_POWER = 123
     WATER_BOX_MODE = 124
-    MAIN_BRUSH_LIFE = 125
-    SIDE_BRUSH_LIFE = 126
-    FILTER_LIFE = 127
+    MAIN_BRUSH_WORK_TIME = 125
+    SIDE_BRUSH_WORK_TIME = 126
+    FILTER_WORK_TIME = 127
     ADDITIONAL_PROPS = 128
     TASK_COMPLETE = 130
     TASK_CANCEL_LOW_POWER = 131
     TASK_CANCEL_IN_MOTION = 132
     CHARGE_STATUS = 133
     DRYING_STATUS = 134
+
+
+ROBOROCK_DATA_STATUS_PROTOCOL = [
+    RoborockDataProtocol.ERROR_CODE,
+    RoborockDataProtocol.STATE,
+    RoborockDataProtocol.BATTERY,
+    RoborockDataProtocol.FAN_POWER,
+    RoborockDataProtocol.WATER_BOX_MODE,
+    RoborockDataProtocol.CHARGE_STATUS,
+]
+
+ROBOROCK_DATA_CONSUMABLE_PROTOCOL = [
+    RoborockDataProtocol.MAIN_BRUSH_WORK_TIME,
+    RoborockDataProtocol.SIDE_BRUSH_WORK_TIME,
+    RoborockDataProtocol.FILTER_WORK_TIME,
+]
 
 
 @dataclass

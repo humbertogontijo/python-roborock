@@ -11,6 +11,8 @@ SET_PREFIX = ("set_", "change_", "close_")
 
 
 class CacheableAttribute(str, Enum):
+    status = "status"
+    consumable = "consumable"
     sound_volume = "sound_volume"
     camera_status = "camera_status"
     carpet_clean_mode = "carpet_clean_mode"
@@ -36,12 +38,20 @@ class CacheableAttribute(str, Enum):
 class RoborockAttribute:
     attribute: str
     get_command: RoborockCommand
-    set_command: RoborockCommand
+    set_command: Optional[RoborockCommand] = None
     close_command: Optional[RoborockCommand] = None
 
 
 def create_cache_map():
     cache_map: Mapping[CacheableAttribute, RoborockAttribute] = {
+        CacheableAttribute.status: RoborockAttribute(
+            attribute="status",
+            get_command=RoborockCommand.GET_STATUS,
+        ),
+        CacheableAttribute.consumable: RoborockAttribute(
+            attribute="consumable",
+            get_command=RoborockCommand.GET_CONSUMABLE,
+        ),
         CacheableAttribute.sound_volume: RoborockAttribute(
             attribute="sound_volume",
             get_command=RoborockCommand.GET_SOUND_VOLUME,
