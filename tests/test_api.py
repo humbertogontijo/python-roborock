@@ -12,7 +12,7 @@ from roborock import (
 )
 from roborock.api import PreparedRequest, RoborockApiClient
 from roborock.cloud_api import RoborockMqttClient
-from roborock.containers import DeviceData, DustCollectionMode, S7MaxVStatus, SmartWashParams, WashTowelMode
+from roborock.containers import DeviceData, S7MaxVStatus
 from tests.mock_data import BASE_URL_REQUEST, GET_CODE_RESPONSE, HOME_DATA_RAW, STATUS, USER_DATA
 
 
@@ -117,9 +117,9 @@ async def test_get_prop():
     rmc = RoborockMqttClient(UserData.from_dict(USER_DATA), device_info)
     with patch("roborock.cloud_api.RoborockMqttClient.get_status") as get_status, patch(
         "roborock.api.RoborockClient.send_command"
-    ), patch(
-        "roborock.api.AttributeCache.async_value"
-    ), patch("roborock.cloud_api.RoborockMqttClient.get_dust_collection_mode"):
+    ), patch("roborock.api.AttributeCache.async_value"), patch(
+        "roborock.cloud_api.RoborockMqttClient.get_dust_collection_mode"
+    ):
         status = S7MaxVStatus.from_dict(STATUS)
         status.dock_type = RoborockDockTypeCode.auto_empty_dock_pure
         get_status.return_value = status
