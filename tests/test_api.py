@@ -77,8 +77,8 @@ async def test_get_dust_collection_mode():
     home_data = HomeData.from_dict(HOME_DATA_RAW)
     device_info = DeviceData(device=home_data.devices[0], model=home_data.products[0].model)
     rmc = RoborockMqttClient(UserData.from_dict(USER_DATA), device_info)
-    with patch("roborock.cloud_api.RoborockMqttClient.send_command") as command:
-        command.return_value = DustCollectionMode.from_dict({"mode": 1})
+    with patch("roborock.api.AttributeCache.async_value") as command:
+        command.return_value = {"mode": 1}
         dust = await rmc.get_dust_collection_mode()
         assert dust is not None
         assert dust.mode == RoborockDockDustCollectionModeCode.light
@@ -89,8 +89,8 @@ async def test_get_mop_wash_mode():
     home_data = HomeData.from_dict(HOME_DATA_RAW)
     device_info = DeviceData(device=home_data.devices[0], model=home_data.products[0].model)
     rmc = RoborockMqttClient(UserData.from_dict(USER_DATA), device_info)
-    with patch("roborock.cloud_api.RoborockMqttClient.send_command") as command:
-        command.return_value = SmartWashParams.from_dict({"smart_wash": 0, "wash_interval": 1500})
+    with patch("roborock.api.AttributeCache.async_value") as command:
+        command.return_value = {"smart_wash": 0, "wash_interval": 1500}
         mop_wash = await rmc.get_smart_wash_params()
         assert mop_wash is not None
         assert mop_wash.smart_wash == 0
@@ -102,8 +102,8 @@ async def test_get_washing_mode():
     home_data = HomeData.from_dict(HOME_DATA_RAW)
     device_info = DeviceData(device=home_data.devices[0], model=home_data.products[0].model)
     rmc = RoborockMqttClient(UserData.from_dict(USER_DATA), device_info)
-    with patch("roborock.cloud_api.RoborockMqttClient.send_command") as command:
-        command.return_value = WashTowelMode.from_dict({"wash_mode": 2})
+    with patch("roborock.api.AttributeCache.async_value") as command:
+        command.return_value = {"wash_mode": 2}
         washing_mode = await rmc.get_wash_towel_mode()
         assert washing_mode is not None
         assert washing_mode.wash_mode == RoborockDockWashTowelModeCode.deep
@@ -116,7 +116,9 @@ async def test_get_prop():
     device_info = DeviceData(device=home_data.devices[0], model=home_data.products[0].model)
     rmc = RoborockMqttClient(UserData.from_dict(USER_DATA), device_info)
     with patch("roborock.cloud_api.RoborockMqttClient.get_status") as get_status, patch(
-        "roborock.cloud_api.RoborockMqttClient.send_command"
+        "roborock.api.RoborockClient.send_command"
+    ), patch(
+        "roborock.api.AttributeCache.async_value"
     ), patch("roborock.cloud_api.RoborockMqttClient.get_dust_collection_mode"):
         status = S7MaxVStatus.from_dict(STATUS)
         status.dock_type = RoborockDockTypeCode.auto_empty_dock_pure
