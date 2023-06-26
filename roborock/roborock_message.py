@@ -56,6 +56,12 @@ ROBOROCK_DATA_CONSUMABLE_PROTOCOL = [
 
 
 @dataclass
+class MessageRetry:
+    method: str
+    retry_id: int
+
+
+@dataclass
 class RoborockMessage:
     protocol: RoborockMessageProtocol
     payload: Optional[bytes] = None
@@ -63,6 +69,7 @@ class RoborockMessage:
     version: bytes = b"1.0"
     random: int = randint(10000, 99999)
     timestamp: int = math.floor(time.time())
+    message_retry: Optional[MessageRetry] = None
 
     def get_request_id(self) -> int | None:
         if self.payload:
@@ -73,7 +80,14 @@ class RoborockMessage:
                     return data_point_response.get("id")
         return None
 
+    def get_retry_id(self) -> int | None:
+        if self.message_retry:
+            return self.message_retry.retry_id
+        return self.get_request_id()
+
     def get_method(self) -> str | None:
+        if self.message_retry:
+            return self.message_retry.method
         protocol = self.protocol
         if self.payload and protocol in [4, 5, 101, 102]:
             payload = json.loads(self.payload.decode())

@@ -5,7 +5,7 @@ import logging
 import re
 from dataclasses import asdict, dataclass
 from enum import Enum
-from typing import Any, Optional, Type
+from typing import Any, NamedTuple, Optional, Type
 
 from dacite import Config, from_dict
 
@@ -513,3 +513,9 @@ class FlowLedStatus(RoborockBase):
 class BroadcastMessage(RoborockBase):
     duid: str
     ip: str
+
+
+class ServerTimer(NamedTuple):
+    id: str
+    status: str
+    dontknow: int

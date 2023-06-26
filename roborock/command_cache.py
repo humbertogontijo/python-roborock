@@ -38,6 +38,7 @@ class CacheableAttribute(str, Enum):
 class RoborockAttribute:
     attribute: str
     get_command: RoborockCommand
+    add_command: Optional[RoborockCommand] = None
     set_command: Optional[RoborockCommand] = None
     close_command: Optional[RoborockCommand] = None
 
@@ -126,7 +127,9 @@ def create_cache_map():
         CacheableAttribute.server_timer: RoborockAttribute(
             attribute="server_timer",
             get_command=RoborockCommand.GET_SERVER_TIMER,
-            set_command=RoborockCommand.SET_SERVER_TIMER,
+            add_command=RoborockCommand.SET_SERVER_TIMER,
+            set_command=RoborockCommand.UPD_SERVER_TIMER,
+            close_command=RoborockCommand.DEL_SERVER_TIMER,
         ),
         CacheableAttribute.smart_wash_params: RoborockAttribute(
             attribute="smart_wash_params",

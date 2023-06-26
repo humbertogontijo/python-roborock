@@ -11,7 +11,7 @@ from . import DeviceData
 from .api import COMMANDS_SECURED, QUEUE_TIMEOUT, RoborockClient
 from .exceptions import CommandVacuumError, RoborockConnectionException, RoborockException
 from .protocol import MessageParser
-from .roborock_message import RoborockMessage, RoborockMessageProtocol
+from .roborock_message import MessageRetry, RoborockMessage, RoborockMessageProtocol
 from .roborock_typing import RoborockCommand
 
 _LOGGER = logging.getLogger(__name__)
@@ -85,10 +85,11 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         secured = True if method in COMMANDS_SECURED else False
         request_id, timestamp, payload = self._get_payload(method, params, secured)
         request_protocol = RoborockMessageProtocol.GENERAL_REQUEST
+        message_retry: Optional[MessageRetry] = None
+        if method == RoborockCommand.RETRY_REQUEST and isinstance(params, dict):
+            message_retry = MessageRetry(method=params["method"], retry_id=params["retry_id"])
         return RoborockMessage(
-            timestamp=timestamp,
-            protocol=request_protocol,
-            payload=payload,
+            timestamp=timestamp, protocol=request_protocol, payload=payload, message_retry=message_retry
         )
 
     async def hello(self):
@@ -161,4 +162,9 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
             raise CommandVacuumError(method, err) from err
         if roborock_message.protocol == RoborockMessageProtocol.GENERAL_REQUEST:
             _LOGGER.debug(f"id={request_id} Response from method {roborock_message.get_method()}: {response}")
+        if response == "retry":
+            retry_id = roborock_message.get_retry_id()
+            return self.send_command(
+                RoborockCommand.RETRY_REQUEST, {"retry_id": retry_id, "retry_count": 8, "method": method}
+            )
         return response

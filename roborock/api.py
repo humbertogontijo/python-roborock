@@ -35,6 +35,7 @@ from .containers import (
     RoborockBase,
     RoomMapping,
     S7MaxVStatus,
+    ServerTimer,
     SmartWashParams,
     Status,
     UserData,
@@ -133,6 +134,13 @@ class AttributeCache:
         if self.attribute.set_command is None:
             raise RoborockException(f"{self.attribute.attribute} have no set command")
         response = await self.api._send_command(self.attribute.set_command, params)
+        await self._async_value()
+        return response
+
+    async def add_value(self, params):
+        if self.attribute.add_command is None:
+            raise RoborockException(f"{self.attribute.attribute} have no add command")
+        response = await self.api._send_command(self.attribute.add_command, params)
         await self._async_value()
         return response
 
@@ -482,6 +490,15 @@ class RoborockClient:
     async def get_sound_volume(self) -> int | None:
         """Gets current volume level."""
         return await self.cache[CacheableAttribute.sound_volume].async_value()
+
+    async def get_server_timer(self) -> list[ServerTimer]:
+        """Gets current server timer."""
+        server_timers = await self.cache[CacheableAttribute.server_timer].async_value()
+        if server_timers:
+            if isinstance(server_timers[0], list):
+                return [ServerTimer(*server_timer) for server_timer in server_timers]
+            return [ServerTimer(*server_timers)]
+        return []
 
     def add_listener(self, listener: Callable):
         self._listeners.append(listener)

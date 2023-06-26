@@ -125,6 +125,7 @@ class RoborockCommand(str, Enum):
     SWITCH_WATER_MARK = "switch_water_mark"
     TEST_SOUND_VOLUME = "test_sound_volume"
     UPD_SERVER_TIMER = "upd_server_timer"
+    DEL_SERVER_TIMER = "del_server_timer"
 
 
 @dataclass
@@ -274,7 +275,12 @@ CommandInfoMap: dict[RoborockCommand | None, CommandInfo] = {
     RoborockCommand.SET_IDENTIFY_GROUND_MATERIAL_STATUS: CommandInfo(params={"status": 1}),
     RoborockCommand.SET_LED_STATUS: CommandInfo(params=[1]),
     RoborockCommand.SET_MOP_MODE: CommandInfo(params=None),
-    RoborockCommand.SET_SERVER_TIMER: CommandInfo(params=None),
+    RoborockCommand.SET_SERVER_TIMER: CommandInfo(
+        params={
+            "data": [["1687793948482", ["39 12 * * 0,1,2,3,4,5,6", ["start_clean", 106, "0", -1]]]],
+            "need_retry": 1,
+        }
+    ),
     RoborockCommand.SET_SMART_WASH_PARAMS: CommandInfo(params=None),
     RoborockCommand.SET_TIMEZONE: CommandInfo(params=["America/Sao_Paulo"]),
     RoborockCommand.SET_VALLEY_ELECTRICITY_TIMER: CommandInfo(params=[0, 0, 8, 0]),
@@ -286,7 +292,8 @@ CommandInfoMap: dict[RoborockCommand | None, CommandInfo] = {
     RoborockCommand.STOP_CAMERA_PREVIEW: CommandInfo(params={"client_id": "443f8636"}),
     RoborockCommand.SWITCH_WATER_MARK: CommandInfo(params={"waterMark": "OFF"}),
     RoborockCommand.TEST_SOUND_VOLUME: CommandInfo(params=None),
-    RoborockCommand.UPD_SERVER_TIMER: CommandInfo(params=None),
+    RoborockCommand.UPD_SERVER_TIMER: CommandInfo(params=[["1687793948482", "off"]]),
+    RoborockCommand.DEL_SERVER_TIMER: CommandInfo(params=["1687793948482"]),
 }
 
 
