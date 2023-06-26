@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.28.0 (2023-06-26)
+
+### Feature
+
+* Adding status and consumable listeners ([#83](https://github.com/humbertogontijo/python-roborock/issues/83)) ([`ebdbc90`](https://github.com/humbertogontijo/python-roborock/commit/ebdbc907f1f1a2a91ad10953ca6e70b91b9664dd))
+
 ## v0.27.2 (2023-06-22)
 
 ### Fix
