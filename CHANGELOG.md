@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.29.0 (2023-06-26)
+
+### Feature
+
+* Adding server timer and retry command compatibility ([`1a1565b`](https://github.com/humbertogontijo/python-roborock/commit/1a1565b1f2eb57fa373c9298dd2501a13914bb0a))
+
 ## v0.28.0 (2023-06-26)
 
 ### Feature
