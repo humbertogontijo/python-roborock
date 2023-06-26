@@ -55,7 +55,13 @@ from .exceptions import (
 )
 from .protocol import Utils
 from .roborock_future import RoborockFuture
-from .roborock_message import RoborockDataProtocol, RoborockMessage, RoborockMessageProtocol
+from .roborock_message import (
+    ROBOROCK_DATA_CONSUMABLE_PROTOCOL,
+    ROBOROCK_DATA_STATUS_PROTOCOL,
+    RoborockDataProtocol,
+    RoborockMessage,
+    RoborockMessageProtocol,
+)
 from .roborock_typing import DeviceProp, DockSummary, RoborockCommand
 from .util import RepeatableTask, get_running_loop_or_create_one, unpack_list
 
@@ -124,16 +130,21 @@ class AttributeCache:
         self.task.cancel()
 
     async def update_value(self, params):
+        if self.attribute.set_command is None:
+            raise RoborockException(f"{self.attribute.attribute} have no set command")
         response = await self.api._send_command(self.attribute.set_command, params)
         await self._async_value()
         return response
 
     async def close_value(self):
         if self.attribute.close_command is None:
-            raise RoborockException(f"{self.attribute.attribute} is not closeable")
+            raise RoborockException(f"{self.attribute.attribute} have no close command")
         response = await self.api._send_command(self.attribute.close_command)
         await self._async_value()
         return response
+
+
+device_cache: dict[str, dict[CacheableAttribute, AttributeCache]] = {}
 
 
 class RoborockClient:
@@ -147,9 +158,15 @@ class RoborockClient:
         self._last_disconnection = self.time_func()
         self.keep_alive = KEEPALIVE
         self._diagnostic_data: dict[str, dict[str, Any]] = {}
-        self.cache: dict[CacheableAttribute, AttributeCache] = {
-            cacheable_attribute: AttributeCache(attr, self) for cacheable_attribute, attr in create_cache_map().items()
-        }
+        cache = device_cache.get(device_info.device.duid)
+        if not cache:
+            cache = {
+                cacheable_attribute: AttributeCache(attr, self)
+                for cacheable_attribute, attr in create_cache_map().items()
+            }
+            device_cache[device_info.device.duid] = cache
+        self.cache = cache
+        self._listeners: list[Callable[[CacheableAttribute, RoborockBase], None]] = []
 
     def __del__(self) -> None:
         self.release()
@@ -212,6 +229,30 @@ class RoborockClient:
                                     if isinstance(result, list) and len(result) == 1:
                                         result = result[0]
                                     queue.resolve((result, None))
+                        else:
+                            try:
+                                data_protocol = RoborockDataProtocol(int(data_point_number))
+                                _LOGGER.debug(f"Got device update for {data_protocol.name}: {data_point}")
+                                if data_protocol in ROBOROCK_DATA_STATUS_PROTOCOL:
+                                    _cls: Type[Status] = ModelStatus.get(
+                                        self.device_info.model, S7MaxVStatus
+                                    )  # Default to S7 MAXV if we don't have the data
+                                    value = self.cache[CacheableAttribute.status].value
+                                    value[data_protocol.name] = data_point
+                                    status = _cls.from_dict(value)
+                                    for listener in self._listeners:
+                                        listener(CacheableAttribute.status, status)
+                                elif data_protocol in ROBOROCK_DATA_CONSUMABLE_PROTOCOL:
+                                    value = self.cache[CacheableAttribute.consumable].value
+                                    value[data_protocol.name] = data_point
+                                    consumable = Consumable.from_dict(value)
+                                    for listener in self._listeners:
+                                        listener(CacheableAttribute.consumable, consumable)
+                                return
+                            except ValueError:
+                                pass
+                            dps = {data_point_number: data_point}
+                            _LOGGER.debug(f"Got unknown data point {dps}")
                 elif data.payload and protocol == RoborockMessageProtocol.MAP_RESPONSE:
                     payload = data.payload[0:24]
                     [endpoint, _, request_id, _] = struct.unpack("<8s8sH6s", payload)
@@ -223,8 +264,6 @@ class RoborockClient:
                             if isinstance(decompressed, list):
                                 decompressed = decompressed[0]
                             queue.resolve((decompressed, None))
-                elif data.payload and protocol in RoborockDataProtocol:
-                    _LOGGER.debug(f"Got device update for {RoborockDataProtocol(protocol).name}: {data.payload!r}")
                 else:
                     queue = self._waiting_queue.get(data.seq)
                     if queue:
@@ -329,13 +368,15 @@ class RoborockClient:
         _cls: Type[Status] = ModelStatus.get(
             self.device_info.model, S7MaxVStatus
         )  # Default to S7 MAXV if we don't have the data
-        return await self.send_command(RoborockCommand.GET_STATUS, return_type=_cls)
+        return _cls.from_dict(await self.cache[CacheableAttribute.status].async_value())
 
     async def get_dnd_timer(self) -> DnDTimer | None:
-        return await self.send_command(RoborockCommand.GET_DND_TIMER, return_type=DnDTimer)
+        return DnDTimer.from_dict(await self.cache[CacheableAttribute.dnd_timer].async_value())
 
     async def get_valley_electricity_timer(self) -> ValleyElectricityTimer | None:
-        return await self.send_command(RoborockCommand.GET_VALLEY_ELECTRICITY_TIMER, return_type=ValleyElectricityTimer)
+        return ValleyElectricityTimer.from_dict(
+            await self.cache[CacheableAttribute.valley_electricity_timer].async_value()
+        )
 
     async def get_clean_summary(self) -> CleanSummary | None:
         clean_summary: dict | list | int = await self.send_command(RoborockCommand.GET_CLEAN_SUMMARY)
@@ -357,16 +398,16 @@ class RoborockClient:
         return await self.send_command(RoborockCommand.GET_CLEAN_RECORD, [record_id], return_type=CleanRecord)
 
     async def get_consumable(self) -> Consumable | None:
-        return await self.send_command(RoborockCommand.GET_CONSUMABLE, return_type=Consumable)
+        return Consumable.from_dict(await self.cache[CacheableAttribute.consumable].async_value())
 
     async def get_wash_towel_mode(self) -> WashTowelMode | None:
-        return await self.send_command(RoborockCommand.GET_WASH_TOWEL_MODE, return_type=WashTowelMode)
+        return WashTowelMode.from_dict(await self.cache[CacheableAttribute.wash_towel_mode].async_value())
 
     async def get_dust_collection_mode(self) -> DustCollectionMode | None:
-        return await self.send_command(RoborockCommand.GET_DUST_COLLECTION_MODE, return_type=DustCollectionMode)
+        return DustCollectionMode.from_dict(await self.cache[CacheableAttribute.dust_collection_mode].async_value())
 
     async def get_smart_wash_params(self) -> SmartWashParams | None:
-        return await self.send_command(RoborockCommand.GET_SMART_WASH_PARAMS, return_type=SmartWashParams)
+        return SmartWashParams.from_dict(await self.cache[CacheableAttribute.smart_wash_params].async_value())
 
     async def get_dock_summary(self, dock_type: RoborockDockTypeCode) -> DockSummary | None:
         """Gets the status summary from the dock with the methods available for a given dock.
@@ -432,15 +473,18 @@ class RoborockClient:
 
     async def get_child_lock_status(self) -> ChildLockStatus | None:
         """Gets current child lock status."""
-        return await self.send_command(RoborockCommand.GET_CHILD_LOCK_STATUS, return_type=ChildLockStatus)
+        return ChildLockStatus.from_dict(await self.cache[CacheableAttribute.child_lock_status].async_value())
 
     async def get_flow_led_status(self) -> FlowLedStatus | None:
         """Gets current flow led status."""
-        return await self.send_command(RoborockCommand.GET_FLOW_LED_STATUS, return_type=FlowLedStatus)
+        return FlowLedStatus.from_dict(await self.cache[CacheableAttribute.flow_led_status].async_value())
 
     async def get_sound_volume(self) -> int | None:
         """Gets current volume level."""
-        return await self.send_command(RoborockCommand.GET_SOUND_VOLUME)
+        return await self.cache[CacheableAttribute.sound_volume].async_value()
+
+    def add_listener(self, listener: Callable):
+        self._listeners.append(listener)
 
 
 class RoborockApiClient:
