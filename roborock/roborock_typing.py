@@ -87,6 +87,7 @@ class RoborockCommand(str, Enum):
     GET_WASH_TOWEL_MODE = "get_wash_towel_mode"
     LOAD_MULTI_MAP = "load_multi_map"
     NAME_SEGMENT = "name_segment"
+    REUNION_SCENES = "reunion_scenes"
     RESET_CONSUMABLE = "reset_consumable"
     RESUME_SEGMENT_CLEAN = "resume_segment_clean"
     RESUME_ZONED_CLEAN = "resume_zoned_clean"
@@ -111,6 +112,8 @@ class RoborockCommand(str, Enum):
     SET_IDENTIFY_GROUND_MATERIAL_STATUS = "set_identify_ground_material_status"
     SET_LED_STATUS = "set_led_status"
     SET_MOP_MODE = "set_mop_mode"
+    SET_SCENES_SEGMENTS = "set_scenes_segments"
+    SET_SCENES_ZONES = "set_scenes_zones"
     SET_SERVER_TIMER = "set_server_timer"
     SET_SMART_WASH_PARAMS = "set_smart_wash_params"
     SET_TIMEZONE = "set_timezone"
@@ -232,6 +235,7 @@ CommandInfoMap: dict[RoborockCommand | None, CommandInfo] = {
     RoborockCommand.GET_WASH_TOWEL_MODE: CommandInfo(params=None),
     RoborockCommand.LOAD_MULTI_MAP: CommandInfo(params=None),
     RoborockCommand.NAME_SEGMENT: CommandInfo(params=None),
+    RoborockCommand.REUNION_SCENES: CommandInfo(params={"data": [{"tid": "1687830208457"}]}),
     RoborockCommand.RESET_CONSUMABLE: CommandInfo(params=None),
     RoborockCommand.RESUME_SEGMENT_CLEAN: CommandInfo(params=None),
     RoborockCommand.RESUME_ZONED_CLEAN: CommandInfo(params=None),
@@ -275,6 +279,12 @@ CommandInfoMap: dict[RoborockCommand | None, CommandInfo] = {
     RoborockCommand.SET_IDENTIFY_GROUND_MATERIAL_STATUS: CommandInfo(params={"status": 1}),
     RoborockCommand.SET_LED_STATUS: CommandInfo(params=[1]),
     RoborockCommand.SET_MOP_MODE: CommandInfo(params=None),
+    RoborockCommand.SET_SCENES_SEGMENTS: CommandInfo(
+        params={"data": [{"tid": "1687831528786", "segs": [{"sid": 22}, {"sid": 18}]}]}
+    ),
+    RoborockCommand.SET_SCENES_ZONES: CommandInfo(
+        params={"data": [{"zones": [{"zid": 0, "range": [27700, 23750, 30850, 26900]}], "tid": "1687831073722"}]}
+    ),
     RoborockCommand.SET_SERVER_TIMER: CommandInfo(
         params={
             "data": [["1687793948482", ["39 12 * * 0,1,2,3,4,5,6", ["start_clean", 106, "0", -1]]]],
