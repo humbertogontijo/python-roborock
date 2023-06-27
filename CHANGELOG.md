@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.29.1 (2023-06-27)
+
+### Fix
+
+* Adding scene commands ([`fddbe50`](https://github.com/humbertogontijo/python-roborock/commit/fddbe508f177dc6bc336223007018f501709c995))
+
 ## v0.29.0 (2023-06-26)
 
 ### Feature
