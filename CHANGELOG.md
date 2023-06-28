@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.29.2 (2023-06-28)
+
+### Fix
+
+* Downgrade construct ([#84](https://github.com/humbertogontijo/python-roborock/issues/84)) ([`920f59f`](https://github.com/humbertogontijo/python-roborock/commit/920f59f1fad2790084ee001225bbaff2e21b3f91))
+
 ## v0.29.1 (2023-06-27)
 
 ### Fix
