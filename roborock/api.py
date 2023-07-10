@@ -173,7 +173,7 @@ class RoborockClient:
                 for cacheable_attribute, attr in create_cache_map().items()
             }
             device_cache[device_info.device.duid] = cache
-        self.cache = cache
+        self.cache: dict[CacheableAttribute, AttributeCache] = cache
         self._listeners: list[Callable[[CacheableAttribute, RoborockBase], None]] = []
 
     def __del__(self) -> None:
@@ -245,12 +245,22 @@ class RoborockClient:
                                     _cls: Type[Status] = ModelStatus.get(
                                         self.device_info.model, S7MaxVStatus
                                     )  # Default to S7 MAXV if we don't have the data
+                                    if self.cache[CacheableAttribute.status].value is None:
+                                        _LOGGER.debug(
+                                            f"Got status update({data_protocol.name}) before get_status was called."
+                                        )
+                                        self.cache[CacheableAttribute.status]._value = {}
                                     value = self.cache[CacheableAttribute.status].value
                                     value[data_protocol.name] = data_point
                                     status = _cls.from_dict(value)
                                     for listener in self._listeners:
                                         listener(CacheableAttribute.status, status)
                                 elif data_protocol in ROBOROCK_DATA_CONSUMABLE_PROTOCOL:
+                                    if self.cache[CacheableAttribute.consumable].value is None:
+                                        _LOGGER.debug(
+                                            f"Got consumable update({data_protocol.name}) before get_status was called."
+                                        )
+                                        self.cache[CacheableAttribute.consumable]._value = {}
                                     value = self.cache[CacheableAttribute.consumable].value
                                     value[data_protocol.name] = data_point
                                     consumable = Consumable.from_dict(value)
