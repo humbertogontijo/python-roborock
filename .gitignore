@@ -12,3 +12,4 @@ docs/_build/
 
 # mkdocs documentation
 /site
+/docs/build/
