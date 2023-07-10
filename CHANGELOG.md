@@ -2,6 +2,17 @@
 
 <!--next-version-placeholder-->
 
+## v0.30.0 (2023-07-10)
+
+### Feature
+
+* Created strong foundation for docs ([#86](https://github.com/humbertogontijo/python-roborock/issues/86)) ([`ef88edd`](https://github.com/humbertogontijo/python-roborock/commit/ef88eddb8b582f5ad958d8135964e39ba6a05c91))
+
+### Fix
+
+* Add missing dock for s7 max ultra ([#88](https://github.com/humbertogontijo/python-roborock/issues/88)) ([`10aff22`](https://github.com/humbertogontijo/python-roborock/commit/10aff22bc1e6d17b1b6c2587ebefcfd1d9fb7be7))
+* Listeners getting protocol data before it exists. ([#87](https://github.com/humbertogontijo/python-roborock/issues/87)) ([`3d68ea4`](https://github.com/humbertogontijo/python-roborock/commit/3d68ea4326da827f17a32b2b5645f1e1e43f3eca))
+
 ## v0.29.2 (2023-06-28)
 
 ### Fix
