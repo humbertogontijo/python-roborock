@@ -232,6 +232,7 @@ class RoborockDockTypeCode(RoborockEnum):
     auto_empty_dock = 1
     empty_wash_fill_dock = 3
     auto_empty_dock_pure = 5
+    s7_max_ultra_dock = 6
     s8_dock = 7
 
 
