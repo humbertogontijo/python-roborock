@@ -190,6 +190,7 @@ class RoborockMopModeS8ProUltra(RoborockMopModeCode):
     deep = 301
     deep_plus = 303
     fast = 304
+    custom = 302
 
 
 class RoborockMopIntensityCode(RoborockEnum):
@@ -234,6 +235,7 @@ class RoborockDockTypeCode(RoborockEnum):
     auto_empty_dock_pure = 5
     s7_max_ultra_dock = 6
     s8_dock = 7
+    q_revo = 8
 
 
 class RoborockDockDustCollectionModeCode(RoborockEnum):
