@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.30.1 (2023-07-18)
+
+### Fix
+
+* Add missing s8 pro mop code and q revo dock ([#92](https://github.com/humbertogontijo/python-roborock/issues/92)) ([`5d75c3b`](https://github.com/humbertogontijo/python-roborock/commit/5d75c3b794db231e07f8b6693f2a96b132f737ce))
+
 ## v0.30.0 (2023-07-10)
 
 ### Feature
