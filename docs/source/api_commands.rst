@@ -527,9 +527,25 @@ Parameters:
 get_network_info
 ----------------
 
-Description:
+Description: Get the network information of the device.
 
-Parameters:
+Returns:
+
+    ssid: SSID of the wirelness network the device is connected to.
+
+    ip: IP address of the device.
+
+    mac: MAC address of the device.
+
+    bssid: BSSID of the device.
+
+    rssi: RSSI of the device.
+
+Return example::
+
+    {'ssid': 'My WiFi Network', 'ip': '192.168.1.29', 'mac': 'a0:2b:47:3d:24:51', 'bssid': '18:3b:1a:23:41:3c', 'rssi': -32}
+
+Parameters: None
 
 
 get_prop
@@ -855,9 +871,99 @@ status
 
 Get: get_status
 
-Description:
+Description: Get status information of the device.
 
-Parameters:
+Returns:
+    
+    msg_ver: 
+
+    msg_seq: 
+
+    state: 
+
+    battery: Battery level of your device.
+
+    clean_time: Total clean time in hours.
+
+    clean_area: Total clean area in meters.
+
+    error_code:
+
+    map_reset: 
+
+    in_cleaning:
+
+    in_returning:
+
+    in_fresh_state:
+
+    lab_status:
+
+    water_box_status:
+
+    back_type:
+
+    wash_phase:
+
+    wash_ready:
+
+    fan_power:
+
+    dnd_enabled:
+
+    map_status:
+
+    is_locating:
+
+    lock_status:
+
+    water_box_mode: 
+
+    water_box_carriage_status:
+
+    mop_forbidden_enable:
+
+    camera_status: 
+
+    is_exploring:
+
+    home_sec_status:
+
+    home_sec_enable_password:
+
+    adbumper_status:
+
+    water_shortage_status:
+
+    dock_type:
+
+    dust_collection_status:
+
+    auto_dust_collection:
+
+    avoid_count:
+
+    mop_mode:
+
+    debug_mode:
+
+    collision_avoid_status:
+
+    switch_map_mode:
+
+    dock_error_status:
+
+    charge_status:
+
+    unsave_map_reason:
+
+    unsave_map_flag:
+
+Return example::
+
+    {'msg_ver': 2, 'msg_seq': 1965, 'state': 8, 'battery': 100, 'clean_time': 1976, 'clean_area': 33197500, 'error_code': 0, 'map_present': 1, 'in_cleaning': 0, 'in_returning': 0, 'in_fresh_state': 1, 'lab_status': 1, 'water_box_status': 1, 'back_type': -1, 'wash_phase': 0, 'wash_ready': 0, 'fan_power': 102, 'dnd_enabled': 0, 'map_status': 3, 'is_locating': 0, 'lock_status': 0, 'water_box_mode': 203, 'water_box_carriage_status': 1, 'mop_forbidden_enable': 1, 'camera_status': 3457, 'is_exploring': 0, 'home_sec_status': 0, 'home_sec_enable_password': 0, 'adbumper_status': [0, 0, 0], 'water_shortage_status': 0, 'dock_type': 3, 'dust_collection_status': 0, 'auto_dust_collection': 1, 'avoid_count': 141, 'mop_mode': 300, 'debug_mode': 0, 'collision_avoid_status': 1, 'switch_map_mode': 0, 'dock_error_status': 0, 'charge_status': 1, 'unsave_map_reason': 0, 'unsave_map_flag': 0}
+
+Parameters: None
 
 
 
@@ -890,9 +996,11 @@ timezone
 
 Get: get_timezone
 
-Description:
+Description: Get the time zone of the device.
 
-Parameters:
+Returns: Time zone by the TZ identifier (e.g., America/Los_Angeles)
+
+Parameters: None
 
 
 Set: set_timezone
