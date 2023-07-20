@@ -527,7 +527,7 @@ Parameters:
 get_network_info
 ----------------
 
-Description: Get the network information of the device.
+Description: Get the device's network information.
 
 Returns:
 
@@ -996,7 +996,7 @@ timezone
 
 Get: get_timezone
 
-Description: Get the time zone of the device.
+Description: Get the device's time zone.
 
 Returns: Time zone by the TZ identifier (e.g., America/Los_Angeles)
 
