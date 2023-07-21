@@ -14,8 +14,12 @@ class RoborockFuture:
         self.fut: Future = Future()
         self.loop = self.fut.get_loop()
 
+    def _resolve(self, item: tuple[Any, VacuumError | None]) -> None:
+        if not self.fut.cancelled():
+            self.fut.set_result(item)
+
     def resolve(self, item: tuple[Any, VacuumError | None]) -> None:
-        self.loop.call_soon_threadsafe(self.fut.set_result, item)
+        self.loop.call_soon_threadsafe(self._resolve, item)
 
     async def async_get(self, timeout: float | int) -> tuple[Any, VacuumError | None]:
         try:
