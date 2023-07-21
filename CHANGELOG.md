@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.30.2 (2023-07-21)
+
+### Fix
+
+* Possible solution for future invalid state ([`8ac4e72`](https://github.com/humbertogontijo/python-roborock/commit/8ac4e72372f26105423213bb85d4c33d7951af4d))
+
 ## v0.30.1 (2023-07-18)
 
 ### Fix
