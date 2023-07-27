@@ -15,7 +15,7 @@ Parameters: None
 app_get_dryer_setting
 ---------------------
 
-Description: Get docker dryer settings.
+Description: Get dock dryer settings.
 
 Parameters: None
 
@@ -272,7 +272,11 @@ Return example::
 
     {'enable': 1, 'current_integral': 450, 'current_high': 500, 'current_low': 400, 'stall_time': 10}
 
-Source: Roborock S7 MaxV Ultra
+======================  =========
+Vacuum Model            Supported
+======================  =========
+Roborock S7 MaxV Ultra  Yes 
+======================  =========
 
 
 Set: set_carpet_mode
