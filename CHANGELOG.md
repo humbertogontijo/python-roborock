@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.30.3 (2023-07-31)
+
+### Fix
+
+* Adding no dustbin to docker errors ([`0e28628`](https://github.com/humbertogontijo/python-roborock/commit/0e286280edda21a3b95c656d5bc358cd4229d075))
+
 ## v0.30.2 (2023-07-21)
 
 ### Fix
