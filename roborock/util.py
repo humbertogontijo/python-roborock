@@ -3,8 +3,10 @@ from __future__ import annotations
 import asyncio
 import datetime
 import functools
+import logging
 from asyncio import AbstractEventLoop, TimerHandle
-from typing import Callable, Coroutine, Optional, Tuple, TypeVar
+from collections.abc import MutableMapping
+from typing import Any, Callable, Coroutine, Optional, Tuple, TypeVar
 
 from roborock import RoborockException
 
@@ -97,3 +99,13 @@ class RepeatableTask:
     async def reset(self):
         self.cancel()
         return await self._run_task()
+
+
+class RoborockLoggerAdapter(logging.LoggerAdapter):
+    def __init__(self, prefix: str, logger: logging.Logger) -> None:
+
+        super().__init__(logger, {})
+        self.prefix = prefix
+
+    def process(self, msg: str, kwargs: MutableMapping[str, Any]) -> tuple[str, MutableMapping[str, Any]]:
+        return "[%s] %s" % (self.prefix, msg), kwargs
