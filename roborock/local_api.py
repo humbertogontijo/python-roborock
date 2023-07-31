@@ -13,6 +13,7 @@ from .exceptions import CommandVacuumError, RoborockConnectionException, Roboroc
 from .protocol import MessageParser
 from .roborock_message import MessageRetry, RoborockMessage, RoborockMessageProtocol
 from .roborock_typing import RoborockCommand
+from .util import RoborockLoggerAdapter
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -29,6 +30,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         self.transport: Transport | None = None
         self._mutex = Lock()
         self.keep_alive_task: TimerHandle | None = None
+        self._logger = RoborockLoggerAdapter(device_data.device.name, _LOGGER)
 
     def data_received(self, message):
         if self.remaining:
@@ -58,11 +60,11 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
                 if not self.is_connected():
                     self.sync_disconnect()
                     async with async_timeout.timeout(QUEUE_TIMEOUT):
-                        _LOGGER.info(f"Connecting to {self.host}")
+                        self._logger.info(f"Connecting to {self.host}")
                         self.transport, _ = await self.event_loop.create_connection(  # type: ignore
                             lambda: self, self.host, 58867
                         )
-                        _LOGGER.info(f"Connected to {self.host}")
+                        self._logger.info(f"Connected to {self.host}")
                         should_ping = True
             except BaseException as e:
                 raise RoborockConnectionException(f"Failed connecting to {self.host}") from e
@@ -72,7 +74,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
 
     def sync_disconnect(self) -> None:
         if self.transport and self.event_loop.is_running():
-            _LOGGER.debug(f"Disconnecting from {self.host}")
+            self._logger.debug(f"Disconnecting from {self.host}")
             self.transport.close()
         if self.keep_alive_task:
             self.keep_alive_task.cancel()
@@ -104,7 +106,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
                 )
             )
         except Exception as e:
-            _LOGGER.error(e)
+            self._logger.error(e)
 
     async def ping(self):
         request_id = 2
@@ -149,7 +151,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         local_key = self.device_info.device.local_key
         msg = MessageParser.build(roborock_message, local_key=local_key)
         if method:
-            _LOGGER.debug(f"id={request_id} Requesting method {method} with {params}")
+            self._logger.debug(f"id={request_id} Requesting method {method} with {params}")
         # Send the command to the Roborock device
         self._send_msg_raw(msg)
         (response, err) = await self._async_response(request_id, response_protocol)
@@ -161,7 +163,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         if err:
             raise CommandVacuumError(method, err) from err
         if roborock_message.protocol == RoborockMessageProtocol.GENERAL_REQUEST:
-            _LOGGER.debug(f"id={request_id} Response from method {roborock_message.get_method()}: {response}")
+            self._logger.debug(f"id={request_id} Response from method {roborock_message.get_method()}: {response}")
         if response == "retry":
             retry_id = roborock_message.get_retry_id()
             return self.send_command(

@@ -64,7 +64,7 @@ from .roborock_message import (
     RoborockMessageProtocol,
 )
 from .roborock_typing import DeviceProp, DockSummary, RoborockCommand
-from .util import RepeatableTask, get_running_loop_or_create_one, unpack_list
+from .util import RepeatableTask, RoborockLoggerAdapter, get_running_loop_or_create_one, unpack_list
 
 _LOGGER = logging.getLogger(__name__)
 KEEPALIVE = 60
@@ -166,6 +166,7 @@ class RoborockClient:
         self._last_disconnection = self.time_func()
         self.keep_alive = KEEPALIVE
         self._diagnostic_data: dict[str, dict[str, Any]] = {}
+        self._logger = RoborockLoggerAdapter(device_info.device.name, _LOGGER)
         cache = device_cache.get(device_info.device.duid)
         if not cache:
             cache = {
@@ -240,13 +241,13 @@ class RoborockClient:
                         else:
                             try:
                                 data_protocol = RoborockDataProtocol(int(data_point_number))
-                                _LOGGER.debug(f"Got device update for {data_protocol.name}: {data_point}")
+                                self._logger.debug(f"Got device update for {data_protocol.name}: {data_point}")
                                 if data_protocol in ROBOROCK_DATA_STATUS_PROTOCOL:
                                     _cls: Type[Status] = ModelStatus.get(
                                         self.device_info.model, S7MaxVStatus
                                     )  # Default to S7 MAXV if we don't have the data
                                     if self.cache[CacheableAttribute.status].value is None:
-                                        _LOGGER.debug(
+                                        self._logger.debug(
                                             f"Got status update({data_protocol.name}) before get_status was called."
                                         )
                                         self.cache[CacheableAttribute.status]._value = {}
@@ -257,7 +258,7 @@ class RoborockClient:
                                         listener(CacheableAttribute.status, status)
                                 elif data_protocol in ROBOROCK_DATA_CONSUMABLE_PROTOCOL:
                                     if self.cache[CacheableAttribute.consumable].value is None:
-                                        _LOGGER.debug(
+                                        self._logger.debug(
                                             f"Got consumable update({data_protocol.name}) before get_status was called."
                                         )
                                         self.cache[CacheableAttribute.consumable]._value = {}
@@ -270,7 +271,7 @@ class RoborockClient:
                             except ValueError:
                                 pass
                             dps = {data_point_number: data_point}
-                            _LOGGER.debug(f"Got unknown data point {dps}")
+                            self._logger.debug(f"Got unknown data point {dps}")
                 elif data.payload and protocol == RoborockMessageProtocol.MAP_RESPONSE:
                     payload = data.payload[0:24]
                     [endpoint, _, request_id, _] = struct.unpack("<8s8sH6s", payload)
@@ -287,13 +288,13 @@ class RoborockClient:
                     if queue:
                         queue.resolve((data.payload, None))
         except Exception as ex:
-            _LOGGER.exception(ex)
+            self._logger.exception(ex)
 
     def on_connection_lost(self, exc: Optional[Exception]) -> None:
         self._last_disconnection = self.time_func()
-        _LOGGER.info("Roborock client disconnected")
+        self._logger.info("Roborock client disconnected")
         if exc is not None:
-            _LOGGER.warning(exc)
+            self._logger.warning(exc)
 
     def should_keepalive(self) -> bool:
         now = self.time_func()
