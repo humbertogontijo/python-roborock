@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.31.0 (2023-07-31)
+
+### Feature
+
+* Add device name to logs ([#100](https://github.com/humbertogontijo/python-roborock/issues/100)) ([`7690d56`](https://github.com/humbertogontijo/python-roborock/commit/7690d5644181abb5fb7681d6c1764e2f8750c4b5))
+
 ## v0.30.3 (2023-07-31)
 
 ### Fix
