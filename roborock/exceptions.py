@@ -56,3 +56,7 @@ class RoborockInvalidUserAgreement(RoborockException):
 
 class RoborockNoUserAgreement(RoborockException):
     """Class for Roborock no user agreement exceptions."""
+
+
+class RoborockInvalidCredentials(RoborockException):
+    """Class for Roborock credentials have expired or changed."""

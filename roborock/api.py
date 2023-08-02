@@ -46,6 +46,7 @@ from .exceptions import (
     RoborockAccountDoesNotExist,
     RoborockException,
     RoborockInvalidCode,
+    RoborockInvalidCredentials,
     RoborockInvalidEmail,
     RoborockInvalidUserAgreement,
     RoborockNoUserAgreement,
@@ -642,6 +643,10 @@ class RoborockApiClient:
         if home_id_response is None:
             raise RoborockException("home_id_response is None")
         if home_id_response.get("code") != 200:
+            if home_id_response.get("code") == 2010:
+                raise RoborockInvalidCredentials(
+                    f"Invalid credentials ({home_id_response.get('msg')}) - check your login and try again."
+                )
             raise RoborockException(f"{home_id_response.get('msg')} - response code: {home_id_response.get('code')}")
 
         home_id = home_id_response["data"].get("rrHomeId")
