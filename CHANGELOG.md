@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.31.1 (2023-08-02)
+
+### Fix
+
+* Add error code for invalid credentials ([#101](https://github.com/humbertogontijo/python-roborock/issues/101)) ([`703f48b`](https://github.com/humbertogontijo/python-roborock/commit/703f48b66cfd32d20e74eaa959a66cd736ca38c8))
+
 ## v0.31.0 (2023-07-31)
 
 ### Feature
