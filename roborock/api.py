@@ -176,7 +176,7 @@ class RoborockClient:
             }
             device_cache[device_info.device.duid] = cache
         self.cache: dict[CacheableAttribute, AttributeCache] = cache
-        self._listeners: list[Callable[[CacheableAttribute, RoborockBase], None]] = []
+        self._listeners: list[Callable[[str, CacheableAttribute, RoborockBase], None]] = []
 
     def __del__(self) -> None:
         self.release()
@@ -256,7 +256,7 @@ class RoborockClient:
                                     value[data_protocol.name] = data_point
                                     status = _cls.from_dict(value)
                                     for listener in self._listeners:
-                                        listener(CacheableAttribute.status, status)
+                                        listener(self.device_info.device.duid, CacheableAttribute.status, status)
                                 elif data_protocol in ROBOROCK_DATA_CONSUMABLE_PROTOCOL:
                                     if self.cache[CacheableAttribute.consumable].value is None:
                                         self._logger.debug(
@@ -267,7 +267,9 @@ class RoborockClient:
                                     value[data_protocol.name] = data_point
                                     consumable = Consumable.from_dict(value)
                                     for listener in self._listeners:
-                                        listener(CacheableAttribute.consumable, consumable)
+                                        listener(
+                                            self.device_info.device.duid, CacheableAttribute.consumable, consumable
+                                        )
                                 return
                             except ValueError:
                                 pass
