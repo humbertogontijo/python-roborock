@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.32.0 (2023-08-03)
+
+### Feature
+
+* Adding device_id to listeners and fixing race condition on connection, disconnection and messages ([`2bee8a1`](https://github.com/humbertogontijo/python-roborock/commit/2bee8a11ad30cd4a3c186a4c0a619838adc83a53))
+
 ## v0.31.1 (2023-08-02)
 
 ### Fix
