@@ -103,7 +103,6 @@ class RepeatableTask:
 
 class RoborockLoggerAdapter(logging.LoggerAdapter):
     def __init__(self, prefix: str, logger: logging.Logger) -> None:
-
         super().__init__(logger, {})
         self.prefix = prefix
 
