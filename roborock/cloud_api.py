@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import base64
 import logging
 import threading
@@ -132,7 +133,7 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
 
     async def async_disconnect(self) -> None:
         async with self._mutex:
-            async_response = self._async_response(DISCONNECT_REQUEST_ID)
+            async_response = asyncio.ensure_future(self._async_response(DISCONNECT_REQUEST_ID))
             disconnecting = self.sync_disconnect()
             if disconnecting:
                 (_, err) = await async_response
@@ -141,7 +142,7 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
 
     async def async_connect(self) -> None:
         async with self._mutex:
-            async_response = self._async_response(CONNECT_REQUEST_ID)
+            async_response = asyncio.ensure_future(self._async_response(CONNECT_REQUEST_ID))
             connecting = self.sync_connect()
             if connecting:
                 (_, err) = await async_response
@@ -167,7 +168,7 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
         local_key = self.device_info.device.local_key
         msg = MessageParser.build(roborock_message, local_key, False)
         self._logger.debug(f"id={request_id} Requesting method {method} with {params}")
-        async_response = self._async_response(request_id, response_protocol)
+        async_response = asyncio.ensure_future(self._async_response(request_id, response_protocol))
         self._send_msg_raw(msg)
         (response, err) = await async_response
         self._diagnostic_data[method if method is not None else "unknown"] = {

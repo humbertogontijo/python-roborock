@@ -153,7 +153,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         if method:
             self._logger.debug(f"id={request_id} Requesting method {method} with {params}")
         # Send the command to the Roborock device
-        async_response = self._async_response(request_id, response_protocol)
+        async_response = asyncio.ensure_future(self._async_response(request_id, response_protocol))
         self._send_msg_raw(msg)
         (response, err) = await async_response
         self._diagnostic_data[method if method is not None else "unknown"] = {
