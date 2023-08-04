@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.32.2 (2023-08-04)
+
+### Fix
+
+* Waiting queue ([`ff5376b`](https://github.com/humbertogontijo/python-roborock/commit/ff5376be3a4ff4eb90e33118db89214ef699dc6f))
+
 ## v0.32.1 (2023-08-04)
 
 ### Fix
