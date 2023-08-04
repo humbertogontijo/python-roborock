@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.32.1 (2023-08-04)
+
+### Fix
+
+* Remove coroutine warning ([`da83078`](https://github.com/humbertogontijo/python-roborock/commit/da83078f7ef8f333fa46b75603ce8a88bb97914d))
+
 ## v0.32.0 (2023-08-03)
 
 ### Feature
