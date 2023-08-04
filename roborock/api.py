@@ -311,10 +311,8 @@ class RoborockClient:
             await self.async_disconnect()
         await self.async_connect()
 
-    async def _async_response(self, request_id: int, protocol_id: int = 0) -> tuple[Any, VacuumError | None]:
+    async def _wait_response(self, request_id: int, queue: RoborockFuture) -> tuple[Any, VacuumError | None]:
         try:
-            queue = RoborockFuture(protocol_id)
-            self._waiting_queue[request_id] = queue
             (response, err) = await queue.async_get(QUEUE_TIMEOUT)
             if response == "unknown_method":
                 raise UnknownMethodError("Unknown method")
@@ -323,6 +321,13 @@ class RoborockClient:
             raise RoborockTimeout(f"id={request_id} Timeout after {QUEUE_TIMEOUT} seconds") from None
         finally:
             self._waiting_queue.pop(request_id, None)
+
+    def _async_response(
+        self, request_id: int, protocol_id: int = 0
+    ) -> Coroutine[Any, Any, tuple[Any, VacuumError | None]]:
+        queue = RoborockFuture(protocol_id)
+        self._waiting_queue[request_id] = queue
+        return self._wait_response(request_id, queue)
 
     def _get_payload(
         self,
