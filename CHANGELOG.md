@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.32.3 (2023-08-05)
+
+### Fix
+
+* Resolve unawaited task errors on connect/disconnect ([#103](https://github.com/humbertogontijo/python-roborock/issues/103)) ([`1ad03be`](https://github.com/humbertogontijo/python-roborock/commit/1ad03befa84f9b729a0cc7553b794fe5344a22ce))
+
 ## v0.32.2 (2023-08-04)
 
 ### Fix
