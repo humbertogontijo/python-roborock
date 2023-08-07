@@ -158,11 +158,12 @@ class RoborockFanSpeedS7MaxV(RoborockFanPowerCode):
 
 
 class RoborockFanSpeedS6Pure(RoborockFanPowerCode):
-    gentle = 105
     quiet = 101
     balanced = 102
     turbo = 103
     max = 104
+    gentle = 105
+    custom = 106
 
 
 class RoborockFanSpeedQ7Max(RoborockFanPowerCode):
@@ -214,7 +215,7 @@ class RoborockMopIntensityV2(RoborockMopIntensityCode):
     low = 201
     medium = 202
     high = 203
-    custom = 207
+    custom = 204
 
 
 class RoborockDockErrorCode(RoborockEnum):
