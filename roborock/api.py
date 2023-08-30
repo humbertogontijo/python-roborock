@@ -18,7 +18,7 @@ from typing import Any, Callable, Coroutine, Optional, Type, TypeVar, final
 import aiohttp
 
 from .code_mappings import RoborockDockTypeCode
-from .command_cache import CacheableAttribute, CommandType, RoborockAttribute, create_cache_map, parse_method
+from .command_cache import CacheableAttribute, CommandType, RoborockAttribute, find_cacheable_attribute, get_cache_map
 from .containers import (
     ChildLockStatus,
     CleanRecord,
@@ -152,6 +152,9 @@ class AttributeCache:
         await self._async_value()
         return response
 
+    async def refresh_value(self):
+        await self._async_value()
+
 
 device_cache: dict[str, dict[CacheableAttribute, AttributeCache]] = {}
 
@@ -171,8 +174,7 @@ class RoborockClient:
         cache = device_cache.get(device_info.device.duid)
         if not cache:
             cache = {
-                cacheable_attribute: AttributeCache(attr, self)
-                for cacheable_attribute, attr in create_cache_map().items()
+                cacheable_attribute: AttributeCache(attr, self) for cacheable_attribute, attr in get_cache_map().items()
             }
             device_cache[device_info.device.duid] = cache
         self.cache: dict[CacheableAttribute, AttributeCache] = cache
@@ -260,7 +262,8 @@ class RoborockClient:
                                 elif data_protocol in ROBOROCK_DATA_CONSUMABLE_PROTOCOL:
                                     if self.cache[CacheableAttribute.consumable].value is None:
                                         self._logger.debug(
-                                            f"Got consumable update({data_protocol.name}) before get_status was called."
+                                            f"Got consumable update({data_protocol.name})"
+                                            + "before get_consumable was called."
                                         )
                                         self.cache[CacheableAttribute.consumable]._value = {}
                                     value = self.cache[CacheableAttribute.consumable].value
@@ -375,18 +378,22 @@ class RoborockClient:
         params: Optional[list | dict] = None,
         return_type: Optional[Type[RT]] = None,
     ) -> RT:
-        parsed_method = parse_method(method)
+        cacheable_attribute_result = find_cacheable_attribute(method)
+
         cache = None
-        if parsed_method is not None:
-            cache = self.cache[parsed_method.attribute]
+        command_type = None
+        if cacheable_attribute_result is not None:
+            cache = self.cache[cacheable_attribute_result.attribute]
+            command_type = cacheable_attribute_result.type
+
         response: Any = None
-        if cache is not None:
-            if parsed_method.type == CommandType.GET:
-                response = await cache.async_value()
-            elif parsed_method.type == CommandType.SET:
-                response = await cache.update_value(params)
+        if cache is not None and command_type == CommandType.GET:
+            response = await cache.async_value()
         else:
             response = await self._send_command(method, params)
+            if cache is not None and command_type == CommandType.CHANGE:
+                await cache.refresh_value()
+
         if return_type:
             return return_type.from_dict(response)
         return response
