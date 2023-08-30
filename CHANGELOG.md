@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.32.4 (2023-08-30)
+
+### Fix
+
+* Refactor cache and call get_status after changing mop mode ([#105](https://github.com/humbertogontijo/python-roborock/issues/105)) ([`8bf70f4`](https://github.com/humbertogontijo/python-roborock/commit/8bf70f4f8b3cabe846bffdc3dd3300f9f621ae97))
+
 ## v0.32.3 (2023-08-05)
 
 ### Fix
