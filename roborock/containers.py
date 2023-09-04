@@ -27,7 +27,6 @@ from .code_mappings import (
     RoborockMopModeCode,
     RoborockMopModeS7,
     RoborockMopModeS8ProUltra,
-    RoborockMopModeP10,
     RoborockStateCode,
 )
 from .const import (
@@ -362,7 +361,7 @@ class S8Status(Status):
 class P10Status(Status):
     fan_power: Optional[RoborockFanSpeedP10] = None
     water_box_mode: Optional[RoborockMopIntensityV2] = None
-    mop_mode: Optional[RoborockMopModeP10] = None
+    mop_mode: Optional[RoborockMopModeS8ProUltra] = None
 
 
 ModelStatus: dict[str, Type[Status]] = {
@@ -377,7 +376,7 @@ ModelStatus: dict[str, Type[Status]] = {
     ROBOROCK_S8: S8Status,
     ROBOROCK_S8_PRO_ULTRA: S8ProUltraStatus,
     ROBOROCK_G10S_PRO: S7MaxVStatus,
-    ROBOROCK_P10: P10Status
+    ROBOROCK_P10: P10Status,
 }
 
 
