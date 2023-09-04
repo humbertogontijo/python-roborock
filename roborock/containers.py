@@ -26,7 +26,7 @@ from .code_mappings import (
     RoborockMopModeCode,
     RoborockMopModeS7,
     RoborockMopModeS8ProUltra,
-    RoborockStateCode,
+    RoborockStateCode, RoborockMopIntensityS5Max,
 )
 from .const import (
     FILTER_REPLACE_TIME,
@@ -297,7 +297,7 @@ class S4MaxStatus(Status):
 @dataclass
 class S5MaxStatus(Status):
     fan_power: Optional[RoborockFanSpeedS6Pure] = None
-    water_box_mode: Optional[RoborockMopIntensityV2] = None
+    water_box_mode: Optional[RoborockMopIntensityS5Max] = None
 
 
 @dataclass
