@@ -196,6 +196,14 @@ class RoborockMopModeS8ProUltra(RoborockMopModeCode):
 class RoborockMopIntensityCode(RoborockEnum):
     """Describes the mop intensity of the vacuum cleaner."""
 
+class RoborockMopModeP10(RoborockMopModeCode):
+    standard = 300
+    deep = 301
+    deep_plus = 302
+    fast = 303
+
+class RoborockMopIntensityCode(RoborockEnum):
+    """Describes the mop intensity of the vacuum cleaner."""
 
 class RoborockMopIntensityS7(RoborockMopIntensityCode):
     """Describes the mop intensity of the vacuum cleaner."""
