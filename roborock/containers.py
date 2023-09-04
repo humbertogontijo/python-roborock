@@ -20,12 +20,14 @@ from .code_mappings import (
     RoborockFanSpeedS6Pure,
     RoborockFanSpeedS7,
     RoborockFanSpeedS7MaxV,
+    RoborockFanSpeedP10,
     RoborockMopIntensityCode,
     RoborockMopIntensityS7,
     RoborockMopIntensityV2,
     RoborockMopModeCode,
     RoborockMopModeS7,
     RoborockMopModeS8ProUltra,
+    RoborockMopModeP10,
     RoborockStateCode,
 )
 from .const import (
@@ -42,6 +44,7 @@ from .const import (
     ROBOROCK_S7_MAXV,
     ROBOROCK_S8,
     ROBOROCK_S8_PRO_ULTRA,
+    ROBOROCK_P10,
     SENSOR_DIRTY_REPLACE_TIME,
     SIDE_BRUSH_REPLACE_TIME,
 )
@@ -345,6 +348,13 @@ class S8Status(Status):
     mop_mode: Optional[RoborockMopModeS8ProUltra] = None
 
 
+@dataclass
+class P10Status(Status):
+    fan_power: Optional[RoborockFanSpeedP10] = None
+    water_box_mode: Optional[RoborockMopIntensityV2] = None
+    mop_mode: Optional[RoborockMopModeP10] = None
+
+
 ModelStatus: dict[str, Type[Status]] = {
     ROBOROCK_S4_MAX: S4MaxStatus,
     ROBOROCK_S5_MAX: S5MaxStatus,
@@ -357,6 +367,7 @@ ModelStatus: dict[str, Type[Status]] = {
     ROBOROCK_S8: S8Status,
     ROBOROCK_S8_PRO_ULTRA: S8ProUltraStatus,
     ROBOROCK_G10S_PRO: S7MaxVStatus,
+    ROBOROCK_P10: P10Status
 }
 
 
