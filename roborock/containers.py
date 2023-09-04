@@ -21,12 +21,13 @@ from .code_mappings import (
     RoborockFanSpeedS7,
     RoborockFanSpeedS7MaxV,
     RoborockMopIntensityCode,
+    RoborockMopIntensityS5Max,
     RoborockMopIntensityS7,
     RoborockMopIntensityV2,
     RoborockMopModeCode,
     RoborockMopModeS7,
     RoborockMopModeS8ProUltra,
-    RoborockStateCode, RoborockMopIntensityS5Max,
+    RoborockStateCode,
 )
 from .const import (
     FILTER_REPLACE_TIME,

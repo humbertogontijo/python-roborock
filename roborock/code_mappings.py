@@ -217,6 +217,7 @@ class RoborockMopIntensityV2(RoborockMopIntensityCode):
     high = 203
     custom = 207
 
+
 class RoborockMopIntensityS5Max(RoborockMopIntensityCode):
     """Describes the mop intensity of the vacuum cleaner."""
 
