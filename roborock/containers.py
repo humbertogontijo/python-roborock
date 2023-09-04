@@ -16,6 +16,7 @@ from .code_mappings import (
     RoborockDockWashTowelModeCode,
     RoborockErrorCode,
     RoborockFanPowerCode,
+    RoborockFanSpeedP10,
     RoborockFanSpeedQ7Max,
     RoborockFanSpeedS6Pure,
     RoborockFanSpeedS7,
@@ -32,6 +33,7 @@ from .const import (
     FILTER_REPLACE_TIME,
     MAIN_BRUSH_REPLACE_TIME,
     ROBOROCK_G10S_PRO,
+    ROBOROCK_P10,
     ROBOROCK_Q7_MAX,
     ROBOROCK_S4_MAX,
     ROBOROCK_S5_MAX,
@@ -282,6 +284,16 @@ class Status(RoborockBase):
     charge_status: Optional[int] = None
     unsave_map_reason: Optional[int] = None
     unsave_map_flag: Optional[int] = None
+    wash_status: Optional[int] = None
+    distance_off: Optional[int] = None
+    in_warmup: Optional[int] = None
+    dry_status: Optional[int] = None
+    rdt: Optional[int] = None
+    clean_percent: Optional[int] = None
+    rss: Optional[int] = None
+    dss: Optional[int] = None
+    common_status: Optional[int] = None
+    corner_clean_mode: Optional[int] = None
 
     def __post_init__(self) -> None:
         self.square_meter_clean_area = round(self.clean_area / 1000000, 1) if self.clean_area is not None else None
@@ -345,6 +357,13 @@ class S8Status(Status):
     mop_mode: Optional[RoborockMopModeS8ProUltra] = None
 
 
+@dataclass
+class P10Status(Status):
+    fan_power: Optional[RoborockFanSpeedP10] = None
+    water_box_mode: Optional[RoborockMopIntensityV2] = None
+    mop_mode: Optional[RoborockMopModeS8ProUltra] = None
+
+
 ModelStatus: dict[str, Type[Status]] = {
     ROBOROCK_S4_MAX: S4MaxStatus,
     ROBOROCK_S5_MAX: S5MaxStatus,
@@ -357,6 +376,7 @@ ModelStatus: dict[str, Type[Status]] = {
     ROBOROCK_S8: S8Status,
     ROBOROCK_S8_PRO_ULTRA: S8ProUltraStatus,
     ROBOROCK_G10S_PRO: S7MaxVStatus,
+    ROBOROCK_P10: P10Status,
 }
 
 
@@ -378,6 +398,7 @@ class CleanSummary(RoborockBase):
     clean_count: Optional[int] = None
     dust_collection_count: Optional[int] = None
     records: Optional[list[int]] = None
+    last_clean_t: Optional[int] = None
 
     def __post_init__(self) -> None:
         self.square_meter_clean_area = round(self.clean_area / 1000000, 1) if self.clean_area is not None else None
