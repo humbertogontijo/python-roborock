@@ -202,13 +202,6 @@ class RoborockMopModeS8ProUltra(RoborockMopModeCode):
     custom = 302
 
 
-class RoborockMopModeP10(RoborockMopModeCode):
-    """Describes the mop mode of the vacuum cleaner."""
-
-    standard = 300
-    fast = 304
-
-
 class RoborockMopIntensityCode(RoborockEnum):
     """Describes the mop intensity of the vacuum cleaner."""
 
