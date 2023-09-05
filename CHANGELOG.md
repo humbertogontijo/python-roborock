@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.33.0 (2023-09-04)
+
+### Feature
+
+* Add q revo/p10 support ([#114](https://github.com/humbertogontijo/python-roborock/issues/114)) ([`b2237d9`](https://github.com/humbertogontijo/python-roborock/commit/b2237d97384d819cbcc62902bbcbb2c7dbe0072e))
+
 ## v0.32.4 (2023-08-30)
 
 ### Fix
