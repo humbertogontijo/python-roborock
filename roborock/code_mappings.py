@@ -163,6 +163,7 @@ class RoborockFanSpeedS6Pure(RoborockFanPowerCode):
     balanced = 102
     turbo = 103
     max = 104
+    custom = 106
 
 
 class RoborockFanSpeedQ7Max(RoborockFanPowerCode):
@@ -224,6 +225,16 @@ class RoborockMopIntensityV2(RoborockMopIntensityCode):
     medium = 202
     high = 203
     custom = 207
+
+
+class RoborockMopIntensityS5Max(RoborockMopIntensityCode):
+    """Describes the mop intensity of the vacuum cleaner."""
+
+    off = 200
+    low = 201
+    medium = 202
+    high = 203
+    custom = 204
 
 
 class RoborockDockErrorCode(RoborockEnum):
