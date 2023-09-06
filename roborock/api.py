@@ -75,6 +75,11 @@ COMMANDS_SECURED = [
     RoborockCommand.GET_MULTI_MAP,
 ]
 RT = TypeVar("RT", bound=RoborockBase)
+WASH_N_FILL_DOCK = [
+    RoborockDockTypeCode.empty_wash_fill_dock,
+    RoborockDockTypeCode.s8_dock,
+    RoborockDockTypeCode.p10_dock,
+]
 
 
 def md5hex(message: str) -> str:
@@ -454,7 +459,7 @@ class RoborockClient:
                 DustCollectionMode | WashTowelMode | SmartWashParams | None,
             ]
         ] = [self.get_dust_collection_mode()]
-        if dock_type == RoborockDockTypeCode.empty_wash_fill_dock or dock_type == RoborockDockTypeCode.s8_dock:
+        if dock_type in WASH_N_FILL_DOCK:
             commands += [
                 self.get_wash_towel_mode(),
                 self.get_smart_wash_params(),
