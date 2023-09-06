@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.33.2 (2023-09-06)
+
+### Fix
+
+* Add missing s5 codes ([#116](https://github.com/humbertogontijo/python-roborock/issues/116)) ([`4d56021`](https://github.com/humbertogontijo/python-roborock/commit/4d560216354fab4ab8b1d452dd6b29008b20d50a))
+
 ## v0.33.1 (2023-09-06)
 
 ### Fix
