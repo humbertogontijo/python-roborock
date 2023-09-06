@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.33.1 (2023-09-06)
+
+### Fix
+
+* Unknow values on HA component ([#117](https://github.com/humbertogontijo/python-roborock/issues/117)) ([`1323618`](https://github.com/humbertogontijo/python-roborock/commit/1323618c6c58bb6dcef5c7f5f2ca12e32969ba0f))
+
 ## v0.33.0 (2023-09-04)
 
 ### Feature
