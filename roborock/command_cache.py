@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Mapping, Optional
 
 from roborock import RoborockCommand
 
@@ -38,9 +38,9 @@ class CacheableAttribute(str, Enum):
 class RoborockAttribute:
     attribute: str
     get_command: RoborockCommand
-    add_command: Optional[RoborockCommand] = None
-    set_command: Optional[RoborockCommand] = None
-    close_command: Optional[RoborockCommand] = None
+    add_command: RoborockCommand | None = None
+    set_command: RoborockCommand | None = None
+    close_command: RoborockCommand | None = None
     additional_change_commands: list[RoborockCommand] = field(default_factory=list)
 
 

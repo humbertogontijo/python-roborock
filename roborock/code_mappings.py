@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 from enum import IntEnum
-from typing import Type
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -15,7 +14,7 @@ class RoborockEnum(IntEnum):
         return super().name.lower()
 
     @classmethod
-    def _missing_(cls: Type[RoborockEnum], key) -> RoborockEnum:
+    def _missing_(cls: type[RoborockEnum], key) -> RoborockEnum:
         if hasattr(cls, "unknown"):
             _LOGGER.warning(f"Missing {cls.__name__} code: {key} - defaulting to 'unknown'")
             return cls.unknown  # type: ignore
@@ -24,23 +23,23 @@ class RoborockEnum(IntEnum):
         return default_value
 
     @classmethod
-    def as_dict(cls: Type[RoborockEnum]):
+    def as_dict(cls: type[RoborockEnum]):
         return {i.name: i.value for i in cls if i.name != "missing"}
 
     @classmethod
-    def as_enum_dict(cls: Type[RoborockEnum]):
+    def as_enum_dict(cls: type[RoborockEnum]):
         return {i.value: i for i in cls if i.name != "missing"}
 
     @classmethod
-    def values(cls: Type[RoborockEnum]) -> list[int]:
+    def values(cls: type[RoborockEnum]) -> list[int]:
         return list(cls.as_dict().values())
 
     @classmethod
-    def keys(cls: Type[RoborockEnum]) -> list[str]:
+    def keys(cls: type[RoborockEnum]) -> list[str]:
         return list(cls.as_dict().keys())
 
     @classmethod
-    def items(cls: Type[RoborockEnum]):
+    def items(cls: type[RoborockEnum]):
         return cls.as_dict().items()
 
 

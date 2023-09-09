@@ -7,7 +7,7 @@ import hashlib
 import json
 import logging
 from asyncio import BaseTransport, Lock
-from typing import Callable
+from collections.abc import Callable
 
 from construct import (  # type: ignore
     Bytes,
@@ -35,8 +35,8 @@ from roborock import BroadcastMessage, RoborockException
 from roborock.roborock_message import RoborockMessage
 
 _LOGGER = logging.getLogger(__name__)
-SALT = "TXdfu$jyZ#TZHsg4".encode()
-BROADCAST_TOKEN = "qWKYcdQWrbm9hPqe".encode()
+SALT = b"TXdfu$jyZ#TZHsg4"
+BROADCAST_TOKEN = b"qWKYcdQWrbm9hPqe"
 AP_CONFIG = 1
 SOCK_DISCOVERY = 2
 
