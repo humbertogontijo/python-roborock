@@ -185,6 +185,7 @@ class RoborockClient:
             device_cache[device_info.device.duid] = cache
         self.cache: dict[CacheableAttribute, AttributeCache] = cache
         self._listeners: list[Callable[[str, CacheableAttribute, RoborockBase], None]] = []
+        self.is_available: bool = False
 
     def __del__(self) -> None:
         self.release()
