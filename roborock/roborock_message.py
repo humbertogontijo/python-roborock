@@ -5,7 +5,6 @@ import math
 import time
 from dataclasses import dataclass
 from random import randint
-from typing import Optional
 
 from roborock import RoborockEnum
 
@@ -64,12 +63,12 @@ class MessageRetry:
 @dataclass
 class RoborockMessage:
     protocol: RoborockMessageProtocol
-    payload: Optional[bytes] = None
+    payload: bytes | None = None
     seq: int = randint(100000, 999999)
     version: bytes = b"1.0"
     random: int = randint(10000, 99999)
     timestamp: int = math.floor(time.time())
-    message_retry: Optional[MessageRetry] = None
+    message_retry: MessageRetry | None = None
 
     def get_request_id(self) -> int | None:
         if self.payload:

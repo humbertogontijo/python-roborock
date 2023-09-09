@@ -6,7 +6,7 @@ import logging
 import threading
 import uuid
 from asyncio import Lock, Task
-from typing import Any, Optional
+from typing import Any
 from urllib.parse import urlparse
 
 import paho.mqtt.client as mqtt
@@ -199,7 +199,7 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
     async def _send_command(
         self,
         method: RoborockCommand,
-        params: Optional[list | dict] = None,
+        params: list | dict | None = None,
     ):
         request_id, timestamp, payload = super()._get_payload(method, params, True)
         request_protocol = RoborockMessageProtocol.RPC_REQUEST
