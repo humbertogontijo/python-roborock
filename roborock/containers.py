@@ -408,7 +408,9 @@ class CleanSummary(RoborockBase):
 @dataclass
 class CleanRecord(RoborockBase):
     begin: Optional[int] = None
+    begin_datetime: datetime.datetime | None = None
     end: Optional[int] = None
+    end_datetime: datetime.datetime | None = None
     duration: Optional[int] = None
     area: Optional[int] = None
     square_meter_area: Optional[float] = None
@@ -424,6 +426,8 @@ class CleanRecord(RoborockBase):
 
     def __post_init__(self) -> None:
         self.square_meter_area = round(self.area / 1000000, 1) if self.area is not None else None
+        self.begin_datetime = datetime.datetime.fromtimestamp(self.begin).astimezone(datetime.UTC) if self.begin else None
+        self.end_datetime = datetime.datetime.fromtimestamp(self.end).astimezone(datetime.UTC) if self.end else None
 
 
 @dataclass
