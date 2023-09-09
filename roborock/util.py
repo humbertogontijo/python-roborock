@@ -5,9 +5,8 @@ import datetime
 import functools
 import logging
 from asyncio import AbstractEventLoop, TimerHandle
-from collections.abc import MutableMapping
+from collections.abc import Callable, Coroutine, MutableMapping
 from typing import Any, TypeVar
-from collections.abc import Callable, Coroutine
 
 from roborock import RoborockException
 

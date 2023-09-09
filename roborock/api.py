@@ -12,9 +12,9 @@ import math
 import secrets
 import struct
 import time
+from collections.abc import Callable, Coroutine
 from random import randint
 from typing import Any, TypeVar, final
-from collections.abc import Callable, Coroutine
 
 import aiohttp
 
