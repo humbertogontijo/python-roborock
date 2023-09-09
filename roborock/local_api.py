@@ -3,7 +3,6 @@ from __future__ import annotations
 import asyncio
 import logging
 from asyncio import Lock, TimerHandle, Transport
-from typing import Optional
 
 import async_timeout
 
@@ -39,7 +38,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         parser_msg, self.remaining = MessageParser.parse(message, local_key=self.device_info.device.local_key)
         self.on_message_received(parser_msg)
 
-    def connection_lost(self, exc: Optional[Exception]):
+    def connection_lost(self, exc: Exception | None):
         self.sync_disconnect()
         self.on_connection_lost(exc)
 
@@ -83,11 +82,11 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         async with self._mutex:
             self.sync_disconnect()
 
-    def build_roborock_message(self, method: RoborockCommand, params: Optional[list | dict] = None) -> RoborockMessage:
+    def build_roborock_message(self, method: RoborockCommand, params: list | dict | None = None) -> RoborockMessage:
         secured = True if method in COMMANDS_SECURED else False
         request_id, timestamp, payload = self._get_payload(method, params, secured)
         request_protocol = RoborockMessageProtocol.GENERAL_REQUEST
-        message_retry: Optional[MessageRetry] = None
+        message_retry: MessageRetry | None = None
         if method == RoborockCommand.RETRY_REQUEST and isinstance(params, dict):
             message_retry = MessageRetry(method=params["method"], retry_id=params["retry_id"])
         return RoborockMessage(
@@ -122,7 +121,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
     async def _send_command(
         self,
         method: RoborockCommand,
-        params: Optional[list | dict] = None,
+        params: list | dict | None = None,
     ):
         roborock_message = self.build_roborock_message(method, params)
         return await self.send_message(roborock_message)

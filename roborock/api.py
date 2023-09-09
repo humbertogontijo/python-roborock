@@ -12,8 +12,9 @@ import math
 import secrets
 import struct
 import time
+from collections.abc import Callable, Coroutine
 from random import randint
-from typing import Any, Callable, Coroutine, Optional, Type, TypeVar, final
+from typing import Any, TypeVar, final
 
 import aiohttp
 
@@ -89,7 +90,7 @@ def md5hex(message: str) -> str:
 
 
 class PreparedRequest:
-    def __init__(self, base_url: str, base_headers: Optional[dict] = None) -> None:
+    def __init__(self, base_url: str, base_headers: dict | None = None) -> None:
         self.base_url = base_url
         self.base_headers = base_headers or {}
 
@@ -251,7 +252,7 @@ class RoborockClient:
                                 data_protocol = RoborockDataProtocol(int(data_point_number))
                                 self._logger.debug(f"Got device update for {data_protocol.name}: {data_point}")
                                 if data_protocol in ROBOROCK_DATA_STATUS_PROTOCOL:
-                                    _cls: Type[Status] = ModelStatus.get(
+                                    _cls: type[Status] = ModelStatus.get(
                                         self.device_info.model, S7MaxVStatus
                                     )  # Default to S7 MAXV if we don't have the data
                                     if self.cache[CacheableAttribute.status].value is None:
@@ -301,7 +302,7 @@ class RoborockClient:
         except Exception as ex:
             self._logger.exception(ex)
 
-    def on_connection_lost(self, exc: Optional[Exception]) -> None:
+    def on_connection_lost(self, exc: Exception | None) -> None:
         self._last_disconnection = self.time_func()
         self._logger.info("Roborock client disconnected")
         if exc is not None:
@@ -340,7 +341,7 @@ class RoborockClient:
     def _get_payload(
         self,
         method: RoborockCommand,
-        params: Optional[list | dict] = None,
+        params: list | dict | None = None,
         secured=False,
     ):
         timestamp = math.floor(time.time())
@@ -372,7 +373,7 @@ class RoborockClient:
     async def _send_command(
         self,
         method: RoborockCommand,
-        params: Optional[list | dict] = None,
+        params: list | dict | None = None,
     ):
         raise NotImplementedError
 
@@ -380,8 +381,8 @@ class RoborockClient:
     async def send_command(
         self,
         method: RoborockCommand,
-        params: Optional[list | dict] = None,
-        return_type: Optional[Type[RT]] = None,
+        params: list | dict | None = None,
+        return_type: type[RT] | None = None,
     ) -> RT:
         cacheable_attribute_result = find_cacheable_attribute(method)
 
@@ -404,7 +405,7 @@ class RoborockClient:
         return response
 
     async def get_status(self) -> Status | None:
-        _cls: Type[Status] = ModelStatus.get(
+        _cls: type[Status] = ModelStatus.get(
             self.device_info.model, S7MaxVStatus
         )  # Default to S7 MAXV if we don't have the data
         return _cls.from_dict(await self.cache[CacheableAttribute.status].async_value())
