@@ -6,7 +6,7 @@ import re
 from dataclasses import asdict, dataclass
 from enum import Enum
 from typing import Any, NamedTuple
-
+from datetime import timezone
 from dacite import Config, from_dict
 
 from .code_mappings import (
@@ -427,9 +427,9 @@ class CleanRecord(RoborockBase):
     def __post_init__(self) -> None:
         self.square_meter_area = round(self.area / 1000000, 1) if self.area is not None else None
         self.begin_datetime = (
-            datetime.datetime.fromtimestamp(self.begin).astimezone(datetime.UTC) if self.begin else None
+            datetime.datetime.fromtimestamp(self.begin).astimezone(timezone.utc) if self.begin else None
         )
-        self.end_datetime = datetime.datetime.fromtimestamp(self.end).astimezone(datetime.UTC) if self.end else None
+        self.end_datetime = datetime.datetime.fromtimestamp(self.end).astimezone(timezone.utc) if self.end else None
 
 
 @dataclass
