@@ -4,9 +4,10 @@ import datetime
 import logging
 import re
 from dataclasses import asdict, dataclass
+from datetime import timezone
 from enum import Enum
 from typing import Any, NamedTuple
-from datetime import timezone
+
 from dacite import Config, from_dict
 
 from .code_mappings import (
