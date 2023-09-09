@@ -407,9 +407,9 @@ class CleanSummary(RoborockBase):
 
 @dataclass
 class CleanRecord(RoborockBase):
-    begin: Optional[int] = None
+    begin: int | None = None
     begin_datetime: datetime.datetime | None = None
-    end: Optional[int] = None
+    end: int | None = None
     end_datetime: datetime.datetime | None = None
     duration: int | None = None
     area: int | None = None
