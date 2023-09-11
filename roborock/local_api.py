@@ -7,7 +7,7 @@ from asyncio import Lock, TimerHandle, Transport
 import async_timeout
 
 from . import DeviceData
-from .api import COMMANDS_SECURED, QUEUE_TIMEOUT, RoborockClient
+from .api import COMMANDS_SECURED, RoborockClient
 from .exceptions import CommandVacuumError, RoborockConnectionException, RoborockException
 from .protocol import MessageParser
 from .roborock_message import MessageRetry, RoborockMessage, RoborockMessageProtocol
@@ -58,7 +58,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
             try:
                 if not self.is_connected():
                     self.sync_disconnect()
-                    async with async_timeout.timeout(QUEUE_TIMEOUT):
+                    async with async_timeout.timeout(self.queue_timeout):
                         self._logger.info(f"Connecting to {self.host}")
                         self.transport, _ = await self.event_loop.create_connection(  # type: ignore
                             lambda: self, self.host, 58867
