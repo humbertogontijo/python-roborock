@@ -70,7 +70,6 @@ from .util import RepeatableTask, RoborockLoggerAdapter, get_running_loop_or_cre
 
 _LOGGER = logging.getLogger(__name__)
 KEEPALIVE = 60
-QUEUE_TIMEOUT = 4
 COMMANDS_SECURED = [
     RoborockCommand.GET_MAP_V1,
     RoborockCommand.GET_MULTI_MAP,
@@ -166,7 +165,7 @@ device_cache: dict[str, dict[CacheableAttribute, AttributeCache]] = {}
 
 
 class RoborockClient:
-    def __init__(self, endpoint: str, device_info: DeviceData) -> None:
+    def __init__(self, endpoint: str, device_info: DeviceData, queue_timeout: int = 4) -> None:
         self.event_loop = get_running_loop_or_create_one()
         self.device_info = device_info
         self._endpoint = endpoint
@@ -186,6 +185,7 @@ class RoborockClient:
         self.cache: dict[CacheableAttribute, AttributeCache] = cache
         self._listeners: list[Callable[[str, CacheableAttribute, RoborockBase], None]] = []
         self.is_available: bool = False
+        self.queue_timeout = queue_timeout
 
     def __del__(self) -> None:
         self.release()
@@ -323,12 +323,12 @@ class RoborockClient:
 
     async def _wait_response(self, request_id: int, queue: RoborockFuture) -> tuple[Any, VacuumError | None]:
         try:
-            (response, err) = await queue.async_get(QUEUE_TIMEOUT)
+            (response, err) = await queue.async_get(self.queue_timeout)
             if response == "unknown_method":
                 raise UnknownMethodError("Unknown method")
             return response, err
         except (asyncio.TimeoutError, asyncio.CancelledError):
-            raise RoborockTimeout(f"id={request_id} Timeout after {QUEUE_TIMEOUT} seconds") from None
+            raise RoborockTimeout(f"id={request_id} Timeout after {self.queue_timeout} seconds") from None
         finally:
             self._waiting_queue.pop(request_id, None)
 

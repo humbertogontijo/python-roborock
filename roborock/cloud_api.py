@@ -29,12 +29,12 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
     _thread: threading.Thread
     _client_id: str
 
-    def __init__(self, user_data: UserData, device_info: DeviceData) -> None:
+    def __init__(self, user_data: UserData, device_info: DeviceData, queue_timeout: int = 10) -> None:
         rriot = user_data.rriot
         if rriot is None:
             raise RoborockException("Got no rriot data from user_data")
         endpoint = base64.b64encode(Utils.md5(rriot.k.encode())[8:14]).decode()
-        RoborockClient.__init__(self, endpoint, device_info)
+        RoborockClient.__init__(self, endpoint, device_info, queue_timeout)
         mqtt.Client.__init__(self, protocol=mqtt.MQTTv5)
         self._logger = RoborockLoggerAdapter(device_info.device.name, _LOGGER)
         self._mqtt_user = rriot.u
