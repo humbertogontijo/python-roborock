@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.34.0 (2023-09-12)
+
+### Feature
+
+* Add datetime parsing in cleanrecord ([#119](https://github.com/humbertogontijo/python-roborock/issues/119)) ([`5e67fa6`](https://github.com/humbertogontijo/python-roborock/commit/5e67fa648478e573239c2f1dfc4b58c01cae1797))
+
 ## v0.33.2 (2023-09-06)
 
 ### Fix
