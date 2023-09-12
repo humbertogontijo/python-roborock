@@ -4,6 +4,7 @@ import datetime
 import logging
 import re
 from dataclasses import asdict, dataclass
+from datetime import timezone
 from enum import Enum
 from typing import Any, NamedTuple
 
@@ -408,7 +409,9 @@ class CleanSummary(RoborockBase):
 @dataclass
 class CleanRecord(RoborockBase):
     begin: int | None = None
+    begin_datetime: datetime.datetime | None = None
     end: int | None = None
+    end_datetime: datetime.datetime | None = None
     duration: int | None = None
     area: int | None = None
     square_meter_area: float | None = None
@@ -424,6 +427,10 @@ class CleanRecord(RoborockBase):
 
     def __post_init__(self) -> None:
         self.square_meter_area = round(self.area / 1000000, 1) if self.area is not None else None
+        self.begin_datetime = (
+            datetime.datetime.fromtimestamp(self.begin).astimezone(timezone.utc) if self.begin else None
+        )
+        self.end_datetime = datetime.datetime.fromtimestamp(self.end).astimezone(timezone.utc) if self.end else None
 
 
 @dataclass
