@@ -186,9 +186,7 @@ class RoborockClient:
         self._listeners: list[Callable[[str, CacheableAttribute, RoborockBase], None]] = []
         self.is_available: bool = True
         self.queue_timeout = queue_timeout
-        self._status_type: type[Status] = ModelStatus.get(
-                                        self.device_info.model, S7MaxVStatus
-                                    )
+        self._status_type: type[Status] = ModelStatus.get(self.device_info.model, S7MaxVStatus)
 
     def __del__(self) -> None:
         self.release()
@@ -265,7 +263,7 @@ class RoborockClient:
                                         self._logger.debug(
                                             f"Got status update({data_protocol.name}) before get_status was called."
                                         )
-                                        self.cache[CacheableAttribute.status]._value = {}
+                                        return
                                     value = self.cache[CacheableAttribute.status].value
                                     value[data_protocol.name] = data_point
                                     status = self._status_type.from_dict(value)
@@ -277,7 +275,7 @@ class RoborockClient:
                                             f"Got consumable update({data_protocol.name})"
                                             + "before get_consumable was called."
                                         )
-                                        self.cache[CacheableAttribute.consumable]._value = {}
+                                        return
                                     value = self.cache[CacheableAttribute.consumable].value
                                     value[data_protocol.name] = data_point
                                     consumable = Consumable.from_dict(value)
