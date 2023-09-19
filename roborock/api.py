@@ -184,11 +184,17 @@ class RoborockClient:
             device_cache[device_info.device.duid] = cache
         self.cache: dict[CacheableAttribute, AttributeCache] = cache
         self._listeners: list[Callable[[str, CacheableAttribute, RoborockBase], None]] = []
-        self.is_available: bool = False
+        self.is_available: bool = True
         self.queue_timeout = queue_timeout
+        self._status_type: type[Status] = ModelStatus.get(self.device_info.model, S7MaxVStatus)
 
     def __del__(self) -> None:
         self.release()
+
+    @property
+    def status_type(self) -> type[Status]:
+        """Gets the status type for this device"""
+        return self._status_type
 
     def release(self):
         self.sync_disconnect()
@@ -253,17 +259,14 @@ class RoborockClient:
                                 data_protocol = RoborockDataProtocol(int(data_point_number))
                                 self._logger.debug(f"Got device update for {data_protocol.name}: {data_point}")
                                 if data_protocol in ROBOROCK_DATA_STATUS_PROTOCOL:
-                                    _cls: type[Status] = ModelStatus.get(
-                                        self.device_info.model, S7MaxVStatus
-                                    )  # Default to S7 MAXV if we don't have the data
                                     if self.cache[CacheableAttribute.status].value is None:
                                         self._logger.debug(
                                             f"Got status update({data_protocol.name}) before get_status was called."
                                         )
-                                        self.cache[CacheableAttribute.status]._value = {}
+                                        return
                                     value = self.cache[CacheableAttribute.status].value
                                     value[data_protocol.name] = data_point
-                                    status = _cls.from_dict(value)
+                                    status = self._status_type.from_dict(value)
                                     for listener in self._listeners:
                                         listener(self.device_info.device.duid, CacheableAttribute.status, status)
                                 elif data_protocol in ROBOROCK_DATA_CONSUMABLE_PROTOCOL:
@@ -272,7 +275,7 @@ class RoborockClient:
                                             f"Got consumable update({data_protocol.name})"
                                             + "before get_consumable was called."
                                         )
-                                        self.cache[CacheableAttribute.consumable]._value = {}
+                                        return
                                     value = self.cache[CacheableAttribute.consumable].value
                                     value[data_protocol.name] = data_point
                                     consumable = Consumable.from_dict(value)
@@ -406,10 +409,7 @@ class RoborockClient:
         return response
 
     async def get_status(self) -> Status | None:
-        _cls: type[Status] = ModelStatus.get(
-            self.device_info.model, S7MaxVStatus
-        )  # Default to S7 MAXV if we don't have the data
-        return _cls.from_dict(await self.cache[CacheableAttribute.status].async_value())
+        return self._status_type.from_dict(await self.cache[CacheableAttribute.status].async_value())
 
     async def get_dnd_timer(self) -> DnDTimer | None:
         return DnDTimer.from_dict(await self.cache[CacheableAttribute.dnd_timer].async_value())

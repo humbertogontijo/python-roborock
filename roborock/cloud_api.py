@@ -138,7 +138,7 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
         if self._mqtt_port is None or self._mqtt_host is None:
             raise RoborockException("Mqtt information was not entered. Cannot connect.")
 
-        self._logger.info("Connecting to mqtt")
+        self._logger.debug("Connecting to mqtt")
         connected_future = asyncio.ensure_future(self._async_response(CONNECT_REQUEST_ID))
         super().connect(host=self._mqtt_host, port=self._mqtt_port, keepalive=KEEPALIVE)
 

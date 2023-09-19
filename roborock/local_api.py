@@ -59,7 +59,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
                 if not self.is_connected():
                     self.sync_disconnect()
                     async with async_timeout.timeout(self.queue_timeout):
-                        self._logger.info(f"Connecting to {self.host}")
+                        self._logger.debug(f"Connecting to {self.host}")
                         self.transport, _ = await self.event_loop.create_connection(  # type: ignore
                             lambda: self, self.host, 58867
                         )
