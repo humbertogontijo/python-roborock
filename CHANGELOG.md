@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.34.1 (2023-09-19)
+
+### Fix
+
+* Status reworking ([#121](https://github.com/humbertogontijo/python-roborock/issues/121)) ([`8f4b7d3`](https://github.com/humbertogontijo/python-roborock/commit/8f4b7d376d5a475798782496ea52ac9674cb9ae7))
+
 ## v0.34.0 (2023-09-12)
 
 ### Feature
