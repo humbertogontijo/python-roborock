@@ -118,13 +118,21 @@ class AttributeCache:
         self.task = RepeatableTask(self.api.event_loop, self._async_value, EVICT_TIME)
         self._value: Any = None
         self._mutex = asyncio.Lock()
+        self.unsupported: bool = False
 
     @property
     def value(self):
         return self._value
 
     async def _async_value(self):
-        self._value = await self.api._send_command(self.attribute.get_command)
+        if self.unsupported:
+            return None
+        try:
+            self._value = await self.api._send_command(self.attribute.get_command)
+        except UnknownMethodError as err:
+            # Limit the amount of times we call unsupported methods
+            self.unsupported = True
+            raise err
         return self._value
 
     async def async_value(self):
@@ -161,9 +169,6 @@ class AttributeCache:
         await self._async_value()
 
 
-device_cache: dict[str, dict[CacheableAttribute, AttributeCache]] = {}
-
-
 class RoborockClient:
     def __init__(self, endpoint: str, device_info: DeviceData, queue_timeout: int = 4) -> None:
         self.event_loop = get_running_loop_or_create_one()
@@ -176,13 +181,9 @@ class RoborockClient:
         self.keep_alive = KEEPALIVE
         self._diagnostic_data: dict[str, dict[str, Any]] = {}
         self._logger = RoborockLoggerAdapter(device_info.device.name, _LOGGER)
-        cache = device_cache.get(device_info.device.duid)
-        if not cache:
-            cache = {
-                cacheable_attribute: AttributeCache(attr, self) for cacheable_attribute, attr in get_cache_map().items()
-            }
-            device_cache[device_info.device.duid] = cache
-        self.cache: dict[CacheableAttribute, AttributeCache] = cache
+        self.cache: dict[CacheableAttribute, AttributeCache] = {
+            cacheable_attribute: AttributeCache(attr, self) for cacheable_attribute, attr in get_cache_map().items()
+        }
         self._listeners: list[Callable[[str, CacheableAttribute, RoborockBase], None]] = []
         self.is_available: bool = True
         self.queue_timeout = queue_timeout
