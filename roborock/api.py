@@ -161,8 +161,6 @@ class AttributeCache:
         await self._async_value()
 
 
-
-
 class RoborockClient:
     def __init__(self, endpoint: str, device_info: DeviceData, queue_timeout: int = 4) -> None:
         self.event_loop = get_running_loop_or_create_one()
