@@ -69,7 +69,7 @@ from .roborock_typing import DeviceProp, DockSummary, RoborockCommand
 from .util import RepeatableTask, RoborockLoggerAdapter, get_running_loop_or_create_one, unpack_list
 
 _LOGGER = logging.getLogger(__name__)
-KEEPALIVE = 120
+KEEPALIVE = 60
 COMMANDS_SECURED = [
     RoborockCommand.GET_MAP_V1,
     RoborockCommand.GET_MULTI_MAP,
