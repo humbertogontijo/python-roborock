@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.34.2 (2023-09-21)
+
+### Fix
+
+* Make cache not global ([#122](https://github.com/humbertogontijo/python-roborock/issues/122)) ([`e119201`](https://github.com/humbertogontijo/python-roborock/commit/e119201f1c700d98e3322653440097c91ef4e14c))
+
 ## v0.34.1 (2023-09-19)
 
 ### Fix
