@@ -118,13 +118,21 @@ class AttributeCache:
         self.task = RepeatableTask(self.api.event_loop, self._async_value, EVICT_TIME)
         self._value: Any = None
         self._mutex = asyncio.Lock()
+        self.unsupported: bool = False
 
     @property
     def value(self):
         return self._value
 
     async def _async_value(self):
-        self._value = await self.api._send_command(self.attribute.get_command)
+        if self.unsupported:
+            return None
+        try:
+            self._value = await self.api._send_command(self.attribute.get_command)
+        except UnknownMethodError as err:
+            # Limit the amount of times we call unsupported methods
+            self.unsupported = True
+            raise err
         return self._value
 
     async def async_value(self):
