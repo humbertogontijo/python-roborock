@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.34.3 (2023-09-24)
+
+### Fix
+
+* Add custom code for p10 ([#123](https://github.com/humbertogontijo/python-roborock/issues/123)) ([`8b57d50`](https://github.com/humbertogontijo/python-roborock/commit/8b57d50b0c898ca7d3df7cbdfe3682fd03cf649e))
+
 ## v0.34.2 (2023-09-21)
 
 ### Fix
