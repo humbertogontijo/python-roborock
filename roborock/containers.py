@@ -29,7 +29,7 @@ from .code_mappings import (
     RoborockMopModeCode,
     RoborockMopModeS7,
     RoborockMopModeS8ProUltra,
-    RoborockStateCode,
+    RoborockStateCode, RoborockMopIntensityP10,
 )
 from .const import (
     FILTER_REPLACE_TIME,
@@ -362,7 +362,7 @@ class S8Status(Status):
 @dataclass
 class P10Status(Status):
     fan_power: RoborockFanSpeedP10 | None = None
-    water_box_mode: RoborockMopIntensityV2 | None = None
+    water_box_mode: RoborockMopIntensityP10 | None = None
     mop_mode: RoborockMopModeS8ProUltra | None = None
 
 
