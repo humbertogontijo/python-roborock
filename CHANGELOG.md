@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.34.4 (2023-09-28)
+
+### Fix
+
+* Parsing potential list of clean record ([#125](https://github.com/humbertogontijo/python-roborock/issues/125)) ([`df7a920`](https://github.com/humbertogontijo/python-roborock/commit/df7a920a94a632d9653637e0111b3a955db49356))
+
 ## v0.34.3 (2023-09-24)
 
 ### Fix
