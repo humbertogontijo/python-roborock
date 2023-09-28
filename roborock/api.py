@@ -437,7 +437,16 @@ class RoborockClient:
         return None
 
     async def get_clean_record(self, record_id: int) -> CleanRecord | None:
-        return await self.send_command(RoborockCommand.GET_CLEAN_RECORD, [record_id], return_type=CleanRecord)
+        record: dict | list = await self.send_command(RoborockCommand.GET_CLEAN_RECORD, [record_id])
+        if isinstance(record, dict):
+            return CleanRecord.from_dict(record)
+        elif isinstance(record, list):
+            # There are still a few unknown variables in this.
+            begin, end, duration, area = unpack_list(record, 4)
+            return CleanRecord(begin=begin, end=end, duration=duration, area=area)
+        else:
+            _LOGGER.warning("Clean record was of a new type, please submit an issue request: %s", record)
+            return None
 
     async def get_consumable(self) -> Consumable | None:
         return Consumable.from_dict(await self.cache[CacheableAttribute.consumable].async_value())
