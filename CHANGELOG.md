@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.34.5 (2023-09-29)
+
+### Fix
+
+* Remove alexapy ([#126](https://github.com/humbertogontijo/python-roborock/issues/126)) ([`38ff4eb`](https://github.com/humbertogontijo/python-roborock/commit/38ff4eb90a1805ad599f61322d7c3547f465868b))
+
 ## v0.34.4 (2023-09-28)
 
 ### Fix
