@@ -28,7 +28,6 @@ pycryptodomex = {version = "^3.18", markers = "sys_platform == 'darwin'"}
 paho-mqtt = "^1.6.1"
 dacite = "^1.8.0"
 construct = "^2.10.56"
-alexapy = "^1.26.8"
 
 
 [build-system]
