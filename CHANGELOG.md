@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.34.6 (2023-10-02)
+
+### Fix
+
+* Add missing 207 code ([#127](https://github.com/humbertogontijo/python-roborock/issues/127)) ([`87431a1`](https://github.com/humbertogontijo/python-roborock/commit/87431a1f155059a51b1b3e2c8867fe18cc476e16))
+
 ## v0.34.5 (2023-09-29)
 
 ### Fix
