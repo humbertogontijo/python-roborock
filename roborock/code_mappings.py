@@ -235,6 +235,7 @@ class RoborockMopIntensityP10(RoborockMopIntensityCode):
     medium = 202
     high = 203
     custom = 204
+    custom_water_flow = 207
 
 
 class RoborockMopIntensityS5Max(RoborockMopIntensityCode):
