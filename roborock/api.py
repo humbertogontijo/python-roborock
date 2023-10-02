@@ -232,7 +232,12 @@ class RoborockClient:
                     RoborockMessageProtocol.RPC_RESPONSE,
                     RoborockMessageProtocol.GENERAL_REQUEST,
                 ]:
-                    payload = json.loads(data.payload.decode())
+                    try:
+                        payload = json.loads(data.payload.decode())
+                    except UnicodeDecodeError as err:
+                        self._logger.warning("failed to decode %s" data.payload)
+                        self._logger.debug(err)
+                        return None
                     for data_point_number, data_point in payload.get("dps").items():
                         if data_point_number == "102":
                             data_point_response = json.loads(data_point)
