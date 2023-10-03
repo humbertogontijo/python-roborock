@@ -31,9 +31,11 @@ Parameters:
 app_goto_target
 ---------------
 
-Description:
-
+Description: Sends the robot to a specific coordinate on the map
+    
 Parameters:
+    - X coordinate as integer (e.g.: 23450)
+    - Y coordinate as integer (e.g.: 16450)
 
 
 app_pause
