@@ -15,6 +15,11 @@ These are the potential errors your dock can have and their corresponding number
 
     dirty_tank_latch_open = 44
 
+    no_dustbin = 46
+
+    cleaning_tank_full_or_blocked = 53
+
+
 Vacuum Errors
 -------------
 
