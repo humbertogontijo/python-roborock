@@ -257,6 +257,7 @@ class RoborockDockErrorCode(RoborockEnum):
     waste_water_tank_full = 39
     dirty_tank_latch_open = 44
     no_dustbin = 46
+    cleaning_tank_full_or_blocked = 53
 
 
 class RoborockDockTypeCode(RoborockEnum):
