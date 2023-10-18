@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.35.0 (2023-10-18)
+
+### Feature
+
+* **code_mappings:** Add error n53 cleaning tank full or blocked ([#130](https://github.com/humbertogontijo/python-roborock/issues/130)) ([`ebd57a0`](https://github.com/humbertogontijo/python-roborock/commit/ebd57a0b559c0dee605e30eaead58b8433347a84))
+
 ## v0.34.6 (2023-10-02)
 
 ### Fix
