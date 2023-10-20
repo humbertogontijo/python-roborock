@@ -300,6 +300,9 @@ class Status(RoborockBase):
 
     def __post_init__(self) -> None:
         self.square_meter_clean_area = round(self.clean_area / 1000000, 1) if self.clean_area is not None else None
+        # If a cleaning is still active and we are currently charging - then we should mark it that we will continue.
+        if self.state == RoborockStateCode.charging and self.in_cleaning:
+            self.state = RoborockStateCode.charging_will_continue_cleaning
 
 
 @dataclass

@@ -67,6 +67,7 @@ class RoborockStateCode(RoborockEnum):
     going_to_wash_the_mop = 26  # on a46
     charging_complete = 100
     device_offline = 101
+    charging_will_continue_cleaning = 9999  # Manually added
 
 
 class RoborockErrorCode(RoborockEnum):
