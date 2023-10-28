@@ -15,10 +15,37 @@ Parameters: None
 app_get_dryer_setting
 ---------------------
 
-Description:
+Description: Get dock dryer settings.
 
-Parameters:
+Parameters: None
 
+Returns:
+
+    status:
+
+    on:
+
+        cliff_on:
+
+        cliff_off
+
+        count:
+
+        dry_time: Duration dryer remains on in seconds.
+
+    off:
+
+        cliff_on:
+
+        cliff_off:
+
+        count:
+
+Return example::
+
+    {'status': 1, 'on': {'cliff_on': 1, 'cliff_off': 1, 'count': 10, 'dry_time': 7200}, 'off': {'cliff_on': 2, 'cliff_off': 1, 'count': 10}}
+
+Source: Roborock S7 MaxV Ultra
 
 app_get_init_status
 -------------------
@@ -177,9 +204,13 @@ camera_status
 
 Get: get_camera_status
 
-Description:
+Description: Get camera status.
 
-Parameters:
+Parameters: None
+
+Returns: 3457
+
+Source: Roborock S7 MaxV Ultra
 
 
 Set: set_camera_status
@@ -194,9 +225,19 @@ carpet_clean_mode
 
 Get: get_carpet_clean_mode
 
-Description:
+Description: Get carpet clean mode.
 
 Parameters:
+
+Returns:
+
+    carpet_clean_mode: Enumeration for carpet clean mode.
+
+Return example::
+
+    {'carpet_clean_mode': 3}
+
+Source: Roborock S7 MaxV Ultra
 
 
 Set: set_carpet_clean_mode
@@ -213,7 +254,29 @@ Get: get_carpet_mode
 
 Description:
 
-Parameters:
+Parameters: None
+
+Returns:
+
+    enable:
+
+    current_integral:
+
+    current_high:
+
+    current_low:
+
+    stall_time:
+
+Return example::
+
+    {'enable': 1, 'current_integral': 450, 'current_high': 500, 'current_low': 400, 'stall_time': 10}
+
+======================  =========
+Vacuum Model            Supported
+======================  =========
+Roborock S7 MaxV Ultra  Yes
+======================  =========
 
 
 Set: set_carpet_mode
@@ -247,7 +310,17 @@ Get: get_collision_avoid_status
 
 Description:
 
-Parameters:
+Parameters: None
+
+Returns:
+
+    status:
+
+Return example::
+
+    {'status': 1}
+
+Source: Roborock S7 MaxV Ultra
 
 
 Set: set_collision_avoid_status
@@ -264,7 +337,9 @@ Get: get_consumable
 
 Description: This gets the status of all of the consumables for your device.
 
-The following can be returned:
+Parameters: None
+
+Returns:
 
     main_brush_work_time: This is the amount of time the main brush has been used in seconds since it was last replaced
 
@@ -281,8 +356,6 @@ The following can be returned:
     dust_collection_work_times:
 
     cleaning_brush_work_times:
-
-Parameters: None
 
 
 
@@ -345,7 +418,6 @@ Description: Gets the do not disturb timer
 
     enabled: If the switch is currently turned on in the app for DnD
 
-
 Parameters: None
 
 
@@ -354,6 +426,7 @@ Set: set_dnd_timer
 Description:
 
 Parameters:
+
 
 Close: close_dnd_timer
 
@@ -377,7 +450,17 @@ Get: get_dust_collection_mode
 
 Description:
 
-Parameters:
+Parameters: None
+
+Returns:
+
+    mode:
+
+Return example::
+
+    {'mode': 0}
+
+Source: Roborock S7 MaxV Ultra
 
 
 Set: set_dust_collection_mode
@@ -455,9 +538,27 @@ Parameters:
 get_clean_summary
 -----------------
 
-Description:
+Description: Get a summary of cleaning history.
 
-Parameters:
+Parameters: None
+
+Returns:
+
+    clean_time:
+
+    clean_area:
+
+    clean_count:
+
+    dust_collection_count:
+
+    records:
+
+Return example::
+
+    {'clean_time': 568146, 'clean_area': 8816865000, 'clean_count': 178, 'dust_collection_count': 172, 'records': [1689740211, 1689555788, 1689259450, 1688999113, 1688852350, 1688693213, 1688692357, 1688614354, 1688613280, 1688606676, 1688325265, 1688174717, 1688149381, 1688092832, 1688001593, 1687921414, 1687890618, 1687743256, 1687655018, 1687631444]}
+
+Source: Roborock S7 MaxV Ultra
 
 
 get_current_sound
@@ -527,9 +628,27 @@ Parameters:
 get_network_info
 ----------------
 
-Description:
+Description: Get the device's network information.
 
-Parameters:
+Parameters: None
+
+Returns:
+
+    ssid: SSID of the wirelness network the device is connected to.
+
+    ip: IP address of the device.
+
+    mac: MAC address of the device.
+
+    bssid: BSSID of the device.
+
+    rssi: RSSI of the device.
+
+Return example::
+
+    {'ssid': 'My WiFi Network', 'ip': '192.168.1.29', 'mac': 'a0:2b:47:3d:24:51', 'bssid': '18:3b:1a:23:41:3c', 'rssi': -32}
+
+Source: Roborock S7 MaxV Ultra
 
 
 get_prop
@@ -559,9 +678,19 @@ Parameters:
 get_serial_number
 -----------------
 
-Description:
+Description: Get serial number of the vacuum.
 
-Parameters:
+Parameters: None
+
+Returns:
+
+    serial_number: Serial number of the vacuum.
+
+Return example::
+
+    {'serial_number': 'B16EVD12345678'}
+
+Source: Roborock S7 MaxV Ultra
 
 
 get_sound_progress
@@ -855,10 +984,101 @@ status
 
 Get: get_status
 
-Description:
+Description: Get status information of the device.
 
-Parameters:
+Parameters: None
 
+Returns:
+
+    msg_ver:
+
+    msg_seq:
+
+    state:
+
+    battery: Battery level of your device.
+
+    clean_time: Total clean time in hours.
+
+    clean_area: Total clean area in meters.
+
+    error_code:
+
+    map_reset:
+
+    in_cleaning:
+
+    in_returning:
+
+    in_fresh_state:
+
+    lab_status:
+
+    water_box_status:
+
+    back_type:
+
+    wash_phase:
+
+    wash_ready:
+
+    fan_power:
+
+    dnd_enabled:
+
+    map_status:
+
+    is_locating:
+
+    lock_status:
+
+    water_box_mode:
+
+    water_box_carriage_status:
+
+    mop_forbidden_enable:
+
+    camera_status:
+
+    is_exploring:
+
+    home_sec_status:
+
+    home_sec_enable_password:
+
+    adbumper_status:
+
+    water_shortage_status:
+
+    dock_type:
+
+    dust_collection_status:
+
+    auto_dust_collection:
+
+    avoid_count:
+
+    mop_mode:
+
+    debug_mode:
+
+    collision_avoid_status:
+
+    switch_map_mode:
+
+    dock_error_status:
+
+    charge_status:
+
+    unsave_map_reason:
+
+    unsave_map_flag:
+
+Return example::
+
+    {'msg_ver': 2, 'msg_seq': 1965, 'state': 8, 'battery': 100, 'clean_time': 1976, 'clean_area': 33197500, 'error_code': 0, 'map_present': 1, 'in_cleaning': 0, 'in_returning': 0, 'in_fresh_state': 1, 'lab_status': 1, 'water_box_status': 1, 'back_type': -1, 'wash_phase': 0, 'wash_ready': 0, 'fan_power': 102, 'dnd_enabled': 0, 'map_status': 3, 'is_locating': 0, 'lock_status': 0, 'water_box_mode': 203, 'water_box_carriage_status': 1, 'mop_forbidden_enable': 1, 'camera_status': 3457, 'is_exploring': 0, 'home_sec_status': 0, 'home_sec_enable_password': 0, 'adbumper_status': [0, 0, 0], 'water_shortage_status': 0, 'dock_type': 3, 'dust_collection_status': 0, 'auto_dust_collection': 1, 'avoid_count': 141, 'mop_mode': 300, 'debug_mode': 0, 'collision_avoid_status': 1, 'switch_map_mode': 0, 'dock_error_status': 0, 'charge_status': 1, 'unsave_map_reason': 0, 'unsave_map_flag': 0}
+
+Source: Roborock S7 MaxV Ultra
 
 
 stop_camera_preview
@@ -890,9 +1110,11 @@ timezone
 
 Get: get_timezone
 
-Description:
+Description: Get the device's time zone.
 
-Parameters:
+Parameters: None
+
+Returns: Time zone by the TZ identifier (e.g., America/Los_Angeles)
 
 
 Set: set_timezone
@@ -934,7 +1156,17 @@ Get: get_wash_towel_mode
 
 Description:
 
-Parameters:
+Parameters: None
+
+Returns:
+
+    wash_mode:
+
+Return example::
+
+    {'wash_mode': 1}
+
+Source: Roborock S7 MaxV Ultra
 
 
 Set: set_wash_towel_mode
