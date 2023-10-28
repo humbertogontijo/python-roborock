@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.35.1 (2023-10-28)
+
+### Fix
+
+* Add s5 max mop code 207 ([#132](https://github.com/humbertogontijo/python-roborock/issues/132)) ([`adc7ae0`](https://github.com/humbertogontijo/python-roborock/commit/adc7ae0bbb75eb5be452efb62ca93de6a5211eef))
+
 ## v0.35.0 (2023-10-18)
 
 ### Feature
