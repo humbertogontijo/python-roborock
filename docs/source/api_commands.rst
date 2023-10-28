@@ -34,7 +34,7 @@ Returns:
         dry_time: Duration dryer remains on in seconds.
 
     off:
-    
+
         cliff_on:
 
         cliff_off:
@@ -275,7 +275,7 @@ Return example::
 ======================  =========
 Vacuum Model            Supported
 ======================  =========
-Roborock S7 MaxV Ultra  Yes 
+Roborock S7 MaxV Ultra  Yes
 ======================  =========
 
 
@@ -989,12 +989,12 @@ Description: Get status information of the device.
 Parameters: None
 
 Returns:
-    
-    msg_ver: 
 
-    msg_seq: 
+    msg_ver:
 
-    state: 
+    msg_seq:
+
+    state:
 
     battery: Battery level of your device.
 
@@ -1004,7 +1004,7 @@ Returns:
 
     error_code:
 
-    map_reset: 
+    map_reset:
 
     in_cleaning:
 
@@ -1032,13 +1032,13 @@ Returns:
 
     lock_status:
 
-    water_box_mode: 
+    water_box_mode:
 
     water_box_carriage_status:
 
     mop_forbidden_enable:
 
-    camera_status: 
+    camera_status:
 
     is_exploring:
 
