@@ -30,10 +30,15 @@ def test_can_create_mqtt_roborock():
     RoborockMqttClient(UserData.from_dict(USER_DATA), device_info)
 
 
-def test_sync_connect(mqtt_client):
+@pytest.mark.asyncio
+async def test_sync_connect(mqtt_client):
     with patch("paho.mqtt.client.Client.connect", return_value=mqtt.MQTT_ERR_SUCCESS):
         with patch("paho.mqtt.client.Client.loop_start", return_value=mqtt.MQTT_ERR_SUCCESS):
-            mqtt_client.sync_connect()
+            connecting, connected_future = mqtt_client.sync_connect()
+            assert connecting is True
+            assert connected_future is not None
+
+            connected_future.cancel()
 
 
 @pytest.mark.asyncio

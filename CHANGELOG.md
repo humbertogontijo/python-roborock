@@ -2,6 +2,132 @@
 
 <!--next-version-placeholder-->
 
+## v0.35.1 (2023-10-28)
+
+### Fix
+
+* Add s5 max mop code 207 ([#132](https://github.com/humbertogontijo/python-roborock/issues/132)) ([`adc7ae0`](https://github.com/humbertogontijo/python-roborock/commit/adc7ae0bbb75eb5be452efb62ca93de6a5211eef))
+
+## v0.35.0 (2023-10-18)
+
+### Feature
+
+* **code_mappings:** Add error n53 cleaning tank full or blocked ([#130](https://github.com/humbertogontijo/python-roborock/issues/130)) ([`ebd57a0`](https://github.com/humbertogontijo/python-roborock/commit/ebd57a0b559c0dee605e30eaead58b8433347a84))
+
+## v0.34.6 (2023-10-02)
+
+### Fix
+
+* Add missing 207 code ([#127](https://github.com/humbertogontijo/python-roborock/issues/127)) ([`87431a1`](https://github.com/humbertogontijo/python-roborock/commit/87431a1f155059a51b1b3e2c8867fe18cc476e16))
+
+## v0.34.5 (2023-09-29)
+
+### Fix
+
+* Remove alexapy ([#126](https://github.com/humbertogontijo/python-roborock/issues/126)) ([`38ff4eb`](https://github.com/humbertogontijo/python-roborock/commit/38ff4eb90a1805ad599f61322d7c3547f465868b))
+
+## v0.34.4 (2023-09-28)
+
+### Fix
+
+* Parsing potential list of clean record ([#125](https://github.com/humbertogontijo/python-roborock/issues/125)) ([`df7a920`](https://github.com/humbertogontijo/python-roborock/commit/df7a920a94a632d9653637e0111b3a955db49356))
+
+## v0.34.3 (2023-09-24)
+
+### Fix
+
+* Add custom code for p10 ([#123](https://github.com/humbertogontijo/python-roborock/issues/123)) ([`8b57d50`](https://github.com/humbertogontijo/python-roborock/commit/8b57d50b0c898ca7d3df7cbdfe3682fd03cf649e))
+
+## v0.34.2 (2023-09-21)
+
+### Fix
+
+* Make cache not global ([#122](https://github.com/humbertogontijo/python-roborock/issues/122)) ([`e119201`](https://github.com/humbertogontijo/python-roborock/commit/e119201f1c700d98e3322653440097c91ef4e14c))
+
+## v0.34.1 (2023-09-19)
+
+### Fix
+
+* Status reworking ([#121](https://github.com/humbertogontijo/python-roborock/issues/121)) ([`8f4b7d3`](https://github.com/humbertogontijo/python-roborock/commit/8f4b7d376d5a475798782496ea52ac9674cb9ae7))
+
+## v0.34.0 (2023-09-12)
+
+### Feature
+
+* Add datetime parsing in cleanrecord ([#119](https://github.com/humbertogontijo/python-roborock/issues/119)) ([`5e67fa6`](https://github.com/humbertogontijo/python-roborock/commit/5e67fa648478e573239c2f1dfc4b58c01cae1797))
+
+## v0.33.2 (2023-09-06)
+
+### Fix
+
+* Add missing s5 codes ([#116](https://github.com/humbertogontijo/python-roborock/issues/116)) ([`4d56021`](https://github.com/humbertogontijo/python-roborock/commit/4d560216354fab4ab8b1d452dd6b29008b20d50a))
+
+## v0.33.1 (2023-09-06)
+
+### Fix
+
+* Unknow values on HA component ([#117](https://github.com/humbertogontijo/python-roborock/issues/117)) ([`1323618`](https://github.com/humbertogontijo/python-roborock/commit/1323618c6c58bb6dcef5c7f5f2ca12e32969ba0f))
+
+## v0.33.0 (2023-09-04)
+
+### Feature
+
+* Add q revo/p10 support ([#114](https://github.com/humbertogontijo/python-roborock/issues/114)) ([`b2237d9`](https://github.com/humbertogontijo/python-roborock/commit/b2237d97384d819cbcc62902bbcbb2c7dbe0072e))
+
+## v0.32.4 (2023-08-30)
+
+### Fix
+
+* Refactor cache and call get_status after changing mop mode ([#105](https://github.com/humbertogontijo/python-roborock/issues/105)) ([`8bf70f4`](https://github.com/humbertogontijo/python-roborock/commit/8bf70f4f8b3cabe846bffdc3dd3300f9f621ae97))
+
+## v0.32.3 (2023-08-05)
+
+### Fix
+
+* Resolve unawaited task errors on connect/disconnect ([#103](https://github.com/humbertogontijo/python-roborock/issues/103)) ([`1ad03be`](https://github.com/humbertogontijo/python-roborock/commit/1ad03befa84f9b729a0cc7553b794fe5344a22ce))
+
+## v0.32.2 (2023-08-04)
+
+### Fix
+
+* Waiting queue ([`ff5376b`](https://github.com/humbertogontijo/python-roborock/commit/ff5376be3a4ff4eb90e33118db89214ef699dc6f))
+
+## v0.32.1 (2023-08-04)
+
+### Fix
+
+* Remove coroutine warning ([`da83078`](https://github.com/humbertogontijo/python-roborock/commit/da83078f7ef8f333fa46b75603ce8a88bb97914d))
+
+## v0.32.0 (2023-08-03)
+
+### Feature
+
+* Adding device_id to listeners and fixing race condition on connection, disconnection and messages ([`2bee8a1`](https://github.com/humbertogontijo/python-roborock/commit/2bee8a11ad30cd4a3c186a4c0a619838adc83a53))
+
+## v0.31.1 (2023-08-02)
+
+### Fix
+
+* Add error code for invalid credentials ([#101](https://github.com/humbertogontijo/python-roborock/issues/101)) ([`703f48b`](https://github.com/humbertogontijo/python-roborock/commit/703f48b66cfd32d20e74eaa959a66cd736ca38c8))
+
+## v0.31.0 (2023-07-31)
+
+### Feature
+
+* Add device name to logs ([#100](https://github.com/humbertogontijo/python-roborock/issues/100)) ([`7690d56`](https://github.com/humbertogontijo/python-roborock/commit/7690d5644181abb5fb7681d6c1764e2f8750c4b5))
+
+## v0.30.3 (2023-07-31)
+
+### Fix
+
+* Adding no dustbin to docker errors ([`0e28628`](https://github.com/humbertogontijo/python-roborock/commit/0e286280edda21a3b95c656d5bc358cd4229d075))
+
+## v0.30.2 (2023-07-21)
+
+### Fix
+
+* Possible solution for future invalid state ([`8ac4e72`](https://github.com/humbertogontijo/python-roborock/commit/8ac4e72372f26105423213bb85d4c33d7951af4d))
+
 ## v0.30.1 (2023-07-18)
 
 ### Fix

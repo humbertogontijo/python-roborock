@@ -33,6 +33,7 @@ ROBOROCK_1S = "roborock.vacuum.m1s"
 ROBOROCK_C1 = "roborock.vacuum.c1"
 ROBOROCK_S8_PRO_ULTRA = "roborock.vacuum.a70"
 ROBOROCK_S8 = "roborock.vacuum.a51"
+ROBOROCK_P10 = "roborock.vacuum.a75"
 
 SUPPORTED_VACUUMS = (
     [  # These are the devices that show up when you add a device - more could be supported and just not show up
@@ -51,5 +52,6 @@ SUPPORTED_VACUUMS = (
         ROBOROCK_S8,
         ROBOROCK_S4_MAX,
         ROBOROCK_S7,
+        ROBOROCK_P10,
     ]
 )

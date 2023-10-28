@@ -3,25 +3,25 @@ from __future__ import annotations
 import asyncio
 import logging
 from asyncio import Lock, TimerHandle, Transport
-from typing import Optional
 
 import async_timeout
 
 from . import DeviceData
-from .api import COMMANDS_SECURED, QUEUE_TIMEOUT, RoborockClient
+from .api import COMMANDS_SECURED, RoborockClient
 from .exceptions import CommandVacuumError, RoborockConnectionException, RoborockException
 from .protocol import MessageParser
 from .roborock_message import MessageRetry, RoborockMessage, RoborockMessageProtocol
 from .roborock_typing import RoborockCommand
+from .util import RoborockLoggerAdapter
 
 _LOGGER = logging.getLogger(__name__)
 
 
 class RoborockLocalClient(RoborockClient, asyncio.Protocol):
-    def __init__(self, device_data: DeviceData):
+    def __init__(self, device_data: DeviceData, queue_timeout: int = 4):
         if device_data.host is None:
             raise RoborockException("Host is required")
-        super().__init__("abc", device_data)
+        super().__init__("abc", device_data, queue_timeout)
         self.host = device_data.host
         self._batch_structs: list[RoborockMessage] = []
         self._executing = False
@@ -29,6 +29,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         self.transport: Transport | None = None
         self._mutex = Lock()
         self.keep_alive_task: TimerHandle | None = None
+        self._logger = RoborockLoggerAdapter(device_data.device.name, _LOGGER)
 
     def data_received(self, message):
         if self.remaining:
@@ -37,7 +38,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         parser_msg, self.remaining = MessageParser.parse(message, local_key=self.device_info.device.local_key)
         self.on_message_received(parser_msg)
 
-    def connection_lost(self, exc: Optional[Exception]):
+    def connection_lost(self, exc: Exception | None):
         self.sync_disconnect()
         self.on_connection_lost(exc)
 
@@ -57,12 +58,12 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
             try:
                 if not self.is_connected():
                     self.sync_disconnect()
-                    async with async_timeout.timeout(QUEUE_TIMEOUT):
-                        _LOGGER.info(f"Connecting to {self.host}")
+                    async with async_timeout.timeout(self.queue_timeout):
+                        self._logger.debug(f"Connecting to {self.host}")
                         self.transport, _ = await self.event_loop.create_connection(  # type: ignore
                             lambda: self, self.host, 58867
                         )
-                        _LOGGER.info(f"Connected to {self.host}")
+                        self._logger.info(f"Connected to {self.host}")
                         should_ping = True
             except BaseException as e:
                 raise RoborockConnectionException(f"Failed connecting to {self.host}") from e
@@ -72,7 +73,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
 
     def sync_disconnect(self) -> None:
         if self.transport and self.event_loop.is_running():
-            _LOGGER.debug(f"Disconnecting from {self.host}")
+            self._logger.debug(f"Disconnecting from {self.host}")
             self.transport.close()
         if self.keep_alive_task:
             self.keep_alive_task.cancel()
@@ -81,11 +82,11 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         async with self._mutex:
             self.sync_disconnect()
 
-    def build_roborock_message(self, method: RoborockCommand, params: Optional[list | dict] = None) -> RoborockMessage:
+    def build_roborock_message(self, method: RoborockCommand, params: list | dict | None = None) -> RoborockMessage:
         secured = True if method in COMMANDS_SECURED else False
         request_id, timestamp, payload = self._get_payload(method, params, secured)
         request_protocol = RoborockMessageProtocol.GENERAL_REQUEST
-        message_retry: Optional[MessageRetry] = None
+        message_retry: MessageRetry | None = None
         if method == RoborockCommand.RETRY_REQUEST and isinstance(params, dict):
             message_retry = MessageRetry(method=params["method"], retry_id=params["retry_id"])
         return RoborockMessage(
@@ -104,7 +105,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
                 )
             )
         except Exception as e:
-            _LOGGER.error(e)
+            self._logger.error(e)
 
     async def ping(self):
         request_id = 2
@@ -120,7 +121,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
     async def _send_command(
         self,
         method: RoborockCommand,
-        params: Optional[list | dict] = None,
+        params: list | dict | None = None,
     ):
         roborock_message = self.build_roborock_message(method, params)
         return await self.send_message(roborock_message)
@@ -149,10 +150,11 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         local_key = self.device_info.device.local_key
         msg = MessageParser.build(roborock_message, local_key=local_key)
         if method:
-            _LOGGER.debug(f"id={request_id} Requesting method {method} with {params}")
+            self._logger.debug(f"id={request_id} Requesting method {method} with {params}")
         # Send the command to the Roborock device
+        async_response = asyncio.ensure_future(self._async_response(request_id, response_protocol))
         self._send_msg_raw(msg)
-        (response, err) = await self._async_response(request_id, response_protocol)
+        (response, err) = await async_response
         self._diagnostic_data[method if method is not None else "unknown"] = {
             "params": roborock_message.get_params(),
             "response": response,
@@ -161,7 +163,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         if err:
             raise CommandVacuumError(method, err) from err
         if roborock_message.protocol == RoborockMessageProtocol.GENERAL_REQUEST:
-            _LOGGER.debug(f"id={request_id} Response from method {roborock_message.get_method()}: {response}")
+            self._logger.debug(f"id={request_id} Response from method {roborock_message.get_method()}: {response}")
         if response == "retry":
             retry_id = roborock_message.get_retry_id()
             return self.send_command(

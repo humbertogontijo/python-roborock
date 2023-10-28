@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional
 
 from .containers import (
     CleanRecord,
@@ -133,7 +132,7 @@ class RoborockCommand(str, Enum):
 
 @dataclass
 class CommandInfo:
-    params: Optional[list | dict] = None
+    params: list | dict | None = None
 
 
 CommandInfoMap: dict[RoborockCommand | None, CommandInfo] = {
@@ -309,18 +308,18 @@ CommandInfoMap: dict[RoborockCommand | None, CommandInfo] = {
 
 @dataclass
 class DockSummary(RoborockBase):
-    dust_collection_mode: Optional[DustCollectionMode] = None
-    wash_towel_mode: Optional[WashTowelMode] = None
-    smart_wash_params: Optional[SmartWashParams] = None
+    dust_collection_mode: DustCollectionMode | None = None
+    wash_towel_mode: WashTowelMode | None = None
+    smart_wash_params: SmartWashParams | None = None
 
 
 @dataclass
 class DeviceProp(RoborockBase):
-    status: Optional[Status] = None
-    clean_summary: Optional[CleanSummary] = None
-    consumable: Optional[Consumable] = None
-    last_clean_record: Optional[CleanRecord] = None
-    dock_summary: Optional[DockSummary] = None
+    status: Status | None = None
+    clean_summary: CleanSummary | None = None
+    consumable: Consumable | None = None
+    last_clean_record: CleanRecord | None = None
+    dock_summary: DockSummary | None = None
 
     def update(self, device_prop: DeviceProp) -> None:
         if device_prop.status:

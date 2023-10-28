@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "python-roborock"
-version = "0.30.1"
+version = "0.35.1"
 description = "A package to control Roborock vacuums."
 authors = ["humbertogontijo <humbertogontijo@users.noreply.github.com>"]
 license = "GPL-3.0-only"
@@ -28,7 +28,6 @@ pycryptodomex = {version = "^3.18", markers = "sys_platform == 'darwin'"}
 paho-mqtt = "^1.6.1"
 dacite = "^1.8.0"
 construct = "^2.10.56"
-alexapy = "^1.26.8"
 
 
 [build-system]
@@ -54,6 +53,7 @@ build_command = "pip install poetry && poetry build"
 [tool.ruff]
 ignore = ["F403", "E741"]
 line-length = 120
+select=["E", "F", "UP"]
 
 [tool.black]
 line-length = 120

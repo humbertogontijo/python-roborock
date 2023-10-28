@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+import asyncio
 import base64
 import logging
 import threading
 import uuid
-from asyncio import Lock
-from typing import Optional
+from asyncio import Lock, Task
+from typing import Any
 from urllib.parse import urlparse
 
 import paho.mqtt.client as mqtt
@@ -17,6 +18,7 @@ from .protocol import MessageParser, Utils
 from .roborock_future import RoborockFuture
 from .roborock_message import RoborockMessage, RoborockMessageProtocol
 from .roborock_typing import RoborockCommand
+from .util import RoborockLoggerAdapter
 
 _LOGGER = logging.getLogger(__name__)
 CONNECT_REQUEST_ID = 0
@@ -27,13 +29,14 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
     _thread: threading.Thread
     _client_id: str
 
-    def __init__(self, user_data: UserData, device_info: DeviceData) -> None:
+    def __init__(self, user_data: UserData, device_info: DeviceData, queue_timeout: int = 10) -> None:
         rriot = user_data.rriot
         if rriot is None:
             raise RoborockException("Got no rriot data from user_data")
         endpoint = base64.b64encode(Utils.md5(rriot.k.encode())[8:14]).decode()
-        RoborockClient.__init__(self, endpoint, device_info)
+        RoborockClient.__init__(self, endpoint, device_info, queue_timeout)
         mqtt.Client.__init__(self, protocol=mqtt.MQTTv5)
+        self._logger = RoborockLoggerAdapter(device_info.device.name, _LOGGER)
         self._mqtt_user = rriot.u
         self._hashed_user = md5hex(self._mqtt_user + ":" + rriot.k)[2:10]
         url = urlparse(rriot.r.m)
@@ -57,20 +60,20 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
         connection_queue = self._waiting_queue.get(CONNECT_REQUEST_ID)
         if rc != mqtt.MQTT_ERR_SUCCESS:
             message = f"Failed to connect ({mqtt.error_string(rc)})"
-            _LOGGER.error(message)
+            self._logger.error(message)
             if connection_queue:
                 connection_queue.resolve((None, VacuumError(message)))
             return
-        _LOGGER.info(f"Connected to mqtt {self._mqtt_host}:{self._mqtt_port}")
+        self._logger.info(f"Connected to mqtt {self._mqtt_host}:{self._mqtt_port}")
         topic = f"rr/m/o/{self._mqtt_user}/{self._hashed_user}/{self.device_info.device.duid}"
         (result, mid) = self.subscribe(topic)
         if result != 0:
             message = f"Failed to subscribe ({mqtt.error_string(rc)})"
-            _LOGGER.error(message)
+            self._logger.error(message)
             if connection_queue:
                 connection_queue.resolve((None, VacuumError(message)))
             return
-        _LOGGER.info(f"Subscribed to topic {topic}")
+        self._logger.info(f"Subscribed to topic {topic}")
         if connection_queue:
             connection_queue.resolve((True, None))
 
@@ -80,7 +83,7 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
             messages, _ = MessageParser.parse(msg.payload, local_key=self.device_info.device.local_key)
             super().on_message_received(messages)
         except Exception as ex:
-            _LOGGER.exception(ex)
+            self._logger.exception(ex)
 
     def on_disconnect(self, *args, **kwargs):
         _, __, rc, ___ = args
@@ -93,54 +96,68 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
             if connection_queue:
                 connection_queue.resolve((True, None))
         except Exception as ex:
-            _LOGGER.exception(ex)
+            self._logger.exception(ex)
 
     def update_client_id(self):
         self._client_id = mqtt.base62(uuid.uuid4().int, padding=22)
 
     def sync_stop_loop(self) -> None:
         if self._thread:
-            _LOGGER.info("Stopping mqtt loop")
+            self._logger.info("Stopping mqtt loop")
             super().loop_stop()
 
     def sync_start_loop(self) -> None:
         if not self._thread or not self._thread.is_alive():
             self.sync_stop_loop()
-            _LOGGER.info("Starting mqtt loop")
+            self._logger.info("Starting mqtt loop")
             super().loop_start()
 
-    def sync_disconnect(self) -> bool:
-        rc = mqtt.MQTT_ERR_AGAIN
-        if self.is_connected():
-            _LOGGER.info("Disconnecting from mqtt")
-            rc = super().disconnect()
-            if rc not in [mqtt.MQTT_ERR_SUCCESS, mqtt.MQTT_ERR_NO_CONN]:
-                raise RoborockException(f"Failed to disconnect ({mqtt.error_string(rc)})")
-        return rc == mqtt.MQTT_ERR_SUCCESS
+    def sync_disconnect(self) -> tuple[bool, Task[tuple[Any, VacuumError | None]] | None]:
+        if not self.is_connected():
+            return False, None
 
-    def sync_connect(self) -> bool:
-        should_connect = not self.is_connected()
-        if should_connect:
-            if self._mqtt_port is None or self._mqtt_host is None:
-                raise RoborockException("Mqtt information was not entered. Cannot connect.")
-            _LOGGER.info("Connecting to mqtt")
-            super().connect(host=self._mqtt_host, port=self._mqtt_port, keepalive=KEEPALIVE)
+        self._logger.info("Disconnecting from mqtt")
+        disconnected_future = asyncio.ensure_future(self._async_response(DISCONNECT_REQUEST_ID))
+        rc = super().disconnect()
+
+        if rc == mqtt.MQTT_ERR_NO_CONN:
+            disconnected_future.cancel()
+            return False, None
+
+        if rc != mqtt.MQTT_ERR_SUCCESS:
+            disconnected_future.cancel()
+            raise RoborockException(f"Failed to disconnect ({mqtt.error_string(rc)})")
+
+        return True, disconnected_future
+
+    def sync_connect(self) -> tuple[bool, Task[tuple[Any, VacuumError | None]] | None]:
+        if self.is_connected():
+            self.sync_start_loop()
+            return False, None
+
+        if self._mqtt_port is None or self._mqtt_host is None:
+            raise RoborockException("Mqtt information was not entered. Cannot connect.")
+
+        self._logger.debug("Connecting to mqtt")
+        connected_future = asyncio.ensure_future(self._async_response(CONNECT_REQUEST_ID))
+        super().connect(host=self._mqtt_host, port=self._mqtt_port, keepalive=KEEPALIVE)
+
         self.sync_start_loop()
-        return should_connect
+        return True, connected_future
 
     async def async_disconnect(self) -> None:
         async with self._mutex:
-            disconnecting = self.sync_disconnect()
-            if disconnecting:
-                (_, err) = await self._async_response(DISCONNECT_REQUEST_ID)
+            (disconnecting, disconnected_future) = self.sync_disconnect()
+            if disconnecting and disconnected_future:
+                (_, err) = await disconnected_future
                 if err:
                     raise RoborockException(err) from err
 
     async def async_connect(self) -> None:
         async with self._mutex:
-            connecting = self.sync_connect()
-            if connecting:
-                (_, err) = await self._async_response(CONNECT_REQUEST_ID)
+            (connecting, connected_future) = self.sync_connect()
+            if connecting and connected_future:
+                (_, err) = await connected_future
                 if err:
                     raise RoborockException(err) from err
 
@@ -162,9 +179,10 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
 
         local_key = self.device_info.device.local_key
         msg = MessageParser.build(roborock_message, local_key, False)
-        _LOGGER.debug(f"id={request_id} Requesting method {method} with {params}")
+        self._logger.debug(f"id={request_id} Requesting method {method} with {params}")
+        async_response = asyncio.ensure_future(self._async_response(request_id, response_protocol))
         self._send_msg_raw(msg)
-        (response, err) = await self._async_response(request_id, response_protocol)
+        (response, err) = await async_response
         self._diagnostic_data[method if method is not None else "unknown"] = {
             "params": roborock_message.get_params(),
             "response": response,
@@ -173,15 +191,15 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
         if err:
             raise CommandVacuumError(method, err) from err
         if response_protocol == RoborockMessageProtocol.MAP_RESPONSE:
-            _LOGGER.debug(f"id={request_id} Response from {method}: {len(response)} bytes")
+            self._logger.debug(f"id={request_id} Response from {method}: {len(response)} bytes")
         else:
-            _LOGGER.debug(f"id={request_id} Response from {method}: {response}")
+            self._logger.debug(f"id={request_id} Response from {method}: {response}")
         return response
 
     async def _send_command(
         self,
         method: RoborockCommand,
-        params: Optional[list | dict] = None,
+        params: list | dict | None = None,
     ):
         request_id, timestamp, payload = super()._get_payload(method, params, True)
         request_protocol = RoborockMessageProtocol.RPC_REQUEST

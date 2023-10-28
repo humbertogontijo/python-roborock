@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 from enum import IntEnum
-from typing import Type
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -15,7 +14,7 @@ class RoborockEnum(IntEnum):
         return super().name.lower()
 
     @classmethod
-    def _missing_(cls: Type[RoborockEnum], key) -> RoborockEnum:
+    def _missing_(cls: type[RoborockEnum], key) -> RoborockEnum:
         if hasattr(cls, "unknown"):
             _LOGGER.warning(f"Missing {cls.__name__} code: {key} - defaulting to 'unknown'")
             return cls.unknown  # type: ignore
@@ -24,23 +23,23 @@ class RoborockEnum(IntEnum):
         return default_value
 
     @classmethod
-    def as_dict(cls: Type[RoborockEnum]):
+    def as_dict(cls: type[RoborockEnum]):
         return {i.name: i.value for i in cls if i.name != "missing"}
 
     @classmethod
-    def as_enum_dict(cls: Type[RoborockEnum]):
+    def as_enum_dict(cls: type[RoborockEnum]):
         return {i.value: i for i in cls if i.name != "missing"}
 
     @classmethod
-    def values(cls: Type[RoborockEnum]) -> list[int]:
+    def values(cls: type[RoborockEnum]) -> list[int]:
         return list(cls.as_dict().values())
 
     @classmethod
-    def keys(cls: Type[RoborockEnum]) -> list[str]:
+    def keys(cls: type[RoborockEnum]) -> list[str]:
         return list(cls.as_dict().keys())
 
     @classmethod
-    def items(cls: Type[RoborockEnum]):
+    def items(cls: type[RoborockEnum]):
         return cls.as_dict().items()
 
 
@@ -163,6 +162,7 @@ class RoborockFanSpeedS6Pure(RoborockFanPowerCode):
     balanced = 102
     turbo = 103
     max = 104
+    custom = 106
 
 
 class RoborockFanSpeedQ7Max(RoborockFanPowerCode):
@@ -170,6 +170,16 @@ class RoborockFanSpeedQ7Max(RoborockFanPowerCode):
     balanced = 102
     turbo = 103
     max = 104
+
+
+class RoborockFanSpeedP10(RoborockFanPowerCode):
+    off = 105
+    quiet = 101
+    balanced = 102
+    turbo = 103
+    max = 104
+    custom = 106
+    max_plus = 108
 
 
 class RoborockMopModeCode(RoborockEnum):
@@ -217,6 +227,28 @@ class RoborockMopIntensityV2(RoborockMopIntensityCode):
     custom = 207
 
 
+class RoborockMopIntensityP10(RoborockMopIntensityCode):
+    """Describes the mop intensity of the vacuum cleaner."""
+
+    off = 200
+    low = 201
+    medium = 202
+    high = 203
+    custom = 204
+    custom_water_flow = 207
+
+
+class RoborockMopIntensityS5Max(RoborockMopIntensityCode):
+    """Describes the mop intensity of the vacuum cleaner."""
+
+    off = 200
+    low = 201
+    medium = 202
+    high = 203
+    custom = 204
+    custom_water_flow = 207
+
+
 class RoborockDockErrorCode(RoborockEnum):
     """Describes the error code of the dock."""
 
@@ -225,6 +257,8 @@ class RoborockDockErrorCode(RoborockEnum):
     water_empty = 38
     waste_water_tank_full = 39
     dirty_tank_latch_open = 44
+    no_dustbin = 46
+    cleaning_tank_full_or_blocked = 53
 
 
 class RoborockDockTypeCode(RoborockEnum):
@@ -235,7 +269,7 @@ class RoborockDockTypeCode(RoborockEnum):
     auto_empty_dock_pure = 5
     s7_max_ultra_dock = 6
     s8_dock = 7
-    q_revo = 8
+    p10_dock = 8
 
 
 class RoborockDockDustCollectionModeCode(RoborockEnum):

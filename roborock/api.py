@@ -12,13 +12,14 @@ import math
 import secrets
 import struct
 import time
+from collections.abc import Callable, Coroutine
 from random import randint
-from typing import Any, Callable, Coroutine, Optional, Type, TypeVar, final
+from typing import Any, TypeVar, final
 
 import aiohttp
 
 from .code_mappings import RoborockDockTypeCode
-from .command_cache import CacheableAttribute, CommandType, RoborockAttribute, create_cache_map, parse_method
+from .command_cache import CacheableAttribute, CommandType, RoborockAttribute, find_cacheable_attribute, get_cache_map
 from .containers import (
     ChildLockStatus,
     CleanRecord,
@@ -46,6 +47,7 @@ from .exceptions import (
     RoborockAccountDoesNotExist,
     RoborockException,
     RoborockInvalidCode,
+    RoborockInvalidCredentials,
     RoborockInvalidEmail,
     RoborockInvalidUserAgreement,
     RoborockNoUserAgreement,
@@ -64,16 +66,20 @@ from .roborock_message import (
     RoborockMessageProtocol,
 )
 from .roborock_typing import DeviceProp, DockSummary, RoborockCommand
-from .util import RepeatableTask, get_running_loop_or_create_one, unpack_list
+from .util import RepeatableTask, RoborockLoggerAdapter, get_running_loop_or_create_one, unpack_list
 
 _LOGGER = logging.getLogger(__name__)
 KEEPALIVE = 60
-QUEUE_TIMEOUT = 4
 COMMANDS_SECURED = [
     RoborockCommand.GET_MAP_V1,
     RoborockCommand.GET_MULTI_MAP,
 ]
 RT = TypeVar("RT", bound=RoborockBase)
+WASH_N_FILL_DOCK = [
+    RoborockDockTypeCode.empty_wash_fill_dock,
+    RoborockDockTypeCode.s8_dock,
+    RoborockDockTypeCode.p10_dock,
+]
 
 
 def md5hex(message: str) -> str:
@@ -83,7 +89,7 @@ def md5hex(message: str) -> str:
 
 
 class PreparedRequest:
-    def __init__(self, base_url: str, base_headers: Optional[dict] = None) -> None:
+    def __init__(self, base_url: str, base_headers: dict | None = None) -> None:
         self.base_url = base_url
         self.base_headers = base_headers or {}
 
@@ -112,13 +118,21 @@ class AttributeCache:
         self.task = RepeatableTask(self.api.event_loop, self._async_value, EVICT_TIME)
         self._value: Any = None
         self._mutex = asyncio.Lock()
+        self.unsupported: bool = False
 
     @property
     def value(self):
         return self._value
 
     async def _async_value(self):
-        self._value = await self.api._send_command(self.attribute.get_command)
+        if self.unsupported:
+            return None
+        try:
+            self._value = await self.api._send_command(self.attribute.get_command)
+        except UnknownMethodError as err:
+            # Limit the amount of times we call unsupported methods
+            self.unsupported = True
+            raise err
         return self._value
 
     async def async_value(self):
@@ -151,12 +165,12 @@ class AttributeCache:
         await self._async_value()
         return response
 
-
-device_cache: dict[str, dict[CacheableAttribute, AttributeCache]] = {}
+    async def refresh_value(self):
+        await self._async_value()
 
 
 class RoborockClient:
-    def __init__(self, endpoint: str, device_info: DeviceData) -> None:
+    def __init__(self, endpoint: str, device_info: DeviceData, queue_timeout: int = 4) -> None:
         self.event_loop = get_running_loop_or_create_one()
         self.device_info = device_info
         self._endpoint = endpoint
@@ -166,18 +180,22 @@ class RoborockClient:
         self._last_disconnection = self.time_func()
         self.keep_alive = KEEPALIVE
         self._diagnostic_data: dict[str, dict[str, Any]] = {}
-        cache = device_cache.get(device_info.device.duid)
-        if not cache:
-            cache = {
-                cacheable_attribute: AttributeCache(attr, self)
-                for cacheable_attribute, attr in create_cache_map().items()
-            }
-            device_cache[device_info.device.duid] = cache
-        self.cache: dict[CacheableAttribute, AttributeCache] = cache
-        self._listeners: list[Callable[[CacheableAttribute, RoborockBase], None]] = []
+        self._logger = RoborockLoggerAdapter(device_info.device.name, _LOGGER)
+        self.cache: dict[CacheableAttribute, AttributeCache] = {
+            cacheable_attribute: AttributeCache(attr, self) for cacheable_attribute, attr in get_cache_map().items()
+        }
+        self._listeners: list[Callable[[str, CacheableAttribute, RoborockBase], None]] = []
+        self.is_available: bool = True
+        self.queue_timeout = queue_timeout
+        self._status_type: type[Status] = ModelStatus.get(self.device_info.model, S7MaxVStatus)
 
     def __del__(self) -> None:
         self.release()
+
+    @property
+    def status_type(self) -> type[Status]:
+        """Gets the status type for this device"""
+        return self._status_type
 
     def release(self):
         self.sync_disconnect()
@@ -240,37 +258,37 @@ class RoborockClient:
                         else:
                             try:
                                 data_protocol = RoborockDataProtocol(int(data_point_number))
-                                _LOGGER.debug(f"Got device update for {data_protocol.name}: {data_point}")
+                                self._logger.debug(f"Got device update for {data_protocol.name}: {data_point}")
                                 if data_protocol in ROBOROCK_DATA_STATUS_PROTOCOL:
-                                    _cls: Type[Status] = ModelStatus.get(
-                                        self.device_info.model, S7MaxVStatus
-                                    )  # Default to S7 MAXV if we don't have the data
                                     if self.cache[CacheableAttribute.status].value is None:
-                                        _LOGGER.debug(
+                                        self._logger.debug(
                                             f"Got status update({data_protocol.name}) before get_status was called."
                                         )
-                                        self.cache[CacheableAttribute.status]._value = {}
+                                        return
                                     value = self.cache[CacheableAttribute.status].value
                                     value[data_protocol.name] = data_point
-                                    status = _cls.from_dict(value)
+                                    status = self._status_type.from_dict(value)
                                     for listener in self._listeners:
-                                        listener(CacheableAttribute.status, status)
+                                        listener(self.device_info.device.duid, CacheableAttribute.status, status)
                                 elif data_protocol in ROBOROCK_DATA_CONSUMABLE_PROTOCOL:
                                     if self.cache[CacheableAttribute.consumable].value is None:
-                                        _LOGGER.debug(
-                                            f"Got consumable update({data_protocol.name}) before get_status was called."
+                                        self._logger.debug(
+                                            f"Got consumable update({data_protocol.name})"
+                                            + "before get_consumable was called."
                                         )
-                                        self.cache[CacheableAttribute.consumable]._value = {}
+                                        return
                                     value = self.cache[CacheableAttribute.consumable].value
                                     value[data_protocol.name] = data_point
                                     consumable = Consumable.from_dict(value)
                                     for listener in self._listeners:
-                                        listener(CacheableAttribute.consumable, consumable)
+                                        listener(
+                                            self.device_info.device.duid, CacheableAttribute.consumable, consumable
+                                        )
                                 return
                             except ValueError:
                                 pass
                             dps = {data_point_number: data_point}
-                            _LOGGER.debug(f"Got unknown data point {dps}")
+                            self._logger.debug(f"Got unknown data point {dps}")
                 elif data.payload and protocol == RoborockMessageProtocol.MAP_RESPONSE:
                     payload = data.payload[0:24]
                     [endpoint, _, request_id, _] = struct.unpack("<8s8sH6s", payload)
@@ -287,13 +305,13 @@ class RoborockClient:
                     if queue:
                         queue.resolve((data.payload, None))
         except Exception as ex:
-            _LOGGER.exception(ex)
+            self._logger.exception(ex)
 
-    def on_connection_lost(self, exc: Optional[Exception]) -> None:
+    def on_connection_lost(self, exc: Exception | None) -> None:
         self._last_disconnection = self.time_func()
-        _LOGGER.info("Roborock client disconnected")
+        self._logger.info("Roborock client disconnected")
         if exc is not None:
-            _LOGGER.warning(exc)
+            self._logger.warning(exc)
 
     def should_keepalive(self) -> bool:
         now = self.time_func()
@@ -307,23 +325,28 @@ class RoborockClient:
             await self.async_disconnect()
         await self.async_connect()
 
-    async def _async_response(self, request_id: int, protocol_id: int = 0) -> tuple[Any, VacuumError | None]:
+    async def _wait_response(self, request_id: int, queue: RoborockFuture) -> tuple[Any, VacuumError | None]:
         try:
-            queue = RoborockFuture(protocol_id)
-            self._waiting_queue[request_id] = queue
-            (response, err) = await queue.async_get(QUEUE_TIMEOUT)
+            (response, err) = await queue.async_get(self.queue_timeout)
             if response == "unknown_method":
                 raise UnknownMethodError("Unknown method")
             return response, err
         except (asyncio.TimeoutError, asyncio.CancelledError):
-            raise RoborockTimeout(f"id={request_id} Timeout after {QUEUE_TIMEOUT} seconds") from None
+            raise RoborockTimeout(f"id={request_id} Timeout after {self.queue_timeout} seconds") from None
         finally:
             self._waiting_queue.pop(request_id, None)
+
+    def _async_response(
+        self, request_id: int, protocol_id: int = 0
+    ) -> Coroutine[Any, Any, tuple[Any, VacuumError | None]]:
+        queue = RoborockFuture(protocol_id)
+        self._waiting_queue[request_id] = queue
+        return self._wait_response(request_id, queue)
 
     def _get_payload(
         self,
         method: RoborockCommand,
-        params: Optional[list | dict] = None,
+        params: list | dict | None = None,
         secured=False,
     ):
         timestamp = math.floor(time.time())
@@ -355,7 +378,7 @@ class RoborockClient:
     async def _send_command(
         self,
         method: RoborockCommand,
-        params: Optional[list | dict] = None,
+        params: list | dict | None = None,
     ):
         raise NotImplementedError
 
@@ -363,30 +386,31 @@ class RoborockClient:
     async def send_command(
         self,
         method: RoborockCommand,
-        params: Optional[list | dict] = None,
-        return_type: Optional[Type[RT]] = None,
+        params: list | dict | None = None,
+        return_type: type[RT] | None = None,
     ) -> RT:
-        parsed_method = parse_method(method)
+        cacheable_attribute_result = find_cacheable_attribute(method)
+
         cache = None
-        if parsed_method is not None:
-            cache = self.cache[parsed_method.attribute]
+        command_type = None
+        if cacheable_attribute_result is not None:
+            cache = self.cache[cacheable_attribute_result.attribute]
+            command_type = cacheable_attribute_result.type
+
         response: Any = None
-        if cache is not None:
-            if parsed_method.type == CommandType.GET:
-                response = await cache.async_value()
-            elif parsed_method.type == CommandType.SET:
-                response = await cache.update_value(params)
+        if cache is not None and command_type == CommandType.GET:
+            response = await cache.async_value()
         else:
             response = await self._send_command(method, params)
+            if cache is not None and command_type == CommandType.CHANGE:
+                await cache.refresh_value()
+
         if return_type:
             return return_type.from_dict(response)
         return response
 
     async def get_status(self) -> Status | None:
-        _cls: Type[Status] = ModelStatus.get(
-            self.device_info.model, S7MaxVStatus
-        )  # Default to S7 MAXV if we don't have the data
-        return _cls.from_dict(await self.cache[CacheableAttribute.status].async_value())
+        return self._status_type.from_dict(await self.cache[CacheableAttribute.status].async_value())
 
     async def get_dnd_timer(self) -> DnDTimer | None:
         return DnDTimer.from_dict(await self.cache[CacheableAttribute.dnd_timer].async_value())
@@ -413,7 +437,16 @@ class RoborockClient:
         return None
 
     async def get_clean_record(self, record_id: int) -> CleanRecord | None:
-        return await self.send_command(RoborockCommand.GET_CLEAN_RECORD, [record_id], return_type=CleanRecord)
+        record: dict | list = await self.send_command(RoborockCommand.GET_CLEAN_RECORD, [record_id])
+        if isinstance(record, dict):
+            return CleanRecord.from_dict(record)
+        elif isinstance(record, list):
+            # There are still a few unknown variables in this.
+            begin, end, duration, area = unpack_list(record, 4)
+            return CleanRecord(begin=begin, end=end, duration=duration, area=area)
+        else:
+            _LOGGER.warning("Clean record was of a new type, please submit an issue request: %s", record)
+            return None
 
     async def get_consumable(self) -> Consumable | None:
         return Consumable.from_dict(await self.cache[CacheableAttribute.consumable].async_value())
@@ -438,7 +471,7 @@ class RoborockClient:
                 DustCollectionMode | WashTowelMode | SmartWashParams | None,
             ]
         ] = [self.get_dust_collection_mode()]
-        if dock_type == RoborockDockTypeCode.empty_wash_fill_dock or dock_type == RoborockDockTypeCode.s8_dock:
+        if dock_type in WASH_N_FILL_DOCK:
             commands += [
                 self.get_wash_towel_mode(),
                 self.get_smart_wash_params(),
@@ -641,6 +674,10 @@ class RoborockApiClient:
         if home_id_response is None:
             raise RoborockException("home_id_response is None")
         if home_id_response.get("code") != 200:
+            if home_id_response.get("code") == 2010:
+                raise RoborockInvalidCredentials(
+                    f"Invalid credentials ({home_id_response.get('msg')}) - check your login and try again."
+                )
             raise RoborockException(f"{home_id_response.get('msg')} - response code: {home_id_response.get('code')}")
 
         home_id = home_id_response["data"].get("rrHomeId")

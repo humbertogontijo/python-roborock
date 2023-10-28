@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import logging
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import click
 from pyshark import FileCapture  # type: ignore
@@ -29,7 +29,7 @@ class RoborockContext:
 
     def reload(self):
         if self.roborock_file.is_file():
-            with open(self.roborock_file, "r") as f:
+            with open(self.roborock_file) as f:
                 data = json.load(f)
                 if data:
                     self._login_data = LoginData.from_dict(data)
@@ -54,7 +54,7 @@ class RoborockContext:
 @click.group()
 @click.pass_context
 def cli(ctx, debug: int):
-    logging_config: Dict[str, Any] = {"level": logging.DEBUG if debug > 0 else logging.INFO}
+    logging_config: dict[str, Any] = {"level": logging.DEBUG if debug > 0 else logging.INFO}
     logging.basicConfig(**logging_config)  # type: ignore
     ctx.obj = RoborockContext()
 
@@ -153,7 +153,7 @@ async def parser(_, local_key, device_ip, file):
     else:
         _LOGGER.info("Listen for interface rvi0 since no file was provided")
         capture = LiveCapture(interface="rvi0")
-    buffer = {"data": bytes()}
+    buffer = {"data": b""}
 
     def on_package(packet: Packet):
         if hasattr(packet, "ip"):
