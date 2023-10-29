@@ -168,11 +168,11 @@ def get_change_commands(attr: RoborockAttribute) -> list[RoborockCommand]:
     return [command for command in commands if command is not None]
 
 
-cache_map_by_get_command: dict[RoborockCommand, CacheableAttribute] = {
+cache_map_by_get_command: dict[RoborockCommand | str, CacheableAttribute] = {
     attribute.get_command: cacheable_attribute for cacheable_attribute, attribute in cache_map.items()
 }
 
-cache_map_by_change_command: dict[RoborockCommand, CacheableAttribute] = {
+cache_map_by_change_command: dict[RoborockCommand | str, CacheableAttribute] = {
     command: cacheable_attribute
     for cacheable_attribute, attribute in cache_map.items()
     for command in get_change_commands(attribute)

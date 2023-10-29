@@ -345,7 +345,7 @@ class RoborockClient:
 
     def _get_payload(
         self,
-        method: RoborockCommand,
+        method: RoborockCommand | str,
         params: list | dict | None = None,
         secured=False,
     ):

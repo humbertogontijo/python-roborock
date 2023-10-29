@@ -198,7 +198,7 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
 
     async def _send_command(
         self,
-        method: RoborockCommand,
+        method: RoborockCommand | str,
         params: list | dict | None = None,
     ):
         request_id, timestamp, payload = super()._get_payload(method, params, True)
