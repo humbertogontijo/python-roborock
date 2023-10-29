@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.35.2 (2023-10-29)
+
+### Fix
+
+* Error catch and typing ([#133](https://github.com/humbertogontijo/python-roborock/issues/133)) ([`171c302`](https://github.com/humbertogontijo/python-roborock/commit/171c30265664b0161db75695d2d30d8b45bbf5b3))
+
 ## v0.35.1 (2023-10-28)
 
 ### Fix
