@@ -348,7 +348,7 @@ class RoborockClient:
 
     def _get_payload(
         self,
-        method: RoborockCommand,
+        method: RoborockCommand | str,
         params: list | dict | None = None,
         secured=False,
     ):
@@ -380,7 +380,7 @@ class RoborockClient:
 
     async def _send_command(
         self,
-        method: RoborockCommand,
+        method: RoborockCommand | str,
         params: list | dict | None = None,
     ):
         raise NotImplementedError
@@ -388,7 +388,7 @@ class RoborockClient:
     @final
     async def send_command(
         self,
-        method: RoborockCommand,
+        method: RoborockCommand | str,
         params: list | dict | None = None,
         return_type: type[RT] | None = None,
     ) -> RT:
