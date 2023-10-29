@@ -195,7 +195,7 @@ class CacheableAttributeResult:
     type: CommandType
 
 
-def find_cacheable_attribute(method: RoborockCommand) -> CacheableAttributeResult | None:
+def find_cacheable_attribute(method: RoborockCommand | str) -> CacheableAttributeResult | None:
     if method is None:
         return None
 

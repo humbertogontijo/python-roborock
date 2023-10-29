@@ -377,7 +377,7 @@ class RoborockClient:
 
     async def _send_command(
         self,
-        method: RoborockCommand,
+        method: RoborockCommand | str,
         params: list | dict | None = None,
     ):
         raise NotImplementedError
