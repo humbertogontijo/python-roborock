@@ -7,7 +7,7 @@ from dataclasses import asdict, dataclass
 from datetime import timezone
 from enum import Enum
 from typing import Any, NamedTuple
-
+from dataclasses import field
 from dacite import Config, from_dict
 
 from .code_mappings import (
@@ -168,10 +168,10 @@ class HomeDataProductSchema(RoborockBase):
 
 @dataclass
 class HomeDataProduct(RoborockBase):
-    id: str | None = None
-    name: str | None = None
+    id: str
+    name: str
+    model: str
     code: str | None = None
-    model: str | None = None
     iconurl: str | None = None
     attribute: Any | None = None
     capability: int | None = None
@@ -216,14 +216,14 @@ class HomeDataRoom(RoborockBase):
 
 @dataclass
 class HomeData(RoborockBase):
-    id: int | None = None
-    name: str | None = None
+    id: int
+    name: str
+    products: list[HomeDataProduct] = field(default_factory=lambda: [])
+    devices: list[HomeDataDevice] = field(default_factory=lambda: [])
+    received_devices: list[HomeDataDevice] = field(default_factory=lambda: [])
     lon: Any | None = None
     lat: Any | None = None
     geo_name: Any | None = None
-    products: list[HomeDataProduct] | None = None
-    devices: list[HomeDataDevice] | None = None
-    received_devices: list[HomeDataDevice] | None = None
     rooms: list[HomeDataRoom] | None = None
 
     def get_all_devices(self) -> list[HomeDataDevice]:

@@ -385,7 +385,7 @@ class RoborockClient:
     @final
     async def send_command(
         self,
-        method: RoborockCommand,
+        method: RoborockCommand | str,
         params: list | dict | None = None,
         return_type: type[RT] | None = None,
     ) -> RT:
