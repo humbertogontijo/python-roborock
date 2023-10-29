@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.35.3 (2023-10-29)
+
+### Fix
+
+* Typing and versioning ([#134](https://github.com/humbertogontijo/python-roborock/issues/134)) ([`e1dc545`](https://github.com/humbertogontijo/python-roborock/commit/e1dc545f20f2a163240eb72d831025cb2ff3ec7c))
+
 ## v0.35.2 (2023-10-29)
 
 ### Fix
