@@ -73,7 +73,7 @@ jobs:
       # - Create GitHub release
       # - Publish to PyPI
       - name: Python Semantic Release
-        uses: relekang/python-semantic-release@v7.34.6
+        uses: relekang/python-semantic-release@v8.3.0
         with:
           github_token: ${{ secrets.GH_TOKEN }}
           repository_username: __token__
