@@ -293,7 +293,10 @@ class RoborockClient:
                     payload = data.payload[0:24]
                     [endpoint, _, request_id, _] = struct.unpack("<8s8sH6s", payload)
                     if endpoint.decode().startswith(self._endpoint):
-                        decrypted = Utils.decrypt_cbc(data.payload[24:], self._nonce)
+                        try:
+                            decrypted = Utils.decrypt_cbc(data.payload[24:], self._nonce)
+                        except ValueError as err:
+                            raise RoborockException("Failed to decode %s for %s", data.payload, data.protocol) from err
                         decompressed = Utils.decompress(decrypted)
                         queue = self._waiting_queue.get(request_id)
                         if queue:
