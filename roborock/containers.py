@@ -10,7 +10,6 @@ from typing import Any, NamedTuple
 
 from dacite import Config, from_dict
 
-from . import RoborockException
 from .code_mappings import (
     RoborockDockDustCollectionModeCode,
     RoborockDockErrorCode,
@@ -51,6 +50,7 @@ from .const import (
     SENSOR_DIRTY_REPLACE_TIME,
     SIDE_BRUSH_REPLACE_TIME,
 )
+from .exceptions import RoborockException
 
 _LOGGER = logging.getLogger(__name__)
 

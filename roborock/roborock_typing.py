@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 
 from .containers import (
@@ -315,9 +315,9 @@ class DockSummary(RoborockBase):
 
 @dataclass
 class DeviceProp(RoborockBase):
-    status: Status = Status()
-    clean_summary: CleanSummary = CleanSummary()
-    consumable: Consumable = Consumable()
+    status: Status = field(default_factory=Status)
+    clean_summary: CleanSummary = field(default_factory=CleanSummary)
+    consumable: Consumable = field(default_factory=Consumable)
     last_clean_record: CleanRecord | None = None
     dock_summary: DockSummary | None = None
 
