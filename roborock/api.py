@@ -550,6 +550,7 @@ class RoborockClient:
         val = self.cache.get(key)
         if val is not None:
             return await val.async_value()
+        return None
 
 
 class RoborockApiClient:

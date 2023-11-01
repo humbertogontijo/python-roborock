@@ -10,6 +10,7 @@ from typing import Any, NamedTuple
 
 from dacite import Config, from_dict
 
+from . import RoborockException
 from .code_mappings import (
     RoborockDockDustCollectionModeCode,
     RoborockDockErrorCode,
@@ -300,7 +301,7 @@ class Status(RoborockBase):
     error_code_name: str | None = None
     state_name: str | None = None
     water_box_mode_name: str | None = None
-    fan_power_options: list[str] = field(default_factory=lambda _: [])
+    fan_power_options: list[str] = field(default_factory=list)
     fan_power_name: str | None = None
     mop_mode_name: str | None = None
 
@@ -319,12 +320,18 @@ class Status(RoborockBase):
             self.mop_mode_name = self.mop_mode.name
 
     def get_fan_speed_code(self, fan_speed: str) -> int:
+        if self.fan_power is None:
+            raise RoborockException("Attempted to get fan speed before status has been updated.")
         return self.fan_power.as_dict().get(fan_speed)
 
     def get_mop_intensity_code(self, mop_intensity: str) -> int:
+        if self.water_box_mode is None:
+            raise RoborockException("Attempted to get mop_intensity before status has been updated.")
         return self.water_box_mode.as_dict().get(mop_intensity)
 
     def get_mop_mode_code(self, mop_mode: str) -> int:
+        if self.mop_mode is None:
+            raise RoborockException("Attempted to get mop_mode before status has been updated.")
         return self.mop_mode.as_dict().get(mop_mode)
 
 
