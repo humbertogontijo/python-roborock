@@ -132,7 +132,7 @@ class RoborockCommand(str, Enum):
 
 @dataclass
 class CommandInfo:
-    params: list | dict | None = None
+    params: list | dict | int | None = None
 
 
 CommandInfoMap: dict[RoborockCommand | None, CommandInfo] = {
@@ -315,9 +315,9 @@ class DockSummary(RoborockBase):
 
 @dataclass
 class DeviceProp(RoborockBase):
-    status: Status | None = None
-    clean_summary: CleanSummary | None = None
-    consumable: Consumable | None = None
+    status: Status = Status()
+    clean_summary: CleanSummary = CleanSummary()
+    consumable: Consumable = Consumable()
     last_clean_record: CleanRecord | None = None
     dock_summary: DockSummary | None = None
 

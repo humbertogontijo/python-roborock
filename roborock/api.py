@@ -346,7 +346,7 @@ class RoborockClient:
     def _get_payload(
         self,
         method: RoborockCommand | str,
-        params: list | dict | None = None,
+        params: list | dict | int | None = None,
         secured=False,
     ):
         timestamp = math.floor(time.time())
@@ -378,7 +378,7 @@ class RoborockClient:
     async def _send_command(
         self,
         method: RoborockCommand | str,
-        params: list | dict | None = None,
+        params: list | dict | int | None = None,
     ):
         raise NotImplementedError
 
@@ -386,7 +386,7 @@ class RoborockClient:
     async def send_command(
         self,
         method: RoborockCommand | str,
-        params: list | dict | None = None,
+        params: list | dict | int | None = None,
         return_type: type[RT] | None = None,
     ) -> RT:
         cacheable_attribute_result = find_cacheable_attribute(method)
@@ -409,10 +409,10 @@ class RoborockClient:
             return return_type.from_dict(response)
         return response
 
-    async def get_status(self) -> Status | None:
+    async def get_status(self) -> Status:
         return self._status_type.from_dict(await self.cache[CacheableAttribute.status].async_value())
 
-    async def get_dnd_timer(self) -> DnDTimer | None:
+    async def get_dnd_timer(self) -> DnDTimer:
         return DnDTimer.from_dict(await self.cache[CacheableAttribute.dnd_timer].async_value())
 
     async def get_valley_electricity_timer(self) -> ValleyElectricityTimer | None:
@@ -448,19 +448,19 @@ class RoborockClient:
             _LOGGER.warning("Clean record was of a new type, please submit an issue request: %s", record)
             return None
 
-    async def get_consumable(self) -> Consumable | None:
+    async def get_consumable(self) -> Consumable:
         return Consumable.from_dict(await self.cache[CacheableAttribute.consumable].async_value())
 
-    async def get_wash_towel_mode(self) -> WashTowelMode | None:
+    async def get_wash_towel_mode(self) -> WashTowelMode:
         return WashTowelMode.from_dict(await self.cache[CacheableAttribute.wash_towel_mode].async_value())
 
-    async def get_dust_collection_mode(self) -> DustCollectionMode | None:
+    async def get_dust_collection_mode(self) -> DustCollectionMode:
         return DustCollectionMode.from_dict(await self.cache[CacheableAttribute.dust_collection_mode].async_value())
 
-    async def get_smart_wash_params(self) -> SmartWashParams | None:
+    async def get_smart_wash_params(self) -> SmartWashParams:
         return SmartWashParams.from_dict(await self.cache[CacheableAttribute.smart_wash_params].async_value())
 
-    async def get_dock_summary(self, dock_type: RoborockDockTypeCode) -> DockSummary | None:
+    async def get_dock_summary(self, dock_type: RoborockDockTypeCode) -> DockSummary:
         """Gets the status summary from the dock with the methods available for a given dock.
 
         :param dock_type: RoborockDockTypeCode"""
@@ -522,11 +522,11 @@ class RoborockClient:
             ]
         return None
 
-    async def get_child_lock_status(self) -> ChildLockStatus | None:
+    async def get_child_lock_status(self) -> ChildLockStatus:
         """Gets current child lock status."""
         return ChildLockStatus.from_dict(await self.cache[CacheableAttribute.child_lock_status].async_value())
 
-    async def get_flow_led_status(self) -> FlowLedStatus | None:
+    async def get_flow_led_status(self) -> FlowLedStatus:
         """Gets current flow led status."""
         return FlowLedStatus.from_dict(await self.cache[CacheableAttribute.flow_led_status].async_value())
 
@@ -545,6 +545,11 @@ class RoborockClient:
 
     def add_listener(self, listener: Callable):
         self._listeners.append(listener)
+
+    async def get_from_cache(self, key: CacheableAttribute) -> AttributeCache | None:
+        val = self.cache.get(key)
+        if val is not None:
+            return await val.async_value()
 
 
 class RoborockApiClient:
