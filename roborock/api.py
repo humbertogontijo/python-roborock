@@ -293,10 +293,7 @@ class RoborockClient:
                     payload = data.payload[0:24]
                     [endpoint, _, request_id, _] = struct.unpack("<8s8sH6s", payload)
                     if endpoint.decode().startswith(self._endpoint):
-                        try:
-                            decrypted = Utils.decrypt_cbc(data.payload[24:], self._nonce)
-                        except ValueError as err:
-                            raise RoborockException("Failed to decode %s for %s", data.payload, data.protocol) from err
+                        decrypted = Utils.decrypt_cbc(data.payload[24:], self._nonce)
                         decompressed = Utils.decompress(decrypted)
                         queue = self._waiting_queue.get(request_id)
                         if queue:
@@ -413,9 +410,12 @@ class RoborockClient:
         return response
 
     async def get_status(self) -> Status:
-        return self._status_type.from_dict(await self.cache[CacheableAttribute.status].async_value())
+        data = self._status_type.from_dict(await self.cache[CacheableAttribute.status].async_value())
+        if data is None:
+            return Status()
+        return data
 
-    async def get_dnd_timer(self) -> DnDTimer:
+    async def get_dnd_timer(self) -> DnDTimer | None:
         return DnDTimer.from_dict(await self.cache[CacheableAttribute.dnd_timer].async_value())
 
     async def get_valley_electricity_timer(self) -> ValleyElectricityTimer | None:
@@ -452,15 +452,18 @@ class RoborockClient:
             return None
 
     async def get_consumable(self) -> Consumable:
-        return Consumable.from_dict(await self.cache[CacheableAttribute.consumable].async_value())
+        data = Consumable.from_dict(await self.cache[CacheableAttribute.consumable].async_value())
+        if data is None:
+            return Consumable()
+        return data
 
-    async def get_wash_towel_mode(self) -> WashTowelMode:
+    async def get_wash_towel_mode(self) -> WashTowelMode | None:
         return WashTowelMode.from_dict(await self.cache[CacheableAttribute.wash_towel_mode].async_value())
 
-    async def get_dust_collection_mode(self) -> DustCollectionMode:
+    async def get_dust_collection_mode(self) -> DustCollectionMode | None:
         return DustCollectionMode.from_dict(await self.cache[CacheableAttribute.dust_collection_mode].async_value())
 
-    async def get_smart_wash_params(self) -> SmartWashParams:
+    async def get_smart_wash_params(self) -> SmartWashParams | None:
         return SmartWashParams.from_dict(await self.cache[CacheableAttribute.smart_wash_params].async_value())
 
     async def get_dock_summary(self, dock_type: RoborockDockTypeCode) -> DockSummary:
