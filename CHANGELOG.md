@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.35.4 (2023-11-03)
+
+### Fix
+
+* Mypy complaints ([#137](https://github.com/humbertogontijo/python-roborock/issues/137)) ([`752e320`](https://github.com/humbertogontijo/python-roborock/commit/752e320644449a83a724590628c4011b9d8bacb2))
+
 ## v0.35.3 (2023-10-29)
 
 ### Fix
