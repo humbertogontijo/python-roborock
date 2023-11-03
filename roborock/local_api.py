@@ -83,7 +83,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
             self.sync_disconnect()
 
     def build_roborock_message(
-        self, method: RoborockCommand | str, params: list | dict | None = None
+        self, method: RoborockCommand | str, params: list | dict | int | None = None
     ) -> RoborockMessage:
         secured = True if method in COMMANDS_SECURED else False
         request_id, timestamp, payload = self._get_payload(method, params, secured)
@@ -123,7 +123,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
     async def _send_command(
         self,
         method: RoborockCommand | str,
-        params: list | dict | None = None,
+        params: list | dict | int | None = None,
     ):
         roborock_message = self.build_roborock_message(method, params)
         return await self.send_message(roborock_message)

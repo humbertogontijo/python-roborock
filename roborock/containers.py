@@ -50,6 +50,7 @@ from .const import (
     SENSOR_DIRTY_REPLACE_TIME,
     SIDE_BRUSH_REPLACE_TIME,
 )
+from .exceptions import RoborockException
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -185,12 +186,12 @@ class HomeDataDevice(RoborockBase):
     name: str
     local_key: str
     fv: str
+    product_id: str
     attribute: Any | None = None
     active_time: int | None = None
     runtime_env: Any | None = None
     time_zone_id: str | None = None
     icon_url: str | None = None
-    product_id: str | None = None
     lon: Any | None = None
     lat: Any | None = None
     share: Any | None = None
@@ -297,9 +298,41 @@ class Status(RoborockBase):
     dss: int | None = None
     common_status: int | None = None
     corner_clean_mode: int | None = None
+    error_code_name: str | None = None
+    state_name: str | None = None
+    water_box_mode_name: str | None = None
+    fan_power_options: list[str] = field(default_factory=list)
+    fan_power_name: str | None = None
+    mop_mode_name: str | None = None
 
     def __post_init__(self) -> None:
         self.square_meter_clean_area = round(self.clean_area / 1000000, 1) if self.clean_area is not None else None
+        if self.error_code is not None:
+            self.error_code_name = self.error_code.name
+        if self.state is not None:
+            self.state_name = self.state.name
+        if self.water_box_mode is not None:
+            self.water_box_mode_name = self.water_box_mode.name
+        if self.fan_power is not None:
+            self.fan_power_options = self.fan_power.keys()
+            self.fan_power_name = self.fan_power.name
+        if self.mop_mode is not None:
+            self.mop_mode_name = self.mop_mode.name
+
+    def get_fan_speed_code(self, fan_speed: str) -> int:
+        if self.fan_power is None:
+            raise RoborockException("Attempted to get fan speed before status has been updated.")
+        return self.fan_power.as_dict().get(fan_speed)
+
+    def get_mop_intensity_code(self, mop_intensity: str) -> int:
+        if self.water_box_mode is None:
+            raise RoborockException("Attempted to get mop_intensity before status has been updated.")
+        return self.water_box_mode.as_dict().get(mop_intensity)
+
+    def get_mop_mode_code(self, mop_mode: str) -> int:
+        if self.mop_mode is None:
+            raise RoborockException("Attempted to get mop_mode before status has been updated.")
+        return self.mop_mode.as_dict().get(mop_mode)
 
 
 @dataclass

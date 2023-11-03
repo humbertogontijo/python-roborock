@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 
 from .containers import (
@@ -132,7 +132,7 @@ class RoborockCommand(str, Enum):
 
 @dataclass
 class CommandInfo:
-    params: list | dict | None = None
+    params: list | dict | int | None = None
 
 
 CommandInfoMap: dict[RoborockCommand | None, CommandInfo] = {
@@ -315,9 +315,9 @@ class DockSummary(RoborockBase):
 
 @dataclass
 class DeviceProp(RoborockBase):
-    status: Status | None = None
-    clean_summary: CleanSummary | None = None
-    consumable: Consumable | None = None
+    status: Status = field(default_factory=Status)
+    clean_summary: CleanSummary = field(default_factory=CleanSummary)
+    consumable: Consumable = field(default_factory=Consumable)
     last_clean_record: CleanRecord | None = None
     dock_summary: DockSummary | None = None
 
