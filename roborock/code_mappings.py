@@ -249,6 +249,17 @@ class RoborockMopIntensityS5Max(RoborockMopIntensityCode):
     custom_water_flow = 207
 
 
+class RoborockMopIntensityS6MaxV(RoborockMopIntensityCode):
+    """Describes the mop intensity of the vacuum cleaner."""
+
+    off = 200
+    low = 201
+    medium = 202
+    high = 203
+    custom = 204
+    custom_water_flow = 207
+
+
 class RoborockDockErrorCode(RoborockEnum):
     """Describes the error code of the dock."""
 
