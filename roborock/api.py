@@ -421,7 +421,7 @@ class RoborockClient:
     async def get_status(self) -> Status:
         data = self._status_type.from_dict(await self.cache[CacheableAttribute.status].async_value())
         if data is None:
-            return Status()
+            return self._status_type()
         return data
 
     async def get_dnd_timer(self) -> DnDTimer | None:
@@ -563,6 +563,12 @@ class RoborockClient:
         if protocol not in this_device_listeners:
             this_device_listeners[protocol] = []
         this_device_listeners[protocol].append(listener)
+
+    async def get_from_cache(self, key: CacheableAttribute) -> AttributeCache | None:
+        val = self.cache.get(key)
+        if val is not None:
+            return await val.async_value()
+        return None
 
     async def get_from_cache(self, key: CacheableAttribute) -> AttributeCache | None:
         val = self.cache.get(key)
