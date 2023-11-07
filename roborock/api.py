@@ -271,45 +271,27 @@ class RoborockClient:
                                 data_protocol = RoborockDataProtocol(int(data_point_number))
                                 self._logger.debug(f"Got device update for {data_protocol.name}: {data_point}")
                                 if data_protocol in ROBOROCK_DATA_STATUS_PROTOCOL:
-                                    if (
-                                        data_protocol
-                                        not in self.listener_model.protocol_handlers
-                                    ):
+                                    if data_protocol not in self.listener_model.protocol_handlers:
                                         self._logger.debug(
                                             f"Got status update({data_protocol.name}) before get_status was called."
                                         )
                                         return
-                                    value = (
-                                        self.listener_model
-                                        .cache[CacheableAttribute.status]
-                                        .value
-                                    )
+                                    value = self.listener_model.cache[CacheableAttribute.status].value
                                     value[data_protocol.name] = data_point
                                     status = self._status_type.from_dict(value)
-                                    for listener in self.listener_model.protocol_handlers.get(
-                                        data_protocol, []
-                                    ):
+                                    for listener in self.listener_model.protocol_handlers.get(data_protocol, []):
                                         listener(status)
                                 elif data_protocol in ROBOROCK_DATA_CONSUMABLE_PROTOCOL:
-                                    if (
-                                        data_protocol
-                                        not in self.listener_model.protocol_handlers
-                                    ):
+                                    if data_protocol not in self.listener_model.protocol_handlers:
                                         self._logger.debug(
                                             f"Got consumable update({data_protocol.name})"
                                             + "before get_consumable was called."
                                         )
                                         return
-                                    value = (
-                                        self.listener_model
-                                        .cache[CacheableAttribute.consumable]
-                                        .value
-                                    )
+                                    value = self.listener_model.cache[CacheableAttribute.consumable].value
                                     value[data_protocol.name] = data_point
                                     consumable = Consumable.from_dict(value)
-                                    for listener in self.listener_model.protocol_handlers.get(
-                                        data_protocol, []
-                                    ):
+                                    for listener in self.listener_model.protocol_handlers.get(data_protocol, []):
                                         listener(consumable)
                                 return
                             except ValueError:
