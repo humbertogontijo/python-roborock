@@ -25,6 +25,7 @@ from .code_mappings import (
     RoborockMopIntensityCode,
     RoborockMopIntensityP10,
     RoborockMopIntensityS5Max,
+    RoborockMopIntensityS6MaxV,
     RoborockMopIntensityS7,
     RoborockMopIntensityV2,
     RoborockMopModeCode,
@@ -357,7 +358,7 @@ class Q7MaxStatus(Status):
 @dataclass
 class S6MaxVStatus(Status):
     fan_power: RoborockFanSpeedS7MaxV | None = None
-    water_box_mode: RoborockMopIntensityS7 | None = None
+    water_box_mode: RoborockMopIntensityS6MaxV | None = None
 
 
 @dataclass

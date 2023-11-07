@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import base64
+import dataclasses
 import hashlib
 import hmac
 import json
@@ -169,7 +170,15 @@ class AttributeCache:
         await self._async_value()
 
 
+@dataclasses.dataclass
+class ListenerModel:
+    protocol_handlers: dict[RoborockDataProtocol, list[Callable[[Status | Consumable], None]]]
+    cache: dict[CacheableAttribute, AttributeCache]
+
+
 class RoborockClient:
+    _listeners: dict[str, ListenerModel] = {}
+
     def __init__(self, endpoint: str, device_info: DeviceData, queue_timeout: int = 4) -> None:
         self.event_loop = get_running_loop_or_create_one()
         self.device_info = device_info
@@ -184,10 +193,12 @@ class RoborockClient:
         self.cache: dict[CacheableAttribute, AttributeCache] = {
             cacheable_attribute: AttributeCache(attr, self) for cacheable_attribute, attr in get_cache_map().items()
         }
-        self._listeners: list[Callable[[str, CacheableAttribute, RoborockBase], None]] = []
         self.is_available: bool = True
         self.queue_timeout = queue_timeout
         self._status_type: type[Status] = ModelStatus.get(self.device_info.model, S7MaxVStatus)
+        if device_info.device.duid not in self._listeners:
+            self._listeners[device_info.device.duid] = ListenerModel({}, self.cache)
+        self.listener_model = self._listeners[device_info.device.duid]
 
     def __del__(self) -> None:
         self.release()
@@ -260,32 +271,36 @@ class RoborockClient:
                                 data_protocol = RoborockDataProtocol(int(data_point_number))
                                 self._logger.debug(f"Got device update for {data_protocol.name}: {data_point}")
                                 if data_protocol in ROBOROCK_DATA_STATUS_PROTOCOL:
-                                    if self.cache[CacheableAttribute.status].value is None:
+                                    if data_protocol not in self.listener_model.protocol_handlers:
                                         self._logger.debug(
                                             f"Got status update({data_protocol.name}) before get_status was called."
                                         )
                                         return
-                                    value = self.cache[CacheableAttribute.status].value
+                                    value = self.listener_model.cache[CacheableAttribute.status].value
                                     value[data_protocol.name] = data_point
                                     status = self._status_type.from_dict(value)
-                                    for listener in self._listeners:
-                                        listener(self.device_info.device.duid, CacheableAttribute.status, status)
+                                    for listener in self.listener_model.protocol_handlers.get(data_protocol, []):
+                                        listener(status)
                                 elif data_protocol in ROBOROCK_DATA_CONSUMABLE_PROTOCOL:
-                                    if self.cache[CacheableAttribute.consumable].value is None:
+                                    if data_protocol not in self.listener_model.protocol_handlers:
                                         self._logger.debug(
                                             f"Got consumable update({data_protocol.name})"
                                             + "before get_consumable was called."
                                         )
                                         return
-                                    value = self.cache[CacheableAttribute.consumable].value
+                                    value = self.listener_model.cache[CacheableAttribute.consumable].value
                                     value[data_protocol.name] = data_point
                                     consumable = Consumable.from_dict(value)
-                                    for listener in self._listeners:
-                                        listener(
-                                            self.device_info.device.duid, CacheableAttribute.consumable, consumable
-                                        )
+                                    for listener in self.listener_model.protocol_handlers.get(data_protocol, []):
+                                        listener(consumable)
                                 return
                             except ValueError:
+                                self._logger.warning(
+                                    f"Got listener data for {data_point_number}, data: {data_point}. "
+                                    f"This lets us update data quicker, please open an issue "
+                                    f"at https://github.com/humbertogontijo/python-roborock/issues"
+                                )
+
                                 pass
                             dps = {data_point_number: data_point}
                             self._logger.debug(f"Got unknown data point {dps}")
@@ -552,8 +567,13 @@ class RoborockClient:
             return [ServerTimer(*server_timers)]
         return []
 
-    def add_listener(self, listener: Callable):
-        self._listeners.append(listener)
+    def add_listener(
+        self, protocol: RoborockDataProtocol, listener: Callable, cache: dict[CacheableAttribute, AttributeCache]
+    ):
+        self.listener_model.cache = cache
+        if protocol not in self.listener_model.protocol_handlers:
+            self.listener_model.protocol_handlers[protocol] = []
+        self.listener_model.protocol_handlers[protocol].append(listener)
 
     async def get_from_cache(self, key: CacheableAttribute) -> AttributeCache | None:
         val = self.cache.get(key)
