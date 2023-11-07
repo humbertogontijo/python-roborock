@@ -169,10 +169,12 @@ class AttributeCache:
     async def refresh_value(self):
         await self._async_value()
 
+
 @dataclasses.dataclass
 class ListenerModel:
     protocol_handles: dict[RoborockDataProtocol, list[Callable[[Status | Consumable], None]]]
     cache: dict[CacheableAttribute, AttributeCache]
+
 
 class RoborockClient:
     _listeners: dict[str, ListenerModel] = {}
@@ -268,12 +270,19 @@ class RoborockClient:
                                 data_protocol = RoborockDataProtocol(int(data_point_number))
                                 self._logger.debug(f"Got device update for {data_protocol.name}: {data_point}")
                                 if data_protocol in ROBOROCK_DATA_STATUS_PROTOCOL:
-                                    if data_protocol not in self._listeners[self.device_info.device.duid].protocol_handles:
+                                    if (
+                                        data_protocol
+                                        not in self._listeners[self.device_info.device.duid].protocol_handles
+                                    ):
                                         self._logger.debug(
                                             f"Got status update({data_protocol.name}) before get_status was called."
                                         )
                                         return
-                                    value = self._listeners[self.device_info.device.duid].cache[CacheableAttribute.status].value
+                                    value = (
+                                        self._listeners[self.device_info.device.duid]
+                                        .cache[CacheableAttribute.status]
+                                        .value
+                                    )
                                     value[data_protocol.name] = data_point
                                     status = self._status_type.from_dict(value)
                                     for listener in self._listeners[self.device_info.device.duid].protocol_handles.get(
@@ -281,13 +290,20 @@ class RoborockClient:
                                     ):
                                         listener(status)
                                 elif data_protocol in ROBOROCK_DATA_CONSUMABLE_PROTOCOL:
-                                    if data_protocol not in self._listeners[self.device_info.device.duid].protocol_handles:
+                                    if (
+                                        data_protocol
+                                        not in self._listeners[self.device_info.device.duid].protocol_handles
+                                    ):
                                         self._logger.debug(
                                             f"Got consumable update({data_protocol.name})"
                                             + "before get_consumable was called."
                                         )
                                         return
-                                    value = self._listeners[self.device_info.device.duid].cache[CacheableAttribute.consumable].value
+                                    value = (
+                                        self._listeners[self.device_info.device.duid]
+                                        .cache[CacheableAttribute.consumable]
+                                        .value
+                                    )
                                     value[data_protocol.name] = data_point
                                     consumable = Consumable.from_dict(value)
                                     for listener in self._listeners[self.device_info.device.duid].protocol_handles.get(
@@ -568,7 +584,9 @@ class RoborockClient:
             return [ServerTimer(*server_timers)]
         return []
 
-    def add_listener(self, protocol: RoborockDataProtocol, listener: Callable, cache: dict[CacheableAttribute, AttributeCache]):
+    def add_listener(
+        self, protocol: RoborockDataProtocol, listener: Callable, cache: dict[CacheableAttribute, AttributeCache]
+    ):
         this_device_listeners = self._listeners[self.device_info.device.duid]
         this_device_listeners.cache = cache
         if protocol not in this_device_listeners.protocol_handles:
