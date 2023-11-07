@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.36.0 (2023-11-07)
+
+### Feature
+
+* Update listeners ([#140](https://github.com/humbertogontijo/python-roborock/issues/140)) ([`5498596`](https://github.com/humbertogontijo/python-roborock/commit/549859669941e71c8d7ee09a0d4eea9564b4a12f))
+
 ## v0.35.4 (2023-11-03)
 
 ### Fix
