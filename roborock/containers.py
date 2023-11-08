@@ -474,10 +474,10 @@ class MultiMapsListMapInfoBakMaps(RoborockBase):
 class MultiMapsListMapInfo(RoborockBase):
     _ignore_keys = ["mapFlag"]
 
-    mapFlag: Any | None = None
+    mapFlag: int
+    name: str
     add_time: Any | None = None
     length: Any | None = None
-    name: Any | None = None
     bak_maps: list[MultiMapsListMapInfoBakMaps] | None = None
 
 
