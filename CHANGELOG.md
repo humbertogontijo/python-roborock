@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.36.1 (2023-11-08)
+
+### Fix
+
+* Typing for map ([#141](https://github.com/humbertogontijo/python-roborock/issues/141)) ([`64121ee`](https://github.com/humbertogontijo/python-roborock/commit/64121eee14e4f0ca24db664b0664aaac5c7332af))
+
 ## v0.36.0 (2023-11-07)
 
 ### Feature
