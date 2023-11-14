@@ -276,6 +276,7 @@ Return example::
 Vacuum Model            Supported
 ======================  =========
 Roborock S7 MaxV Ultra  Yes
+Roborock S8 Pro Ultra   Yes
 ======================  =========
 
 
@@ -290,17 +291,29 @@ child_lock_status
 -----------------
 
 Get: get_child_lock_status
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Description: This gets the child lock status of the device. 0 is off, 1 is on.
 
 Parameters: None
 
+Returns:
+
+    lock_status:
+
+Return example::
+
+    {'lock_status': 0}
+
 
 Set: set_child_lock_status
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Description: This sets the child lock status of the device.
 
-Parameters: None
+Parameters: '{"lock_status" :0}' 
+
+Returns: ok
 
 
 collision_avoid_status
@@ -320,20 +333,37 @@ Return example::
 
     {'status': 1}
 
-Source: Roborock S7 MaxV Ultra
+======================  =========
+Vacuum Model            Supported
+======================  =========
+Roborock S7 MaxV Ultra  Yes
+Roborock S8 Pro Ultra   Yes
+======================  =========
 
 
 Set: set_collision_avoid_status
 
-Description:
+Description: Update collision avoid status.
 
-Parameters:
+Parameters: '{"status" :1}'
+
+Returns:
+
+    ok
+
+======================  =========
+Vacuum Model            Supported
+======================  =========
+Roborock S7 MaxV Ultra  Yes
+Roborock S8 Pro Ultra   Yes
+======================  =========
 
 
 consumable
 ----------
 
 Get: get_consumable
+~~~~~~~~~~~~~~~~~~~
 
 Description: This gets the status of all of the consumables for your device.
 
@@ -357,19 +387,48 @@ Returns:
 
     cleaning_brush_work_times:
 
+Return examples::
 
+    {'main_brush_work_time': 14151, 'side_brush_work_time': 41638, 'filter_work_time': 14151, 'filter_element_work_time': 0, 'sensor_dirty_time': 41522, 'strainer_work_times': 44, 'dust_collection_work_times': 19, 'cleaning_brush_work_times': 44}
+
+
+======================  =========
+Vacuum Model            Supported
+======================  =========
+Roborock S7 MaxV Ultra  Yes
+Roborock S8 Pro Ultra   Yes
+======================  =========
 
 custom_mode
 -----------
 
 Get: get_custom_mode
+~~~~~~~~~~~~~~~~~~~~
 
-Description:
+Description: It returns the current custom mode.
 
-Parameters:
+Parameters: None
 
+Returns:
+
+    integer value of the current custom mode
+
+Return example::
+
+    102
+
+Comment : Not clear what a custom mode is = will explore
+
+
+======================  =========
+Vacuum Model            Supported
+======================  =========
+Roborock S7 MaxV Ultra  Yes
+Roborock S8 Pro Ultra   Yes
+======================  =========
 
 Set: set_custom_mode
+~~~~~~~~~~~~~~~~~~~~
 
 Description:
 
@@ -489,15 +548,16 @@ Parameters:
 find_me
 -------
 
-Description:
+Description: This makes your vacuum speaks so you can find it.
 
-Parameters:
+Parameters: None
 
 
 flow_led_status
 ---------------
 
 Get: get_flow_led_status
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 Description:
 
@@ -505,6 +565,7 @@ Parameters:
 
 
 Set: set_flow_led_status
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 Description:
 
@@ -568,6 +629,12 @@ Description:
 
 Parameters:
 
+Return example::
+
+    {'sid_in_use': 122, 'sid_version': 1, 'sid_in_progress': 0, 'location': 'de', 'bom': 'A.03.0342', 'language': 'en', 'msg_ver': 2}
+  
+
+
 
 get_device_ice
 --------------
@@ -576,6 +643,7 @@ Description:
 
 Parameters:
 
+Comment: Not found for S8 Pro Ultra 
 
 get_device_sdp
 --------------
@@ -584,6 +652,7 @@ Description:
 
 Parameters:
 
+Comment: Not found for S8 Pro Ultra
 
 get_homesec_connect_status
 --------------------------
@@ -592,6 +661,7 @@ Description:
 
 Parameters:
 
+Comment: Not found for S8 Pro Ultra
 
 get_map_v1
 ----------
@@ -599,6 +669,8 @@ get_map_v1
 Description:
 
 Parameters:
+
+Comment: Returns a map in a format that is not yet understood by me
 
 
 get_mop_template_params_summary
@@ -608,6 +680,8 @@ Description:
 
 Parameters:
 
+Comment: Not found for S8 Pro Ultra
+
 
 get_multi_map
 -------------
@@ -616,14 +690,38 @@ Description:
 
 Parameters:
 
+Comment: Response timed out for S8 Pro Ultra
+
 
 get_multi_maps_list
 -------------------
 
-Description:
+Description: Returns a list of map information stored on the device.
 
-Parameters:
+Parameters: None required
 
+Returns:
+
+    max_multi_map:
+    max_bak_map:
+    multi_map_count:
+    map_info::
+            
+            mapFlag:
+            add_time:
+            length:
+            name:
+            bak_maps::
+                
+                mapFlag:
+                add_time:
+
+
+Return example::
+
+    {'max_multi_map': 4, 'max_bak_map': 1, 'multi_map_count': 2, 'map_info': [{'mapFlag': 0, 'add_time': 1699919699, 'length': 4, 'name': 'Home', 'bak_maps': [{'mapFlag': 4, 'add_time': 1699823921}]}, {'mapFlag': 1, 'add_time': 1699828035, 'length': 13, 'name': 'Boys bathroom', 'bak_maps': [{'mapFlag': 5, 'add_time': 1699828035}]}]}
+
+Source: S8 Pro Ultra
 
 get_network_info
 ----------------
@@ -658,14 +756,21 @@ Description:
 
 Parameters:
 
+Comment: Not found for S8 Pro Ultra -- assume requires parameters
+
 
 get_room_mapping
 ----------------
 
-Description:
+Description: Returns a list of rooms, ids as discovered by 
 
-Parameters:
+Parameters: None
 
+Returns
+
+    room_id
+Return example::
+    [[16, '14731399', 12], [17, '2220009', 2], [18, '2219688', 12], [19, '2219685', 9], [20, '2219691', 12], [21, '2431758', 12], [22, '2219677', 13], [23, '2312548', 12], [24, '2219678', 14], [25, '2219686', 15], [26, '2219772', 12], [27, '14768755', 12]]
 
 get_scenes_valid_tids
 ---------------------
