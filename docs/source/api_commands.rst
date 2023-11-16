@@ -40,21 +40,21 @@ Parameters:
 app_start_collect_dust
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Description:
+Description: This empties the bin while docked
 
-Parameters:
+Parameters: None
 
 app_stop_collect_dust
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Description:
+Description: This 
 
 Parameters:
 
 app_start_wash
 ~~~~~~~~~~~~~~
 
-Description:
+Description: This washes the mop while docked
 
 Parameters:
 
@@ -62,7 +62,7 @@ Parameters:
 app_stop_wash
 ~~~~~~~~~~~~~
 
-Description:
+Description: This stops washing the mop whiloe docked
 
 Parameters:
 
@@ -945,7 +945,7 @@ Roborock S8 Pro Ultra   Yes
 ======================  =========
 
 get_map_v1
-----------
+~~~~~~~~~~ 
 
 Description: Returns the map
 
@@ -1397,9 +1397,11 @@ Returns:
 
     volume: The volume of the sound played by the vacuum
 
-```
-70
-```
+Example::
+
+    72
+
+
 
 ======================  =========
 Vacuum Model            Supported
@@ -1414,11 +1416,10 @@ Description: Sets the volume of the sound played by the vacuum
 
 Parameters: volume
 
-Returns ok or error
+Returns: ok or error
 
-```
 roborock -d command --device_id aHiddenDeviceId --cmd set_sound_volume --params 72
-```
+
 
 ======================  =========
 Vacuum Model            Supported
