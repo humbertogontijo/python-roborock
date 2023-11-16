@@ -20,8 +20,10 @@ Roborock S7 MaxV Ultra  Yes
 Roborock S8 Pro Ultra   Yes
 ======================  =========
 
+App dryer
+---------
 app_get_dryer_setting
----------------------
+~~~~~~~~~~~~~~~~~~~~~
 
 Description: Get dock dryer settings.
 
@@ -62,43 +64,49 @@ Roborock S7 MaxV Ultra  Yes
 Roborock S8 Pro Ultra   Yes
 ======================  =========
 
+app_set_dryer_setting
+~~~~~~~~~~~~~~~~~~~~~
+
+Description:
+
+Parameters:
+
+App status
+
 app_get_init_status
--------------------
+~~~~~~~~~~~~~~~~~~~
 
 Description: Returns detaiuls on the app being used to interact with Roborock servers ?? In this case  the app is backend supporting the HA integration ?
 
 Parameters: None
 
 Returns:
+
      local_info:
+
         name: Name of the app
+
         bom: Version of the app
+
         location: Location of the app
+
         language: Language of the app
+
         wifiplan: Wifi plan of the app
+
         timezone: Timezone of the app
+
         logserver: Log server of the app
+
         featureset: Featureset of the app
-    feature_info: List of features
-    new_feature_info: New feature info
+
+     feature_info: List of features
+
+     new_feature_info: New feature info
 
 Return example::
     {'local_info': {'name': 'custom_A.03.0342_CE', 'bom': 'A.03.0342', 'location': 'de', 'language': 'en', 'wifiplan': '', 'timezone': 'Europe/Berlin', 'logserver': 'awsde0.fds.api.xiaomi.com', 'featureset': 3}, 'feature_info': [111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125], 'new_feature_info': 2247395306799103, 'new_feature_info_str': '00000008009EFFFE'}
 
-======================  =========
-Vacuum Model            Supported
-======================  =========
-Roborock S8 Pro Ultra   Yes
-======================  =========
-
-app_goto_target
----------------
-
-Description: ??????
-
-Parameters: None
-
-Returns ok or error
 
 ======================  =========
 Vacuum Model            Supported
@@ -106,9 +114,18 @@ Vacuum Model            Supported
 Roborock S8 Pro Ultra   Yes
 ======================  =========
 
+App Vacuum control
+------------------
+
+app_start
+~~~~~~~~~
+
+Description:
+
+Parameters:
 
 app_pause
----------
+~~~~~~~~~
 
 Description: This pauses the vacuum's current task
 
@@ -122,36 +139,62 @@ Vacuum Model            Supported
 Roborock S8 Pro Ultra   Yes
 ======================  =========
 
+app_stop
+~~~~~~~~
 
-app_rc_end
-----------
-
-Description: Ends the remote control task
+Description:
 
 Parameters:
 
+
+app_start_collect_dust
+~~~~~~~~~~~~~~~~~~~~~~
+
+Description:
+
+Parameters:
+
+app_start_wash
+~~~~~~~~~~~~~~
+
+Description:
+
+Parameters:
+
+app_stop_collect_dust
+~~~~~~~~~~~~~~~~~~~~~~
+
+Description:
+
+Parameters:
+
+app_stop_wash
+~~~~~~~~~~~~~
+
+Description:
+
+Parameters:
+
+app_goto_target
+~~~~~~~~~~~~~~~
+
+Description: Got to target
+
+Parameters: Unknown
+
 Returns ok or error
+
 ======================  =========
 Vacuum Model            Supported
 ======================  =========
 Roborock S8 Pro Ultra   Yes
 ======================  =========
 
-
-app_rc_move
------------
-
-Description: Moves the robot in the direction specified
-
-Parameters: To be documented
-
-Returns ok or error
-
-..
-    Need to document the parameters - will need to explore the app to find out what they are
+App remote control
+------------------
 
 app_rc_start
-------------
+~~~~~~~~~~~~
 
 Description: Starts remote control.
 
@@ -165,6 +208,20 @@ Vacuum Model            Supported
 Roborock S8 Pro Ultra   Yes
 ======================  =========
 
+
+app_rc_move
+~~~~~~~~~~~
+
+Description: Moves the robot in the direction specified
+
+Parameters: To be documented
+
+Returns ok or error
+
+..
+    Need to document the parameters - will need to explore the app to find out what they are
+
+
 app_rc_stop
 -----------
 
@@ -177,17 +234,12 @@ Returns ok or error
 ..
     Assume stop stops a move ?? Need to check
 
+app_rc_end
+~~~~~~~~~~
 
-app_segment_clean
------------------
+Description: Ends the remote control task
 
-Description: This starts a segment clean and repeats it the number of times specified.
-
-Parameters: An array of segments to clean. Each segment is an integer with the segment id and the number of times to clean it. For example, to clean segment 18 twice, the parameter would be
- [{'segments': [18], 'repeat': 2}]
-
-Comment: The segment id can be obtained from 
-
+Parameters:
 
 Returns ok or error
 
@@ -197,13 +249,27 @@ Vacuum Model            Supported
 Roborock S8 Pro Ultra   Yes
 ======================  =========
 
+Segments
+--------
 
-app_set_dryer_setting
----------------------
+app_segment_clean
+~~~~~~~~~~~~~~~~~
 
-Description:
+Description: This starts a segment clean and repeats it the number of times specified.
 
-Parameters:
+Parameters: An array of segments to clean. Each segment is an integer with the segment id and the number of times to clean it. For example, to clean segment 18 twice, the parameter would be
+
+ [{'segments': [18], 'repeat': 2}]
+
+Comment: The segment id can be obtained from the inital data returneed on login ??
+
+Returns ok or error
+
+======================  =========
+Vacuum Model            Supported
+======================  =========
+Roborock S8 Pro Ultra   Yes
+======================  =========
 
 
 app_set_smart_cliff_forbidden
@@ -222,48 +288,8 @@ Description:
 Parameters:
 
 
-app_start
----------
-
-Description:
-
-Parameters:
-
-
-app_start_collect_dust
-----------------------
-
-Description:
-
-Parameters:
-
-
-app_start_wash
---------------
-
-Description:
-
-Parameters:
-
-
 app_stat
 --------
-
-Description:
-
-Parameters:
-
-
-app_stop
---------
-
-Description:
-
-Parameters:
-
-
-app_stop_wash
--------------
 
 Description:
 
@@ -986,11 +1012,10 @@ Parameters: None
 
 ..
     Appears to be associated with rooms ??
-Returns
+Returns::
 
-```
 [{'tid': '1699679077347', 'map_flag': 0, 'segs': [{'sid': 24}, {'sid': 20}, {'sid': 22}, {'sid': 18}]}, {'tid': '1699679236553', 'map_flag': 0, 'segs': [{'sid': 24}, {'sid': 20}, {'sid': 22}]}, {'tid': '1699679386045', 'map_flag': 0, 'segs': [{'sid': 16}, {'sid': 19}, {'sid': 17}]}, {'tid': '1699679335823', 'map_flag': 0, 'segs': [{'sid': 19}, {'sid': 16}, {'sid': 17}]}]
-```
+
 
 ======================  =========
 Vacuum Model            Supported
@@ -1005,7 +1030,7 @@ Description: Get serial number of the vacuum.
 
 Parameters: None
 
-Returns:
+Returns::
 
     serial_number: Serial number of the vacuum.
 
