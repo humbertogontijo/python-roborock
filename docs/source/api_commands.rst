@@ -537,7 +537,7 @@ Roborock S8 Pro Ultra   Yes
 ======================  =========
 
 
-custom_mode
+Custom mode
 -----------
 
 Get: get_custom_mode
@@ -840,18 +840,6 @@ Vacuum Model            Supported
 Roborock S8 Pro Ultra   No
 ======================  =========
 
-get_map_v1
-----------
-
-Description: Returns the map
-
-Parameters: Unknown
-
-Comment: Returns a map in a format that is not yet understood by me
-
-..
-    Explore what parameters it may take
-    Extend code to return byte stream ?
 
 Mop mode
 --------
@@ -955,6 +943,19 @@ Vacuum Model            Supported
 ======================  =========
 Roborock S8 Pro Ultra   Yes
 ======================  =========
+
+get_map_v1
+----------
+
+Description: Returns the map
+
+Parameters: Unknown
+
+Comment: Returns a map in a format that is not yet understood by me
+
+..
+    Explore what parameters it may take
+    Extend code to return byte stream ?
 
 get_network_info
 ----------------
