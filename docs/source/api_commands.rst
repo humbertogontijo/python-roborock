@@ -864,13 +864,12 @@ Returns: Enumeration for mop mode. 300
 
 Example for S8 Pro Ultra::
 
-     ```
     standard = 300
     deep = 301
     deep_plus = 303
     fast = 304
     custom = 302
-     ```
+     
 ======================  =========
 Vacuum Model            Supported
 ======================  =========
@@ -1006,10 +1005,12 @@ Description: Returns a list of rooms, ids as discovered by
 
 Parameters: None
 
-Returns
+Returns:
 
     room_id
+
 Return example::
+
     [[16, '14731399', 12], [17, '2220009', 2], [18, '2219688', 12], [19, '2219685', 9], [20, '2219691', 12], [21, '2431758', 12], [22, '2219677', 13], [23, '2312548', 12], [24, '2219678', 14], [25, '2219686', 15], [26, '2219772', 12], [27, '14768755', 12]]
 
 ======================  =========
@@ -1028,10 +1029,10 @@ Parameters: None
 
 ..
     Appears to be associated with rooms ??
+
 Returns::
 
 [{'tid': '1699679077347', 'map_flag': 0, 'segs': [{'sid': 24}, {'sid': 20}, {'sid': 22}, {'sid': 18}]}, {'tid': '1699679236553', 'map_flag': 0, 'segs': [{'sid': 24}, {'sid': 20}, {'sid': 22}]}, {'tid': '1699679386045', 'map_flag': 0, 'segs': [{'sid': 16}, {'sid': 19}, {'sid': 17}]}, {'tid': '1699679335823', 'map_flag': 0, 'segs': [{'sid': 19}, {'sid': 16}, {'sid': 17}]}]
-
 
 ======================  =========
 Vacuum Model            Supported
@@ -1346,9 +1347,10 @@ Returns:
     
         wash_interval: The interval in seconds between washes
 
-```
+Example::
+
 {'smart_wash': 0, 'wash_interval': 1200}
-```
+
 
 ======================  =========
 Vacuum Model            Supported
@@ -1366,10 +1368,10 @@ Parameters:
         smart_wash: 0 is off, 1 is on
     
         wash_interval: The interval in seconds between washes   
-```
+
 
 {'smart_wash': 0, 'wash_interval': 1200}
-```
+
 
 ======================  =========
 Vacuum Model            Supported
@@ -1680,9 +1682,10 @@ Parameters:
 
     enabled: If the switch is currently turned on in the app for valley electricity
 
-```
+Example::
+
 {'start_hour': 0, 'start_minute': 0, 'end_hour': 0, 'end_minute': 0, 'enabled': 0}
-``` 
+
 
 ..
     This does not appear to have any effect on the S8 Pro Ultra - Params accepted however no affect ??
@@ -1714,12 +1717,11 @@ Return example::
 Source: Roborock S7 MaxV Ultra
 
 
-```
     unknown = -9999
     light = 0
     balanced = 1
     deep = 2
-```
+
 
 ======================  =========
 Vacuum Model            Supported
@@ -1751,7 +1753,7 @@ Water box mode
 --------------
 
 get_water_box_custom_mode
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Description: Get water box mode.
 
