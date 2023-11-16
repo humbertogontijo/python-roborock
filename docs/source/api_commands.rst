@@ -4,6 +4,83 @@ This page is still under construction. All of the following are the commands we 
 
 Commands can have multiple parameters that can change from one model to another.
 
+App Vacuum control
+------------------
+
+app_start
+~~~~~~~~~
+
+Description:
+
+Parameters:
+
+app_pause
+~~~~~~~~~
+
+Description: This pauses the vacuum's current task
+
+Parameters: None
+
+Returns ok or error
+
+======================  =========
+Vacuum Model            Supported
+======================  =========
+Roborock S8 Pro Ultra   Yes
+======================  =========
+
+app_stop
+~~~~~~~~
+
+Description:
+
+Parameters:
+
+
+app_start_collect_dust
+~~~~~~~~~~~~~~~~~~~~~~
+
+Description:
+
+Parameters:
+
+app_stop_collect_dust
+~~~~~~~~~~~~~~~~~~~~~~
+
+Description:
+
+Parameters:
+
+app_start_wash
+~~~~~~~~~~~~~~
+
+Description:
+
+Parameters:
+
+
+app_stop_wash
+~~~~~~~~~~~~~
+
+Description:
+
+Parameters:
+
+app_goto_target
+~~~~~~~~~~~~~~~
+
+Description: Got to target
+
+Parameters: Unknown
+
+Returns ok or error
+
+======================  =========
+Vacuum Model            Supported
+======================  =========
+Roborock S8 Pro Ultra   Yes
+======================  =========
+
 app_charge
 ----------
 
@@ -19,6 +96,8 @@ Vacuum Model            Supported
 Roborock S7 MaxV Ultra  Yes
 Roborock S8 Pro Ultra   Yes
 ======================  =========
+‰
+
 
 App dryer
 ---------
@@ -114,81 +193,6 @@ Vacuum Model            Supported
 Roborock S8 Pro Ultra   Yes
 ======================  =========
 
-App Vacuum control
-------------------
-
-app_start
-~~~~~~~~~
-
-Description:
-
-Parameters:
-
-app_pause
-~~~~~~~~~
-
-Description: This pauses the vacuum's current task
-
-Parameters: None
-
-Returns ok or error
-
-======================  =========
-Vacuum Model            Supported
-======================  =========
-Roborock S8 Pro Ultra   Yes
-======================  =========
-
-app_stop
-~~~~~~~~
-
-Description:
-
-Parameters:
-
-
-app_start_collect_dust
-~~~~~~~~~~~~~~~~~~~~~~
-
-Description:
-
-Parameters:
-
-app_start_wash
-~~~~~~~~~~~~~~
-
-Description:
-
-Parameters:
-
-app_stop_collect_dust
-~~~~~~~~~~~~~~~~~~~~~~
-
-Description:
-
-Parameters:
-
-app_stop_wash
-~~~~~~~~~~~~~
-
-Description:
-
-Parameters:
-
-app_goto_target
-~~~~~~~~~~~~~~~
-
-Description: Got to target
-
-Parameters: Unknown
-
-Returns ok or error
-
-======================  =========
-Vacuum Model            Supported
-======================  =========
-Roborock S8 Pro Ultra   Yes
-======================  =========
 
 App remote control
 ------------------
