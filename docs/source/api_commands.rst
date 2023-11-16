@@ -418,6 +418,11 @@ Return example::
 
     {'lock_status': 0}
 
+======================  =========
+Vacuum Model            Supported
+======================  =========
+Roborock S8 Pro Ultra   Yes
+======================  =========
 
 Set: set_child_lock_status
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -428,6 +433,11 @@ Parameters: '{"lock_status" :0}'
 
 Returns: ok
 
+======================  =========
+Vacuum Model            Supported
+======================  =========
+Roborock S8 Pro Ultra   Yes
+======================  =========
 
 collision_avoid_status
 ----------------------
@@ -472,8 +482,8 @@ Roborock S8 Pro Ultra   Yes
 ======================  =========
 
 
-consumable
-----------
+Consumables 
+-----------
 
 Get: get_consumable
 ~~~~~~~~~~~~~~~~~~~
@@ -889,9 +899,11 @@ Vacuum Model            Supported
 Roborock S8 Pro Ultra   No
 ======================  =========
 
+Maps 
+----
 
 get_multi_map
--------------
+~~~~~~~~~~~~~
 
 Description:
 
@@ -903,7 +915,7 @@ Comment: Response timed out for S8 Pro Ultra
     times out after 4 secs
 
 get_multi_maps_list
--------------------
+~~~~~~~~~~~~~~~~~~~
 
 Description: Returns a list of map information stored on the device.
 
