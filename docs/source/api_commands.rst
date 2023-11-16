@@ -337,10 +337,11 @@ Description:
 Parameters:
 
 
-carpet_clean_mode
+Carpet clean mode
 -----------------
 
 Get: get_carpet_clean_mode
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Description: Get carpet clean mode.
 
@@ -358,6 +359,7 @@ Source: Roborock S7 MaxV Ultra
 
 
 Set: set_carpet_clean_mode
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Description:
 
@@ -398,14 +400,15 @@ Roborock S8 Pro Ultra   Yes
 
 
 Set: set_carpet_mode
+~~~~~~~~~~~~~~~~~~~~
 
 Description:
 
 Parameters:
 
 
-child_lock_status
------------------
+Child lock
+----------
 
 Get: get_child_lock_status
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1718,8 +1721,11 @@ Source: Roborock S7 MaxV Ultra
 
 
     unknown = -9999
+
     light = 0
+
     balanced = 1
+
     deep = 2
 
 
