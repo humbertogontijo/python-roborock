@@ -82,7 +82,7 @@ Roborock S8 Pro Ultra   Yes
 ======================  =========
 
 app_charge
-----------
+~~~~~~~~~~ 
 
 Description: This tells your vacuum to go back to the dock and charge.
 
@@ -96,11 +96,55 @@ Vacuum Model            Supported
 Roborock S7 MaxV Ultra  Yes
 Roborock S8 Pro Ultra   Yes
 ======================  =========
-‰
 
 
-App dryer
----------
+App status
+----------
+
+app_get_init_status
+~~~~~~~~~~~~~~~~~~~
+
+Description: Returns detaiuls on the app being used to interact with Roborock servers ?? In this case  the app is backend supporting the HA integration ?
+
+Parameters: None
+
+Returns:
+
+     local_info:
+
+        name: Name of the app
+
+        bom: Version of the app
+
+        location: Location of the app
+
+        language: Language of the app
+
+        wifiplan: Wifi plan of the app
+
+        timezone: Timezone of the app
+
+        logserver: Log server of the app
+
+        featureset: Featureset of the app
+
+     feature_info: List of features
+
+     new_feature_info: New feature info
+
+Return example::
+    {'local_info': {'name': 'custom_A.03.0342_CE', 'bom': 'A.03.0342', 'location': 'de', 'language': 'en', 'wifiplan': '', 'timezone': 'Europe/Berlin', 'logserver': 'awsde0.fds.api.xiaomi.com', 'featureset': 3}, 'feature_info': [111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125], 'new_feature_info': 2247395306799103, 'new_feature_info_str': '00000008009EFFFE'}
+
+
+======================  =========
+Vacuum Model            Supported
+======================  =========
+Roborock S8 Pro Ultra   Yes
+======================  =========
+
+App dryer settings
+------------------
+
 app_get_dryer_setting
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -149,50 +193,6 @@ app_set_dryer_setting
 Description:
 
 Parameters:
-
-App status
-
-app_get_init_status
-~~~~~~~~~~~~~~~~~~~
-
-Description: Returns detaiuls on the app being used to interact with Roborock servers ?? In this case  the app is backend supporting the HA integration ?
-
-Parameters: None
-
-Returns:
-
-     local_info:
-
-        name: Name of the app
-
-        bom: Version of the app
-
-        location: Location of the app
-
-        language: Language of the app
-
-        wifiplan: Wifi plan of the app
-
-        timezone: Timezone of the app
-
-        logserver: Log server of the app
-
-        featureset: Featureset of the app
-
-     feature_info: List of features
-
-     new_feature_info: New feature info
-
-Return example::
-    {'local_info': {'name': 'custom_A.03.0342_CE', 'bom': 'A.03.0342', 'location': 'de', 'language': 'en', 'wifiplan': '', 'timezone': 'Europe/Berlin', 'logserver': 'awsde0.fds.api.xiaomi.com', 'featureset': 3}, 'feature_info': [111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125], 'new_feature_info': 2247395306799103, 'new_feature_info_str': '00000008009EFFFE'}
-
-
-======================  =========
-Vacuum Model            Supported
-======================  =========
-Roborock S8 Pro Ultra   Yes
-======================  =========
-
 
 App remote control
 ------------------
