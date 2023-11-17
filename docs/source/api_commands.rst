@@ -4,6 +4,201 @@ This page is still under construction. All of the following are the commands we 
 
 Commands can have multiple parameters that can change from one model to another.
 
+get_status
+
+:ref:`get_status` 
+
+:ref:`app_start`
+
+app_pause
+
+app_stop
+
+app_start_collect_dust
+
+app_stop_collect_dust
+
+app_start_wash
+
+app_stop_wash
+
+app_charge
+
+app_get_init_status
+app_get_dryer_setting
+app_set_dryer_setting
+app_rc_start
+app_rc_move
+app_rc_stop
+app_rc_end
+app_segment_clean
+set_segment_ground_material
+name_segment
+resume_segment_clean
+app_get_init_status
+app_get_dryer_setting
+app_set_dryer_setting
+get_consumable
+reset_consumable
+get_custom_mode
+set_custom_mode
+get_customize_clean_mode
+set_customize_clean_mode
+get_dnd_timer
+set_dnd_timer
+close_dnd_timer
+dnld_install_sound
+get_dust_collection_mode
+set_dust_collection_mode
+get_identify_furniture_status
+set_identify_furniture_status
+get_identify_ground_material_status
+set_identify_ground_material_status
+get_led_status
+set_led_status
+get_multi_map
+get_multi_maps_list
+get_map_v1
+start_edit_map
+get_room_mapping
+get_network_info
+get_serial_number
+get_prop
+get_scenes_valid_tids
+get_sound_progress
+get_turn_server
+identify_furniture_status
+identify_ground_material_status
+led_status
+load_multi_map
+resume_zoned_clean
+retry_request
+reunion_scenes
+save_map
+send_ice_to_robot
+send_sdp_to_robot
+server_timer
+set_app_timezone
+set_clean_motor_mode
+set_fds_endpoint
+set_mop_mode
+set_scenes_segments
+set_scenes_zones
+set_water_box_custom_mode
+smart_wash_params
+sound_volume
+change_sound_volume
+test_sound_volume
+start_camera_preview
+stop_camera_preview
+start_voice_chat
+start_wash_then_charge
+get_status
+get_timezone
+set_timezone
+upd_server_timer
+valley_electricity_timer
+wash_towel_mode
+
+
+
+
+Status
+------
+
+get_status
+~~~~~~~~~~
+
+Description: Returns the current status of the vacuum
+
+Parameters: None
+
+Returns: 
+
+    msg_ver:
+
+    msg_seq:
+
+    state:
+
+    battery: Battery level of your device.
+
+    clean_time: Total clean time in hours.
+
+    clean_area: Total clean area in meters.
+
+    error_code:
+
+    map_reset:
+
+    in_cleaning:
+
+    in_returning:
+
+    in_fresh_state:
+
+    lab_status:
+
+    water_box_status:
+
+    back_type:
+
+    wash_phase:
+
+    wash_ready:
+
+    fan_power:
+
+    dnd_enabled:
+
+    map_status:
+
+    is_locating:
+
+    lock_status:
+
+    water_box_mode:
+
+    water_box_carriage_status:
+
+    mop_forbidden_enable:
+
+    camera_status:
+
+    is_exploring:
+
+    home_sec_status:
+
+    home_sec_enable_password:
+
+    adbumper_status:
+
+    water_shortage_status:
+
+    dock_type:
+
+    dust_collection_status:
+
+    auto_dust_collection:
+
+    avoid_count:
+
+    mop_mode:
+
+    debug_mode:
+
+    collision_avoid_status:
+
+    switch_map_mode:
+
+    dock_error_status:
+
+    charge_status:
+
+    unsave_map_reason:
+
+    unsave_map_flag:
+
 App Vacuum control
 ------------------
 
@@ -104,7 +299,7 @@ App status
 app_get_init_status
 ~~~~~~~~~~~~~~~~~~~
 
-Description: Returns detaiuls on the app being used to interact with Roborock servers ?? In this case  the app is backend supporting the HA integration ?
+Description: Returns details on the app being used to interact with Roborock servers ?? In this case  the app is backend supporting the HA integration ?
 
 Parameters: None
 
@@ -190,9 +385,20 @@ Roborock S8 Pro Ultra   Yes
 app_set_dryer_setting
 ~~~~~~~~~~~~~~~~~~~~~
 
-Description:
+Description: Set the time for the dryer to run
 
-Parameters:
+Parameters:  '{"status":1,"on":{"dry_time":14400}}'
+
+dry_time is the time in seconds the dryer will run for
+
+Returns ok or error
+
+
+======================  =========
+Vacuum Model            Supported
+======================  =========
+Roborock S8 Pro Ultra   Yes
+======================  =========
 
 App remote control
 ------------------
@@ -274,6 +480,36 @@ Vacuum Model            Supported
 ======================  =========
 Roborock S8 Pro Ultra   Yes
 ======================  =========
+
+set_segment_ground_material
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Description: Sets the groud material for the segment
+
+Parameters: "{'data':[[22,3,0]]}"
+
+Returns ok or error
+
+
+
+name_segment
+~~~~~~~~~~~~
+
+Description: 
+
+Parameters:
+
+..
+    Need to work out parameter format
+    Does this allow us to name a segment ?
+
+
+resume_segment_clean
+~~~~~~~~~~~~~~~~~~~~
+
+Description:
+
+Parameters:
 
 
 app_set_smart_cliff_forbidden
@@ -685,13 +921,6 @@ Description:
 Parameters:
 
 
-end_edit_map
-------------
-
-Description:
-
-Parameters:
-
 
 find_me
 -------
@@ -700,9 +929,8 @@ Description: This makes your vacuum speak so you can find it.
 
 Parameters: None
 
-
-flow_led_status
----------------
+LEDs 
+----
 
 Get: get_flow_led_status
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -957,8 +1185,40 @@ Comment: Returns a map in a format that is not yet understood by me
     Explore what parameters it may take
     Extend code to return byte stream ?
 
-get_network_info
+start_edit_map
+~~~~~~~~~~~~~~
+
+Description:
+
+Parameters:
+
+
+get_room_mapping
 ----------------
+
+Description: Returns a list of rooms, ids as discovered by 
+
+Parameters: None
+
+Returns:
+
+    room_id
+
+Return example::
+
+    [[16, '14731399', 12], [17, '2220009', 2], [18, '2219688', 12], [19, '2219685', 9], [20, '2219691', 12], [21, '2431758', 12], [22, '2219677', 13], [23, '2312548', 12], [24, '2219678', 14], [25, '2219686', 15], [26, '2219772', 12], [27, '14768755', 12]]
+
+======================  =========
+Vacuum Model            Supported
+======================  =========
+Roborock S7 MaxV Ultra  Yes
+Roborock S8 Pro Ultra   Yes
+======================  =========
+
+System information
+------------------
+get_network_info
+~~~~~~~~~~~~~~~~
 
 Description: Get the device's network information.
 
@@ -990,62 +1250,8 @@ Roborock S8 Pro Ultra   Yes
 ======================  =========
 
 
-get_prop
---------
-
-Description:
-
-Parameters:
-
-..
-   Comment: Not found for S8 Pro Ultra -- assume requires parameters
-
-
-
-get_room_mapping
-----------------
-
-Description: Returns a list of rooms, ids as discovered by 
-
-Parameters: None
-
-Returns:
-
-    room_id
-
-Return example::
-
-    [[16, '14731399', 12], [17, '2220009', 2], [18, '2219688', 12], [19, '2219685', 9], [20, '2219691', 12], [21, '2431758', 12], [22, '2219677', 13], [23, '2312548', 12], [24, '2219678', 14], [25, '2219686', 15], [26, '2219772', 12], [27, '14768755', 12]]
-
-======================  =========
-Vacuum Model            Supported
-======================  =========
-Roborock S7 MaxV Ultra  Yes
-Roborock S8 Pro Ultra   Yes
-======================  =========
-
-get_scenes_valid_tids
----------------------
-
-Description: To be confirmed
-
-Parameters: None
-
-..
-    Appears to be associated with rooms ??
-
-Returns::
-
-[{'tid': '1699679077347', 'map_flag': 0, 'segs': [{'sid': 24}, {'sid': 20}, {'sid': 22}, {'sid': 18}]}, {'tid': '1699679236553', 'map_flag': 0, 'segs': [{'sid': 24}, {'sid': 20}, {'sid': 22}]}, {'tid': '1699679386045', 'map_flag': 0, 'segs': [{'sid': 16}, {'sid': 19}, {'sid': 17}]}, {'tid': '1699679335823', 'map_flag': 0, 'segs': [{'sid': 19}, {'sid': 16}, {'sid': 17}]}]
-
-======================  =========
-Vacuum Model            Supported
-======================  =========
-Roborock S8 Pro Ultra   Yes
-======================  =========
-
 get_serial_number
------------------
+~~~~~~~~~~~~~~~~~
 
 Description: Get serial number of the vacuum.
 
@@ -1067,6 +1273,42 @@ Vacuum Model            Supported
 Roborock S7 MaxV Ultra  Yes
 Roborock S8 Pro Ultra   Yes
 ======================  =========
+
+get_prop
+~~~~~~~~
+
+Description: Generic get property command
+
+Parameters: The property to get
+
+Example::
+
+roborock -d command --device_id aHiddenDeviceId--cmd get_prop --params '["get_status"]'
+
+Comment : This example returns the same as get_status. Initial testing has shown that not all get commands are supported by this method
+
+
+
+get_scenes_valid_tids
+---------------------
+
+Description: To be confirmed
+
+Parameters: None
+
+..
+    Appears to be associated with rooms ??
+
+Returns::
+
+[{'tid': '1699679077347', 'map_flag': 0, 'segs': [{'sid': 24}, {'sid': 20}, {'sid': 22}, {'sid': 18}]}, {'tid': '1699679236553', 'map_flag': 0, 'segs': [{'sid': 24}, {'sid': 20}, {'sid': 22}]}, {'tid': '1699679386045', 'map_flag': 0, 'segs': [{'sid': 16}, {'sid': 19}, {'sid': 17}]}, {'tid': '1699679335823', 'map_flag': 0, 'segs': [{'sid': 19}, {'sid': 16}, {'sid': 17}]}]
+
+======================  =========
+Vacuum Model            Supported
+======================  =========
+Roborock S8 Pro Ultra   Yes
+======================  =========
+
 
 get_sound_progress
 ------------------
@@ -1191,24 +1433,7 @@ Parameters: ???
     Need to work out parameter format
 
 
-name_segment
-------------
 
-Description: 
-
-Parameters:
-
-..
-    Need to work out parameter format
-    Does this allow us to name a segment ?
-
-
-resume_segment_clean
---------------------
-
-Description:
-
-Parameters:
 
 
 resume_zoned_clean
@@ -1383,7 +1608,7 @@ Vacuum Model            Supported
 Roborock S8 Pro Ultra   Yes
 ======================  =========
 
-sound_volume
+Sound
 ------------
 
 Get: get_sound_volume
@@ -1401,15 +1626,13 @@ Example::
 
     72
 
-
-
 ======================  =========
 Vacuum Model            Supported
 ======================  =========
 Roborock S8 Pro Ultra   Yes
 ======================  =========
 
-Set: change_sound_volume
+change_sound_volume
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 Description: Sets the volume of the sound played by the vacuum
@@ -1420,6 +1643,18 @@ Returns: ok or error
 
 roborock -d command --device_id aHiddenDeviceId --cmd set_sound_volume --params 72
 
+======================  =========
+Vacuum Model            Supported
+======================  =========
+Roborock S8 Pro Ultra   Yes
+======================  =========
+
+test_sound_volume
+~~~~~~~~~~~~~~~~~
+
+Description: Plays a sound on the vacumm to identity volume
+
+Parameters: None
 
 ======================  =========
 Vacuum Model            Supported
@@ -1427,28 +1662,50 @@ Vacuum Model            Supported
 Roborock S8 Pro Ultra   Yes
 ======================  =========
 
+
+
+Camera
+------
+
 start_camera_preview
---------------------
+~~~~~~~~~~~~~~~~~~~~
 
 Description:
 
 Parameters:
 
+======================  =========
+Vacuum Model            Supported
+======================  =========
+Roborock S8 Pro Ultra   No
+======================  =========
 
-start_edit_map
---------------
+stop_camera_preview
+~~~~~~~~~~~~~~~~~~~
 
 Description:
 
 Parameters:
+
+======================  =========
+Vacuum Model            Supported
+======================  =========
+Roborock S8 Pro Ultra   No
+======================  =========
 
 
 start_voice_chat
-----------------
+~~~~~~~~~~~~~~~~
 
 Description:
 
 Parameters:
+
+======================  =========
+Vacuum Model            Supported
+======================  =========
+Roborock S8 Pro Ultra   No
+======================  =========
 
 
 start_wash_then_charge
@@ -1457,6 +1714,9 @@ start_wash_then_charge
 Description:
 
 Parameters:
+
+..
+    While this returns ok on the S8 Pro Ultra it does not appear to do anything
 
 
 status
@@ -1561,15 +1821,6 @@ Return example::
 Source: Roborock S7 MaxV Ultra
 
 
-
-stop_camera_preview
--------------------
-
-Description:
-
-Parameters:
-
-
 switch_water_mark
 -----------------
 
@@ -1585,22 +1836,6 @@ Roborock S8 Pro Ultra   No
 
 ..
     Not found for S8 Pro Ultra
-
-
-test_sound_volume
------------------
-
-Description: Plays a sound on the vacumm to identity volume
-
-Parameters: None
-
-======================  =========
-Vacuum Model            Supported
-======================  =========
-Roborock S8 Pro Ultra   Yes
-======================  =========
-
-
 
 timezone
 --------
