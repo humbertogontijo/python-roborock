@@ -4,104 +4,89 @@ This page is still under construction. All of the following are the commands we 
 
 Commands can have multiple parameters that can change from one model to another.
 
-get_status
-
-:ref:`get_status` 
-
-:ref:`app_start`
-
-app_pause
-
-app_stop
-
-app_start_collect_dust
-
-app_stop_collect_dust
-
-app_start_wash
-
-app_stop_wash
-
-app_charge
-
-app_get_init_status
-app_get_dryer_setting
-app_set_dryer_setting
-app_rc_start
-app_rc_move
-app_rc_stop
-app_rc_end
-app_segment_clean
-set_segment_ground_material
-name_segment
-resume_segment_clean
-app_get_init_status
-app_get_dryer_setting
-app_set_dryer_setting
-get_consumable
-reset_consumable
-get_custom_mode
-set_custom_mode
-get_customize_clean_mode
-set_customize_clean_mode
-get_dnd_timer
-set_dnd_timer
-close_dnd_timer
-dnld_install_sound
-get_dust_collection_mode
-set_dust_collection_mode
-get_identify_furniture_status
-set_identify_furniture_status
-get_identify_ground_material_status
-set_identify_ground_material_status
-get_led_status
-set_led_status
-get_multi_map
-get_multi_maps_list
-get_map_v1
-start_edit_map
-get_room_mapping
-get_network_info
-get_serial_number
-get_prop
-get_scenes_valid_tids
-get_sound_progress
-get_turn_server
-identify_furniture_status
-identify_ground_material_status
-led_status
-load_multi_map
-resume_zoned_clean
-retry_request
-reunion_scenes
-save_map
-send_ice_to_robot
-send_sdp_to_robot
-server_timer
-set_app_timezone
-set_clean_motor_mode
-set_fds_endpoint
-set_mop_mode
-set_scenes_segments
-set_scenes_zones
-set_water_box_custom_mode
-smart_wash_params
-sound_volume
-change_sound_volume
-test_sound_volume
-start_camera_preview
-stop_camera_preview
-start_voice_chat
-start_wash_then_charge
-get_status
-get_timezone
-set_timezone
-upd_server_timer
-valley_electricity_timer
-wash_towel_mode
-
-
-
+* :ref:`app_charge`
+* :ref:`app_get_dryer_setting`
+* :ref:`app_get_init_status`
+* :ref:`app_pause`
+* :ref:`app_rc_end`
+* :ref:`app_rc_move`
+* :ref:`app_rc_start`
+* :ref:`app_rc_stop`
+* :ref:`app_segment_clean`
+* :ref:`app_set_dryer_setting`
+* :ref:`app_set_dryer_setting`
+* :ref:`app_start_collect_dust`
+* :ref:`app_start_wash`
+* :ref:`app_start`
+* :ref:`app_stop_collect_dust`
+* :ref:`app_stop_wash`
+* :ref:`app_stop`
+* :ref:`change_sound_volumw`
+* :ref:`close_dnd_times`
+* :ref:`del_server_timer`
+* :ref:`dnld_install_sound`
+* :ref:`get_consumable`
+* :ref:`get_custom_mode`
+* :ref:`get_customize_clean_mode`
+* :ref:`get_dnd_times`
+* :ref:`get_dust_collection_mode`
+* :ref:`get_identify_furniture_status`
+* :ref:`get_identify_ground_material_status`
+* :ref:`get_led_status`
+* :ref:`get_map_v1`
+* :ref:`get_multi_map`
+* :ref:`get_multi_maps_list`
+* :ref:`get_network_info`
+* :ref:`get_prop`
+* :ref:`get_room_mapping`
+* :ref:`get_scenes_valid_tids`
+* :ref:`get_serial_number`
+* :ref:`get_sound_progress`
+* :ref:`get_status`
+* :ref:`get_timezone`
+* :ref:`get_turn_server`
+* :ref:`identify_furniture_status`
+* :ref:`identify_ground_material_status`
+* :ref:`led_status`
+* :ref:`load_multi_map`
+* :ref:`name_segment`
+* :ref:`ref:get_dryer_setting`
+* :ref:`reset_consumable`
+* :ref:`resume_segment_clean`
+* :ref:`resume_zoned_clean`
+* :ref:`retry_request`
+* :ref:`reunion_scenes`
+* :ref:`save_map`
+* :ref:`send_ice_to_robot`
+* :ref:`send_sdp_to_robot`
+* :ref:`server_timer`
+* :ref:`set_app_timezone`
+* :ref:`set_clean_motor_mode`
+* :ref:`set_customize_clean_mode`
+* :ref:`set_dnd_timer`
+* :ref:`set_dust_collection_mode`
+* :ref:`set_fds_endpoint`
+* :ref:`set_identify_furniture_status`
+* :ref:`set_identify_ground_material_status`
+* :ref:`set_led_status`
+* :ref:`set_mop_mode`
+* :ref:`set_scenes_segments`
+* :ref:`set_scenes_zones`
+* :ref:`set_segment_ground_material`
+* :ref:`set_timezone`
+* :ref:`set_water_box_custom_mode`
+* :ref:`smart_wash_params`
+* :ref:`sound_volume`
+* :ref:`start_camera_preview`
+* :ref:`start_edit_map`
+* :ref:`start_voice_chat`
+* :ref:`start_wash_then_charge`
+* :ref:`stop_camera_preview`
+* :ref:`stop_segment_clean`
+* :ref:`test_sound_volume`
+* :ref:`upd_server_timer`
+* :ref:`valley_electricity_timer`
+* :ref:`wash_towel_mode`
 
 Status
 ------
@@ -199,6 +184,13 @@ Returns:
 
     unsave_map_flag:
 
+======================  =========
+Vacuum Model            Supported
+======================  =========
+Roborock S7 MaxV Ultra  Yes
+Roborock S8 Pro Ultra   Yes
+======================  =========
+
 App Vacuum control
 ------------------
 
@@ -239,19 +231,37 @@ Description: This empties the bin while docked
 
 Parameters: None
 
+======================  =========
+Vacuum Model            Supported
+======================  =========
+Roborock S8 Pro Ultra   Yes
+======================  =========
+
 app_stop_collect_dust
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Description: This 
+Description: This stops the emptying of the dust bin while docked
 
-Parameters:
+Parameters: None
+
+======================  =========
+Vacuum Model            Supported
+======================  =========
+Roborock S8 Pro Ultra   Yes
+======================  =========
 
 app_start_wash
 ~~~~~~~~~~~~~~
 
 Description: This washes the mop while docked
 
-Parameters:
+Parameters: None
+
+======================  =========
+Vacuum Model            Supported
+======================  =========
+Roborock S8 Pro Ultra   Yes
+======================  =========
 
 
 app_stop_wash
@@ -259,14 +269,20 @@ app_stop_wash
 
 Description: This stops washing the mop whiloe docked
 
-Parameters:
+Parameters: None
+
+======================  =========
+Vacuum Model            Supported
+======================  =========
+Roborock S8 Pro Ultra   Yes
+======================  =========
 
 app_goto_target
 ~~~~~~~~~~~~~~~
 
 Description: Got to target
 
-Parameters: Unknown
+Parameters: To be determined
 
 Returns ok or error
 
@@ -490,14 +506,12 @@ Parameters: "{'data':[[22,3,0]]}"
 
 Returns ok or error
 
-
-
 name_segment
 ~~~~~~~~~~~~
 
 Description: 
 
-Parameters:
+Parameters: To be determined
 
 ..
     Need to work out parameter format
@@ -509,7 +523,26 @@ resume_segment_clean
 
 Description:
 
+Parameters: 
+
+======================  =========
+Vacuum Model            Supported
+======================  =========
+Roborock S8 Pro Ultra   Yes
+======================  =========
+
+stop_segment_clean
+~~~~~~~~~~~~~~~~~~
+
+Description: 
+
 Parameters:
+
+======================  =========
+Vacuum Model            Supported
+======================  =========
+Roborock S8 Pro Ultra   Yes
+======================  =========
 
 
 app_set_smart_cliff_forbidden
@@ -531,10 +564,17 @@ Parameters:
 app_stat
 --------
 
-Description:
+Description: This returns the current status of the vacuum
 
-Parameters:
+Parameters: None
 
+Returns: ok or error
+
+======================  =========
+Vacuum Model            Supported
+======================  =========
+Roborock S8 Pro Ultra   Yes
+======================  =========
 
 app_wakeup_robot
 ----------------
@@ -547,10 +587,20 @@ Parameters:
 app_zoned_clean
 ---------------
 
-Description:
+Description: Starts a zone clean
 
 Parameters:
 
+.. 
+    Us this the last known zone
+
+Returns: ok or error
+
+======================  =========
+Vacuum Model            Supported
+======================  =========
+Roborock S8 Pro Ultra   Yes
+======================  =========
 
 camera_status
 -------------
@@ -1283,7 +1333,9 @@ Parameters: The property to get
 
 Example::
 
-roborock -d command --device_id aHiddenDeviceId--cmd get_prop --params '["get_status"]'
+    roborock -d command --device_id aHiddenDeviceId --cmd get_prop --params '["battery"]'
+
+
 
 Comment : This example returns the same as get_status. Initial testing has shown that not all get commands are supported by this method
 
@@ -1549,14 +1601,6 @@ Description:
 Parameters:
 
 
-set_water_box_custom_mode
--------------------------
-
-Description:
-
-Parameters:
-
-
 smart_wash_params
 -----------------
 
@@ -1719,107 +1763,7 @@ Parameters:
     While this returns ok on the S8 Pro Ultra it does not appear to do anything
 
 
-status
-------
-
-Get: get_status
-
-Description: Get status information of the device.
-
-Parameters: None
-
-Returns:
-
-    msg_ver:
-
-    msg_seq:
-
-    state:
-
-    battery: Battery level of your device.
-
-    clean_time: Total clean time in hours.
-
-    clean_area: Total clean area in meters.
-
-    error_code:
-
-    map_reset:
-
-    in_cleaning:
-
-    in_returning:
-
-    in_fresh_state:
-
-    lab_status:
-
-    water_box_status:
-
-    back_type:
-
-    wash_phase:
-
-    wash_ready:
-
-    fan_power:
-
-    dnd_enabled:
-
-    map_status:
-
-    is_locating:
-
-    lock_status:
-
-    water_box_mode:
-
-    water_box_carriage_status:
-
-    mop_forbidden_enable:
-
-    camera_status:
-
-    is_exploring:
-
-    home_sec_status:
-
-    home_sec_enable_password:
-
-    adbumper_status:
-
-    water_shortage_status:
-
-    dock_type:
-
-    dust_collection_status:
-
-    auto_dust_collection:
-
-    avoid_count:
-
-    mop_mode:
-
-    debug_mode:
-
-    collision_avoid_status:
-
-    switch_map_mode:
-
-    dock_error_status:
-
-    charge_status:
-
-    unsave_map_reason:
-
-    unsave_map_flag:
-
-Return example::
-
-    {'msg_ver': 2, 'msg_seq': 1965, 'state': 8, 'battery': 100, 'clean_time': 1976, 'clean_area': 33197500, 'error_code': 0, 'map_present': 1, 'in_cleaning': 0, 'in_returning': 0, 'in_fresh_state': 1, 'lab_status': 1, 'water_box_status': 1, 'back_type': -1, 'wash_phase': 0, 'wash_ready': 0, 'fan_power': 102, 'dnd_enabled': 0, 'map_status': 3, 'is_locating': 0, 'lock_status': 0, 'water_box_mode': 203, 'water_box_carriage_status': 1, 'mop_forbidden_enable': 1, 'camera_status': 3457, 'is_exploring': 0, 'home_sec_status': 0, 'home_sec_enable_password': 0, 'adbumper_status': [0, 0, 0], 'water_shortage_status': 0, 'dock_type': 3, 'dust_collection_status': 0, 'auto_dust_collection': 1, 'avoid_count': 141, 'mop_mode': 300, 'debug_mode': 0, 'collision_avoid_status': 1, 'switch_map_mode': 0, 'dock_error_status': 0, 'charge_status': 1, 'unsave_map_reason': 0, 'unsave_map_flag': 0}
-
-Source: Roborock S7 MaxV Ultra
-
+s
 
 switch_water_mark
 -----------------
