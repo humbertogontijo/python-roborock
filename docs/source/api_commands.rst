@@ -24,12 +24,14 @@ Commands can have multiple parameters that can change from one model to another.
 * :ref:`change_sound_volumw`
 * :ref:`close_dnd_times`
 * :ref:`del_server_timer`
-* :ref:`dnld_install_sound`
+* :ref:`dnld_instadetermined`
+* :ref:`get_clean_sequence`
 * :ref:`get_consumable`
 * :ref:`get_custom_mode`
 * :ref:`get_customize_clean_mode`
 * :ref:`get_dnd_times`
 * :ref:`get_dust_collection_mode`
+* :ref:`get_clean_follow_ground_material_status`
 * :ref:`get_identify_furniture_status`
 * :ref:`get_identify_ground_material_status`
 * :ref:`get_led_status`
@@ -605,18 +607,21 @@ Roborock S8 Pro Ultra   Yes
 camera_status
 -------------
 
-Get: get_camera_status
+get_camera_status
+~~~~~~~~~~~~~~~~~
 
 Description: Get camera status.
 
 Parameters: None
 
 Returns: 3457
+         387 Roborock S8 Pro Ultra
 
 Source: Roborock S7 MaxV Ultra
 
 
-Set: set_camera_status
+set_camera_status
+~~~~~~~~~~~~~~~~~
 
 Description:
 
@@ -626,7 +631,7 @@ Parameters:
 Carpet clean mode
 -----------------
 
-Get: get_carpet_clean_mode
+get_carpet_clean_mode
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Description: Get carpet clean mode.
@@ -644,7 +649,7 @@ Return example::
 Source: Roborock S7 MaxV Ultra
 
 
-Set: set_carpet_clean_mode
+set_carpet_clean_mode
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Description:
@@ -655,7 +660,8 @@ Parameters:
 carpet_mode
 -----------
 
-Get: get_carpet_mode
+get_carpet_mode
+~~~~~~~~~~~~~~~
 
 Description:
 
@@ -684,8 +690,7 @@ Roborock S7 MaxV Ultra  Yes
 Roborock S8 Pro Ultra   Yes
 ======================  =========
 
-
-Set: set_carpet_mode
+set_carpet_mode
 ~~~~~~~~~~~~~~~~~~~~
 
 Description:
@@ -696,7 +701,7 @@ Parameters:
 Child lock
 ----------
 
-Get: get_child_lock_status
+get_child_lock_status
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Description: This gets the child lock status of the device. 0 is off, 1 is on.
@@ -717,7 +722,7 @@ Vacuum Model            Supported
 Roborock S8 Pro Ultra   Yes
 ======================  =========
 
-Set: set_child_lock_status
+set_child_lock_status
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Description: This sets the child lock status of the device.
@@ -735,7 +740,8 @@ Roborock S8 Pro Ultra   Yes
 collision_avoid_status
 ----------------------
 
-Get: get_collision_avoid_status
+get_collision_avoid_status
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Description:
 
@@ -757,7 +763,8 @@ Roborock S8 Pro Ultra   Yes
 ======================  =========
 
 
-Set: set_collision_avoid_status
+set_collision_avoid_status
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Description: Update collision avoid status.
 
@@ -778,8 +785,8 @@ Roborock S8 Pro Ultra   Yes
 Consumables 
 -----------
 
-Get: get_consumable
-~~~~~~~~~~~~~~~~~~~
+get_consumable
+~~~~~~~~~~~~~~
 
 Description: This gets the status of all of the consumables for your device.
 
@@ -826,7 +833,7 @@ Roborock S8 Pro Ultra   Yes
 Custom mode
 -----------
 
-Get: get_custom_mode
+get_custom_mode
 ~~~~~~~~~~~~~~~~~~~~
 
 Description: It returns the current custom mode.
@@ -851,7 +858,7 @@ Roborock S7 MaxV Ultra  Yes
 Roborock S8 Pro Ultra   Yes
 ======================  =========
 
-Set: set_custom_mode
+set_custom_mode
 ~~~~~~~~~~~~~~~~~~~~
 
 Description:
@@ -862,7 +869,7 @@ Parameters:
 customize_clean_mode
 --------------------
 
-Get: get_customize_clean_mode
+get_customize_clean_mode
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Description:
@@ -870,7 +877,7 @@ Description:
 Parameters:
 
 
-Set: set_customize_clean_mode
+set_customize_clean_mode
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Description:
@@ -907,14 +914,16 @@ Description: Gets the do not disturb timer
 Parameters: None
 
 
-Set: set_dnd_timer
+set_dnd_timer
+~~~~~~~~~~~~~
 
 Description:
 
 Parameters:
 
 
-Close: close_dnd_timer
+close_dnd_timer
+~~~~~~~~~~~~~~~
 
 Description: This disables the dnd timer
 
@@ -932,7 +941,8 @@ Parameters:
 dust_collection_mode
 --------------------
 
-Get: get_dust_collection_mode
+get_dust_collection_mode
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 Description:
 
@@ -956,7 +966,8 @@ Roborock S8 Pro Ultra   Yes
 ======================  =========
 
 
-Set: set_dust_collection_mode
+set_dust_collection_mode
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 Description:
 
@@ -982,16 +993,16 @@ Parameters: None
 LEDs 
 ----
 
-Get: get_flow_led_status
-~~~~~~~~~~~~~~~~~~~~~~~~
+get_flow_led_status
+~~~~~~~~~~~~~~~~~~~
 
 Description:
 
 Parameters:
 
 
-Set: set_flow_led_status
-~~~~~~~~~~~~~~~~~~~~~~~~
+set_flow_led_status
+~~~~~~~~~~~~~~~~~~~
 
 Description:
 
@@ -1003,7 +1014,7 @@ get_clean_record
 
 Description:
 
-Parameters:
+Parameters: To be determined
 
 
 get_clean_record_map
