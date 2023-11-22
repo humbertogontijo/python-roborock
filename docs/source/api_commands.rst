@@ -14,22 +14,21 @@ Commands can have multiple parameters that can change from one model to another.
 * :ref:`app_rc_stop`
 * :ref:`app_segment_clean`
 * :ref:`app_set_dryer_setting`
-* :ref:`app_set_dryer_setting`
 * :ref:`app_start_collect_dust`
 * :ref:`app_start_wash`
 * :ref:`app_start`
 * :ref:`app_stop_collect_dust`
 * :ref:`app_stop_wash`
 * :ref:`app_stop`
-* :ref:`change_sound_volumw`
-* :ref:`close_dnd_times`
+* :ref:`change_sound_volume`
+* :ref:`close_dnd_timer`
 * :ref:`del_server_timer`
-* :ref:`dnld_instadetermined`
+* :ref:`dnld_install_sound`
 * :ref:`get_clean_sequence`
 * :ref:`get_consumable`
 * :ref:`get_custom_mode`
 * :ref:`get_customize_clean_mode`
-* :ref:`get_dnd_times`
+* :ref:`get_dnd_timer`
 * :ref:`get_dust_collection_mode`
 * :ref:`get_clean_follow_ground_material_status`
 * :ref:`get_identify_furniture_status`
@@ -52,7 +51,6 @@ Commands can have multiple parameters that can change from one model to another.
 * :ref:`led_status`
 * :ref:`load_multi_map`
 * :ref:`name_segment`
-* :ref:`ref:get_dryer_setting`
 * :ref:`reset_consumable`
 * :ref:`resume_segment_clean`
 * :ref:`resume_zoned_clean`
@@ -62,7 +60,6 @@ Commands can have multiple parameters that can change from one model to another.
 * :ref:`send_ice_to_robot`
 * :ref:`send_sdp_to_robot`
 * :ref:`server_timer`
-* :ref:`set_app_timezone`
 * :ref:`set_clean_motor_mode`
 * :ref:`set_customize_clean_mode`
 * :ref:`set_dnd_timer`
@@ -78,7 +75,6 @@ Commands can have multiple parameters that can change from one model to another.
 * :ref:`set_timezone`
 * :ref:`set_water_box_custom_mode`
 * :ref:`smart_wash_params`
-* :ref:`sound_volume`
 * :ref:`start_camera_preview`
 * :ref:`start_edit_map`
 * :ref:`start_voice_chat`
@@ -90,8 +86,8 @@ Commands can have multiple parameters that can change from one model to another.
 * :ref:`valley_electricity_timer`
 * :ref:`wash_towel_mode`
 
-Status
-------
+Robot status
+------------
 
 get_status
 ~~~~~~~~~~
@@ -897,7 +893,8 @@ Parameters:
 dnd_timer
 ---------
 
-Get: get_dnd_timer
+get_dnd_timer
+~~~~~~~~~~~~~
 
 Description: Gets the do not disturb timer
 
@@ -1407,7 +1404,7 @@ Roborock S8 Pro Ultra   No
 identify_furniture_status
 -------------------------
 
-Get: get_identify_furniture_status
+get_identify_furniture_status
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Description:
@@ -1417,7 +1414,7 @@ Parameters:
 ..
     Does not return anything for S8 Pro Ultra when docked may require vacumm to be cleaning
 
-Set: set_identify_furniture_status
+set_identify_furniture_status
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Description:
@@ -1432,7 +1429,7 @@ Parameters:
 identify_ground_material_status
 -------------------------------
 
-Get: get_identify_ground_material_status
+get_identify_ground_material_status
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Description:
@@ -1443,7 +1440,7 @@ Parameters:
     Does not return anything for S8 Pro Ultra when docked may require vacumm to be cleaning
 
 
-Set: set_identify_ground_material_status
+set_identify_ground_material_status
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Description:
@@ -1456,7 +1453,7 @@ Parameters:
 led_status
 ----------
 
-Get: get_led_status
+get_led_status
 ~~~~~~~~~~~~~~~~~~~
 
 Description: Returns the LED status. If disabled the indicator light will turn off 1 minute after fully charged
@@ -1474,8 +1471,8 @@ Vacuum Model            Supported
 Roborock S8 Pro Ultra   Yes
 ======================  =========
 
-Set: set_led_status
-~~~~~~~~~~~~~~~~~~~
+set_led_status
+~~~~~~~~~~~~~~
 
 Description:  Sets the LED status. If disabled the indicator light will turn off 1 minute after fully charged
 
@@ -1550,22 +1547,16 @@ Parameters:
 server_timer
 ------------
 
-Get: get_server_timer
+get_server_timer
+~~~~~~~~~~~~~~~~
 
 Description:
 
 Parameters:
 
 
-Set: set_server_timer
-
-Description:
-
-Parameters:
-
-
-set_app_timezone
-----------------
+set_server_timer
+~~~~~~~~~~~~~~~~
 
 Description:
 
@@ -1666,8 +1657,8 @@ Roborock S8 Pro Ultra   Yes
 Sound
 ------------
 
-Get: get_sound_volume
-~~~~~~~~~~~~~~~~~~~~~
+get_sound_volume
+~~~~~~~~~~~~~~~~
 
 Description: Returns the volume of the sound played by the vacuum
 
@@ -1688,7 +1679,7 @@ Roborock S8 Pro Ultra   Yes
 ======================  =========
 
 change_sound_volume
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 
 Description: Sets the volume of the sound played by the vacuum
 
@@ -1696,7 +1687,7 @@ Parameters: volume
 
 Returns: ok or error
 
-roborock -d command --device_id aHiddenDeviceId --cmd set_sound_volume --params 72
+roborock -d command --device_id aHiddenDeviceId --cmd change_sound_volume --params 72
 
 ======================  =========
 Vacuum Model            Supported
@@ -1795,7 +1786,7 @@ Roborock S8 Pro Ultra   No
 timezone
 --------
 
-Get: get_timezone
+get_timezone
 ~~~~~~~~~~~~~~~~~
 
 Description: Get the device's time zone.
@@ -1812,7 +1803,7 @@ Roborock S8 Pro Ultra   Yes
 ======================  =========
 
 
-Set: set_timezone
+set_timezone
 ~~~~~~~~~~~~~~~~~
 
 Description: Sets the device's time zone
@@ -1962,6 +1953,13 @@ Returns: Enumeration for water box mode. 203
 ..
     Not clear what this does - require Enumeration
 
+
+get_clean_follow_ground_material_status
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Description:
+
+Parameters: None
 ======================  =========
 Vacuum Model            Supported
 ======================  =========
