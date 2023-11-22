@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.36.2 (2023-11-22)
+
+### Fix
+
+* Typing and error checking ([#149](https://github.com/humbertogontijo/python-roborock/issues/149)) ([`d94aa48`](https://github.com/humbertogontijo/python-roborock/commit/d94aa48c1e594f7f6cd1cff16da66169368fb86c))
+
 ## v0.36.1 (2023-11-08)
 
 ### Fix
