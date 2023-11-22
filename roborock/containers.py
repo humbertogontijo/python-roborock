@@ -10,7 +10,6 @@ from typing import Any, NamedTuple
 
 from dacite import Config, from_dict
 
-from .exceptions import RoborockException
 from .code_mappings import (
     RoborockDockDustCollectionModeCode,
     RoborockDockErrorCode,
