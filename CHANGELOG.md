@@ -2,6 +2,42 @@
 
 <!--next-version-placeholder-->
 
+## v0.36.1 (2023-11-08)
+
+### Fix
+
+* Typing for map ([#141](https://github.com/humbertogontijo/python-roborock/issues/141)) ([`64121ee`](https://github.com/humbertogontijo/python-roborock/commit/64121eee14e4f0ca24db664b0664aaac5c7332af))
+
+## v0.36.0 (2023-11-07)
+
+### Feature
+
+* Update listeners ([#140](https://github.com/humbertogontijo/python-roborock/issues/140)) ([`5498596`](https://github.com/humbertogontijo/python-roborock/commit/549859669941e71c8d7ee09a0d4eea9564b4a12f))
+
+## v0.35.4 (2023-11-03)
+
+### Fix
+
+* Mypy complaints ([#137](https://github.com/humbertogontijo/python-roborock/issues/137)) ([`752e320`](https://github.com/humbertogontijo/python-roborock/commit/752e320644449a83a724590628c4011b9d8bacb2))
+
+## v0.35.3 (2023-10-29)
+
+### Fix
+
+* Typing and versioning ([#134](https://github.com/humbertogontijo/python-roborock/issues/134)) ([`e1dc545`](https://github.com/humbertogontijo/python-roborock/commit/e1dc545f20f2a163240eb72d831025cb2ff3ec7c))
+
+## v0.35.2 (2023-10-29)
+
+### Fix
+
+* Error catch and typing ([#133](https://github.com/humbertogontijo/python-roborock/issues/133)) ([`171c302`](https://github.com/humbertogontijo/python-roborock/commit/171c30265664b0161db75695d2d30d8b45bbf5b3))
+
+## v0.35.1 (2023-10-28)
+
+### Fix
+
+* Add s5 max mop code 207 ([#132](https://github.com/humbertogontijo/python-roborock/issues/132)) ([`adc7ae0`](https://github.com/humbertogontijo/python-roborock/commit/adc7ae0bbb75eb5be452efb62ca93de6a5211eef))
+
 ## v0.35.0 (2023-10-18)
 
 ### Feature

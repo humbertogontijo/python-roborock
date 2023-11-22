@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "python-roborock"
-version = "0.35.0"
+version = "0.36.1"
 description = "A package to control Roborock vacuums."
 authors = ["humbertogontijo <humbertogontijo@users.noreply.github.com>"]
 license = "GPL-3.0-only"
@@ -31,7 +31,7 @@ construct = "^2.10.56"
 
 
 [build-system]
-requires = ["poetry-core==1.6.1"]
+requires = ["poetry-core==1.7.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.group.dev.dependencies]
