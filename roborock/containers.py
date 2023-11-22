@@ -89,7 +89,10 @@ class RoborockBase:
     def from_dict(cls, data: dict[str, Any]):
         if isinstance(data, dict):
             ignore_keys = cls._ignore_keys
-            return from_dict(cls, decamelize_obj(data, ignore_keys), config=Config(cast=[Enum]))
+            try:
+                return from_dict(cls, decamelize_obj(data, ignore_keys), config=Config(cast=[Enum]))
+            except AttributeError as err:
+                raise RoborockException("It seems like you have an outdated version of dacite.") from err
 
     def as_dict(self) -> dict:
         return asdict(
@@ -212,8 +215,8 @@ class HomeDataDevice(RoborockBase):
 
 @dataclass
 class HomeDataRoom(RoborockBase):
-    id: Any | None = None
-    name: Any | None = None
+    id: int
+    name: str
 
 
 @dataclass
@@ -226,7 +229,7 @@ class HomeData(RoborockBase):
     lon: Any | None = None
     lat: Any | None = None
     geo_name: Any | None = None
-    rooms: list[HomeDataRoom] | None = None
+    rooms: list[HomeDataRoom] = field(default_factory=list)
 
     def get_all_devices(self) -> list[HomeDataDevice]:
         devices = []
