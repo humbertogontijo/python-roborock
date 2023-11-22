@@ -229,9 +229,6 @@ class HomeData(RoborockBase):
     lon: Any | None = None
     lat: Any | None = None
     geo_name: Any | None = None
-    products: list[HomeDataProduct] | None = None
-    devices: list[HomeDataDevice] | None = None
-    received_devices: list[HomeDataDevice] | None = None
     rooms: list[HomeDataRoom] = field(default_factory=list)
 
     def get_all_devices(self) -> list[HomeDataDevice]:
