@@ -20,14 +20,14 @@ Login
 List devices
 ------------
 
+This will list all devices associated with the account:
+
 .. code-block:: console
 
    (.venv) $ roborock list_devices
 
-This will list all devices associated with the account:
+   Known devices MyRobot: 7kI9d66UoPXd6sd9gfd75W
 
-MyRobot: 7kI9d66UoPXd6sd9gfd75W
-          
 
 The deviceId 7kI9d66UoPXd6sd9gfd75W can be used to run commands on the device.
 
