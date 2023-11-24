@@ -10,11 +10,11 @@ To use Python-Roborock, first install it using pip:
 
    (.venv) $ pip install python-roborock
 
-Login 
+Login
 -----
 
 .. code-block:: console
-   
+
       (.venv) $ roborock login --username username --password password
 
 List devices

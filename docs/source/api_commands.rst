@@ -97,7 +97,7 @@ Description: Returns the current status of the vacuum
 
 Parameters: None
 
-Returns: 
+Returns:
 
     msg_ver:
 
@@ -292,7 +292,7 @@ Roborock S8 Pro Ultra   Yes
 ======================  =========
 
 app_charge
-~~~~~~~~~~ 
+~~~~~~~~~~
 
 Description: This tells your vacuum to go back to the dock and charge.
 
@@ -525,7 +525,7 @@ Description: Starts a zone clean
 
 Parameters:
 
-.. 
+..
     Us this the last known zone
 
 Returns: ok or error
@@ -548,7 +548,10 @@ Parameters: An array of segments to clean. Each segment is an integer with the s
 
  [{'segments': [18], 'repeat': 2}]
 
-Comment: The segment id can be obtained from the inital data returneed on login ??
+.. Comment: The segment id can be obtained from the initial data returned on login
+
+Command:
+    roborock -d command --device_id deviceIdRedacted --cmd app_segment_clean --params '[{"segments": [17,19], "repeat": 2}]'
 
 Returns ok or error
 
@@ -570,7 +573,7 @@ Returns ok or error
 name_segment
 ~~~~~~~~~~~~
 
-Description: 
+Description:
 
 Parameters: To be determined
 
@@ -584,7 +587,7 @@ resume_segment_clean
 
 Description:
 
-Parameters: 
+Parameters:
 
 ======================  =========
 Vacuum Model            Supported
@@ -595,7 +598,7 @@ Roborock S8 Pro Ultra   Yes
 stop_segment_clean
 ~~~~~~~~~~~~~~~~~~
 
-Description: 
+Description:
 
 Parameters:
 
@@ -794,10 +797,10 @@ Parameters: None
 ..
     Not clear what this does
 
-Returns: 
-    
+Returns:
+
         smart_wash: 0 is off, 1 is on
-    
+
         wash_interval: The interval in seconds between washes
 
 Example::
@@ -817,10 +820,10 @@ set_smart_wash_params
 Description: Sets the smartwash parameters
 
 Parameters:
-    
+
         smart_wash: 0 is off, 1 is on
-    
-        wash_interval: The interval in seconds between washes   
+
+        wash_interval: The interval in seconds between washes
 
 
 {'smart_wash': 0, 'wash_interval': 1200}
@@ -934,7 +937,7 @@ set_child_lock_status
 
 Description: This sets the child lock status of the device.
 
-Parameters: '{"lock_status" :0}' 
+Parameters: '{"lock_status" :0}'
 
 Returns: ok
 
@@ -947,7 +950,7 @@ Roborock S8 Pro Ultra   Yes
 
 
 
-Consumables 
+Consumables
 -----------
 
 get_consumable
@@ -1092,7 +1095,7 @@ Parameters:
 
 
 
-LEDs 
+LEDs
 ----
 
 get_flow_led_status
@@ -1115,11 +1118,11 @@ get_led_status
 
 Description: Returns the LED status. If disabled the indicator light will turn off 1 minute after fully charged
 
-Parameters: 
+Parameters:
 
-Returns: 
+Returns:
 
-    led_status: 0 is off, 1 is on 
+    led_status: 0 is off, 1 is on
 
 
 ======================  =========
@@ -1141,7 +1144,7 @@ Parameters: ????
 
 
 
-Maps 
+Maps
 ----
 
 get_multi_map
@@ -1153,7 +1156,7 @@ Parameters:
 
 Comment: Response timed out for S8 Pro Ultra
 
-.. 
+..
     times out after 4 secs
 
 get_multi_maps_list
@@ -1169,13 +1172,13 @@ Returns:
     max_bak_map:
     multi_map_count:
     map_info::
-            
+
             mapFlag:
             add_time:
             length:
             name:
             bak_maps::
-                
+
                 mapFlag:
                 add_time:
 
@@ -1193,7 +1196,7 @@ Roborock S8 Pro Ultra   Yes
 ======================  =========
 
 get_map_v1
-~~~~~~~~~~ 
+~~~~~~~~~~
 
 Description: Returns the map
 
@@ -1216,7 +1219,7 @@ Parameters:
 get_room_mapping
 ~~~~~~~~~~~~~~~~
 
-Description: Returns a list of rooms, ids as discovered by 
+Description: Returns a list of rooms, ids as discovered by
 
 Parameters: None
 
@@ -1272,7 +1275,7 @@ Example for S8 Pro Ultra::
     deep_plus = 303
     fast = 304
     custom = 302
-     
+
 ======================  =========
 Vacuum Model            Supported
 ======================  =========
@@ -1723,7 +1726,7 @@ set_timezone
 
 Description: Sets the device's time zone
 
-Parameters: 
+Parameters:
 
 
 
@@ -1739,7 +1742,7 @@ Description: Returns the volume of the sound played by the vacuum
 
 Parameters: None
 
-Returns: 
+Returns:
 
     volume: The volume of the sound played by the vacuum
 
@@ -1812,7 +1815,7 @@ Parameters:
 Return example::
 
     {'sid_in_use': 122, 'sid_version': 1, 'sid_in_progress': 0, 'location': 'de', 'bom': 'A.03.0342', 'language': 'en', 'msg_ver': 2}
-  
+
 ======================  =========
 Vacuum Model            Supported
 ======================  =========
@@ -1835,7 +1838,7 @@ get_valley_electricity_timer
 
 Description:  Get valley electricity timer.
 
-Parameters: None 
+Parameters: None
 
 Returns:
 
@@ -1865,7 +1868,7 @@ set_valley_electricity_timer
 
 Description: Sets the valley electricity timer
 
-Parameters: 
+Parameters:
 
     start_hour: The hour you want valley electricity to start
 
