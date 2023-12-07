@@ -26,6 +26,7 @@ ROBOROCK_Q7PLUS = "roborock.vacuum.a40"
 ROBOROCK_G10S_PRO = "roborock.vacuum.a26"
 ROBOROCK_G10S = "roborock.vacuum.a46"
 ROBOROCK_G10 = "roborock.vacuum.a29"
+ROCKROBO_G10_SG = "roborock.vacuum.a30"  # Variant of the G10, has similar features as S7
 ROBOROCK_S7 = "roborock.vacuum.a15"
 ROBOROCK_S6_MAXV = "roborock.vacuum.a10"
 ROBOROCK_E2 = "roborock.vacuum.e2"
@@ -53,5 +54,6 @@ SUPPORTED_VACUUMS = (
         ROBOROCK_S4_MAX,
         ROBOROCK_S7,
         ROBOROCK_P10,
+        ROCKROBO_G10_SG,
     ]
 )

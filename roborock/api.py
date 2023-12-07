@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import base64
+import dataclasses
 import hashlib
 import hmac
 import json
@@ -169,7 +170,15 @@ class AttributeCache:
         await self._async_value()
 
 
+@dataclasses.dataclass
+class ListenerModel:
+    protocol_handlers: dict[RoborockDataProtocol, list[Callable[[Status | Consumable], None]]]
+    cache: dict[CacheableAttribute, AttributeCache]
+
+
 class RoborockClient:
+    _listeners: dict[str, ListenerModel] = {}
+
     def __init__(self, endpoint: str, device_info: DeviceData, queue_timeout: int = 4) -> None:
         self.event_loop = get_running_loop_or_create_one()
         self.device_info = device_info
@@ -184,10 +193,12 @@ class RoborockClient:
         self.cache: dict[CacheableAttribute, AttributeCache] = {
             cacheable_attribute: AttributeCache(attr, self) for cacheable_attribute, attr in get_cache_map().items()
         }
-        self._listeners: list[Callable[[str, CacheableAttribute, RoborockBase], None]] = []
         self.is_available: bool = True
         self.queue_timeout = queue_timeout
         self._status_type: type[Status] = ModelStatus.get(self.device_info.model, S7MaxVStatus)
+        if device_info.device.duid not in self._listeners:
+            self._listeners[device_info.device.duid] = ListenerModel({}, self.cache)
+        self.listener_model = self._listeners[device_info.device.duid]
 
     def __del__(self) -> None:
         self.release()
@@ -260,32 +271,36 @@ class RoborockClient:
                                 data_protocol = RoborockDataProtocol(int(data_point_number))
                                 self._logger.debug(f"Got device update for {data_protocol.name}: {data_point}")
                                 if data_protocol in ROBOROCK_DATA_STATUS_PROTOCOL:
-                                    if self.cache[CacheableAttribute.status].value is None:
+                                    if data_protocol not in self.listener_model.protocol_handlers:
                                         self._logger.debug(
                                             f"Got status update({data_protocol.name}) before get_status was called."
                                         )
                                         return
-                                    value = self.cache[CacheableAttribute.status].value
+                                    value = self.listener_model.cache[CacheableAttribute.status].value
                                     value[data_protocol.name] = data_point
                                     status = self._status_type.from_dict(value)
-                                    for listener in self._listeners:
-                                        listener(self.device_info.device.duid, CacheableAttribute.status, status)
+                                    for listener in self.listener_model.protocol_handlers.get(data_protocol, []):
+                                        listener(status)
                                 elif data_protocol in ROBOROCK_DATA_CONSUMABLE_PROTOCOL:
-                                    if self.cache[CacheableAttribute.consumable].value is None:
+                                    if data_protocol not in self.listener_model.protocol_handlers:
                                         self._logger.debug(
                                             f"Got consumable update({data_protocol.name})"
                                             + "before get_consumable was called."
                                         )
                                         return
-                                    value = self.cache[CacheableAttribute.consumable].value
+                                    value = self.listener_model.cache[CacheableAttribute.consumable].value
                                     value[data_protocol.name] = data_point
                                     consumable = Consumable.from_dict(value)
-                                    for listener in self._listeners:
-                                        listener(
-                                            self.device_info.device.duid, CacheableAttribute.consumable, consumable
-                                        )
+                                    for listener in self.listener_model.protocol_handlers.get(data_protocol, []):
+                                        listener(consumable)
                                 return
                             except ValueError:
+                                self._logger.warning(
+                                    f"Got listener data for {data_point_number}, data: {data_point}. "
+                                    f"This lets us update data quicker, please open an issue "
+                                    f"at https://github.com/humbertogontijo/python-roborock/issues"
+                                )
+
                                 pass
                             dps = {data_point_number: data_point}
                             self._logger.debug(f"Got unknown data point {dps}")
@@ -293,7 +308,10 @@ class RoborockClient:
                     payload = data.payload[0:24]
                     [endpoint, _, request_id, _] = struct.unpack("<8s8sH6s", payload)
                     if endpoint.decode().startswith(self._endpoint):
-                        decrypted = Utils.decrypt_cbc(data.payload[24:], self._nonce)
+                        try:
+                            decrypted = Utils.decrypt_cbc(data.payload[24:], self._nonce)
+                        except ValueError as err:
+                            raise RoborockException("Failed to decode %s for %s", data.payload, data.protocol) from err
                         decompressed = Utils.decompress(decrypted)
                         queue = self._waiting_queue.get(request_id)
                         if queue:
@@ -345,8 +363,8 @@ class RoborockClient:
 
     def _get_payload(
         self,
-        method: RoborockCommand,
-        params: list | dict | None = None,
+        method: RoborockCommand | str,
+        params: list | dict | int | None = None,
         secured=False,
     ):
         timestamp = math.floor(time.time())
@@ -377,16 +395,16 @@ class RoborockClient:
 
     async def _send_command(
         self,
-        method: RoborockCommand,
-        params: list | dict | None = None,
+        method: RoborockCommand | str,
+        params: list | dict | int | None = None,
     ):
         raise NotImplementedError
 
     @final
     async def send_command(
         self,
-        method: RoborockCommand,
-        params: list | dict | None = None,
+        method: RoborockCommand | str,
+        params: list | dict | int | None = None,
         return_type: type[RT] | None = None,
     ) -> RT:
         cacheable_attribute_result = find_cacheable_attribute(method)
@@ -409,8 +427,11 @@ class RoborockClient:
             return return_type.from_dict(response)
         return response
 
-    async def get_status(self) -> Status | None:
-        return self._status_type.from_dict(await self.cache[CacheableAttribute.status].async_value())
+    async def get_status(self) -> Status:
+        data = self._status_type.from_dict(await self.cache[CacheableAttribute.status].async_value())
+        if data is None:
+            return self._status_type()
+        return data
 
     async def get_dnd_timer(self) -> DnDTimer | None:
         return DnDTimer.from_dict(await self.cache[CacheableAttribute.dnd_timer].async_value())
@@ -448,8 +469,11 @@ class RoborockClient:
             _LOGGER.warning("Clean record was of a new type, please submit an issue request: %s", record)
             return None
 
-    async def get_consumable(self) -> Consumable | None:
-        return Consumable.from_dict(await self.cache[CacheableAttribute.consumable].async_value())
+    async def get_consumable(self) -> Consumable:
+        data = Consumable.from_dict(await self.cache[CacheableAttribute.consumable].async_value())
+        if data is None:
+            return Consumable()
+        return data
 
     async def get_wash_towel_mode(self) -> WashTowelMode | None:
         return WashTowelMode.from_dict(await self.cache[CacheableAttribute.wash_towel_mode].async_value())
@@ -460,7 +484,7 @@ class RoborockClient:
     async def get_smart_wash_params(self) -> SmartWashParams | None:
         return SmartWashParams.from_dict(await self.cache[CacheableAttribute.smart_wash_params].async_value())
 
-    async def get_dock_summary(self, dock_type: RoborockDockTypeCode) -> DockSummary | None:
+    async def get_dock_summary(self, dock_type: RoborockDockTypeCode) -> DockSummary:
         """Gets the status summary from the dock with the methods available for a given dock.
 
         :param dock_type: RoborockDockTypeCode"""
@@ -522,11 +546,11 @@ class RoborockClient:
             ]
         return None
 
-    async def get_child_lock_status(self) -> ChildLockStatus | None:
+    async def get_child_lock_status(self) -> ChildLockStatus:
         """Gets current child lock status."""
         return ChildLockStatus.from_dict(await self.cache[CacheableAttribute.child_lock_status].async_value())
 
-    async def get_flow_led_status(self) -> FlowLedStatus | None:
+    async def get_flow_led_status(self) -> FlowLedStatus:
         """Gets current flow led status."""
         return FlowLedStatus.from_dict(await self.cache[CacheableAttribute.flow_led_status].async_value())
 
@@ -543,8 +567,19 @@ class RoborockClient:
             return [ServerTimer(*server_timers)]
         return []
 
-    def add_listener(self, listener: Callable):
-        self._listeners.append(listener)
+    def add_listener(
+        self, protocol: RoborockDataProtocol, listener: Callable, cache: dict[CacheableAttribute, AttributeCache]
+    ):
+        self.listener_model.cache = cache
+        if protocol not in self.listener_model.protocol_handlers:
+            self.listener_model.protocol_handlers[protocol] = []
+        self.listener_model.protocol_handlers[protocol].append(listener)
+
+    async def get_from_cache(self, key: CacheableAttribute) -> AttributeCache | None:
+        val = self.cache.get(key)
+        if val is not None:
+            return await val.async_value()
+        return None
 
 
 class RoborockApiClient:

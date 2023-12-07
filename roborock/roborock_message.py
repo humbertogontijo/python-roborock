@@ -37,6 +37,10 @@ class RoborockDataProtocol(RoborockEnum):
     CHARGE_STATUS = 133
     DRYING_STATUS = 134
 
+    @classmethod
+    def _missing_(cls: type[RoborockEnum], key) -> RoborockEnum:
+        raise ValueError("%s not a valid key for Data Protocol", key)
+
 
 ROBOROCK_DATA_STATUS_PROTOCOL = [
     RoborockDataProtocol.ERROR_CODE,
