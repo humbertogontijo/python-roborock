@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import base64
 import logging
+import threading
 import uuid
 from asyncio import Lock, Task
 from typing import Any
@@ -25,6 +26,9 @@ DISCONNECT_REQUEST_ID = 1
 
 
 class RoborockMqttClient(RoborockClient, mqtt.Client):
+    _thread: threading.Thread
+    _client_id: str
+
     def __init__(self, user_data: UserData, device_info: DeviceData, queue_timeout: int = 10) -> None:
         rriot = user_data.rriot
         if rriot is None:
@@ -50,7 +54,6 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
         self._waiting_queue: dict[int, RoborockFuture] = {}
         self._mutex = Lock()
         self.update_client_id()
-        self._thread = None
 
     def on_connect(self, *args, **kwargs):
         _, __, ___, rc, ____ = args
