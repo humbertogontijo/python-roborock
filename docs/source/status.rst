@@ -34,9 +34,9 @@ Status is a core piece of information for our system. It is used to get a wide v
 
     wash_ready:
 
-    fan_power:
+    fan_power: The strength of the fan suction. Listed as an integer that corresponds to a enum value.
 
-    dnd_enabled:
+    dnd_enabled: 0 or 1 that states if there is a dnd time enabled (does not mean that dnd is on now)
 
     map_status:
 
@@ -58,7 +58,7 @@ Status is a core piece of information for our system. It is used to get a wide v
 
     home_sec_enable_password:
 
-    adbumper_status: Optional[
+    adbumper_status:
 
     water_shortage_status:
 
@@ -85,3 +85,23 @@ Status is a core piece of information for our system. It is used to get a wide v
     unsave_map_reason:
 
     unsave_map_flag:
+
+    wash_status:
+
+    distance_off:
+
+    in_warmup:
+
+    dry_status:
+
+    rdt:
+
+    clean_percent:
+
+    rss:
+
+    dss:
+
+    common_status:
+
+    corner_clean_mode:

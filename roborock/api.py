@@ -502,18 +502,20 @@ class RoborockClient:
             ]
         [dust_collection_mode, wash_towel_mode, smart_wash_params] = unpack_list(
             list(await asyncio.gather(*commands)), 3
-        )
+        )  # type: DustCollectionMode, WashTowelMode | None, SmartWashParams | None # type: ignore
+
         return DockSummary(dust_collection_mode, wash_towel_mode, smart_wash_params)
 
     async def get_prop(self) -> DeviceProp | None:
         """Gets device general properties."""
-        [status, clean_summary, consumable] = await asyncio.gather(
+        # Mypy thinks that each one of these is typed as a union of all the others. so we do type ignore.
+        status, clean_summary, consumable = await asyncio.gather(
             *[
                 self.get_status(),
                 self.get_clean_summary(),
                 self.get_consumable(),
             ]
-        )
+        )  # type: Status, CleanSummary, Consumable # type: ignore
         last_clean_record = None
         if clean_summary and clean_summary.records and len(clean_summary.records) > 0:
             last_clean_record = await self.get_clean_record(clean_summary.records[0])
