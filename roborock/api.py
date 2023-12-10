@@ -31,18 +31,20 @@ from .containers import (
     DustCollectionMode,
     FlowLedStatus,
     HomeData,
+    HomeDataRoom,
     ModelStatus,
     MultiMapsList,
     NetworkInfo,
     RoborockBase,
     RoomMapping,
+    RRiot,
     S7MaxVStatus,
     ServerTimer,
     SmartWashParams,
     Status,
     UserData,
     ValleyElectricityTimer,
-    WashTowelMode, RRiot, HomeDataRoom,
+    WashTowelMode,
 )
 from .exceptions import (
     RoborockAccountDoesNotExist,
@@ -51,13 +53,13 @@ from .exceptions import (
     RoborockInvalidCredentials,
     RoborockInvalidEmail,
     RoborockInvalidUserAgreement,
+    RoborockMissingParameters,
     RoborockNoUserAgreement,
     RoborockTimeout,
+    RoborockTooFrequentCodeRequests,
     RoborockUrlException,
     UnknownMethodError,
     VacuumError,
-    RoborockMissingParameters,
-    RoborockTooFrequentCodeRequests,
 )
 from .protocol import Utils
 from .roborock_future import RoborockFuture
@@ -609,8 +611,9 @@ class RoborockApiClient:
                 if response_code == 2003:
                     raise RoborockInvalidEmail("Your email was incorrectly formatted.")
                 elif response_code == 1001:
-                    raise RoborockMissingParameters("You are missing parameters for this request, are you sure you "
-                                                    "entered your username?")
+                    raise RoborockMissingParameters(
+                        "You are missing parameters for this request, are you sure you " "entered your username?"
+                    )
                 raise RoborockUrlException(response.get("error"))
             response_data = response.get("data")
             if response_data is None:
@@ -640,7 +643,6 @@ class RoborockApiClient:
         )
         mac = base64.b64encode(hmac.new(rriot.h.encode(), prestr.encode(), hashlib.sha256).digest()).decode()
         return f'Hawk id="{rriot.u}", s="{rriot.s}", ts="{timestamp}", nonce="{nonce}", mac="{mac}"'
-
 
     async def request_code(self) -> None:
         base_url = await self._get_base_url()
@@ -704,7 +706,6 @@ class RoborockApiClient:
         """
         raise NotImplementedError("Pass_login_v3 has not yet been implemented")
 
-
     async def code_login(self, code) -> UserData:
         base_url = await self._get_base_url()
         header_clientid = self._get_header_client_id()
@@ -756,7 +757,6 @@ class RoborockApiClient:
             raise RoborockException(f"{home_id_response.get('msg')} - response code: {home_id_response.get('code')}")
 
         return home_id_response["data"].get("rrHomeId")
-
 
     async def get_home_data(self, user_data: UserData) -> HomeData:
         rriot = user_data.rriot

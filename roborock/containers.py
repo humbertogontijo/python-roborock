@@ -11,6 +11,7 @@ from typing import Any, NamedTuple
 from dacite import Config, from_dict
 
 from .code_mappings import (
+    RoborockCategory,
     RoborockDockDustCollectionModeCode,
     RoborockDockErrorCode,
     RoborockDockTypeCode,
@@ -31,7 +32,7 @@ from .code_mappings import (
     RoborockMopModeCode,
     RoborockMopModeS7,
     RoborockMopModeS8ProUltra,
-    RoborockStateCode, RoborockCategory,
+    RoborockStateCode,
 )
 from .const import (
     FILTER_REPLACE_TIME,
@@ -176,11 +177,11 @@ class HomeDataProduct(RoborockBase):
     id: str
     name: str
     model: str
+    category: RoborockCategory
     code: str | None = None
     iconurl: str | None = None
     attribute: Any | None = None
     capability: int | None = None
-    category: RoborockCategory = None
     schema: list[HomeDataProductSchema] | None = None
 
 
@@ -588,4 +589,3 @@ class ServerTimer(NamedTuple):
     id: str
     status: str
     dontknow: int
-

@@ -6,6 +6,7 @@ authors = ["humbertogontijo <humbertogontijo@users.noreply.github.com>"]
 license = "GPL-3.0-only"
 readme = "README.md"
 repository = "https://github.com/humbertogontijo/python-roborock"
+documentation = "https://python-roborock.readthedocs.io/"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
@@ -14,6 +15,7 @@ classifiers = [
     "Topic :: Software Development :: Libraries",
 ]
 packages = [{include = "roborock"}]
+keywords = ["roborock", "vacuum", "homeassistant"]
 
 [tool.poetry.scripts]
 roborock = "roborock.cli:main"
