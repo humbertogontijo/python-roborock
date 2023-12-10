@@ -1,5 +1,6 @@
 from roborock import CleanRecord, CleanSummary, Consumable, DnDTimer, HomeData, S7MaxVStatus, UserData
 from roborock.code_mappings import (
+    RoborockCategory,
     RoborockDockErrorCode,
     RoborockDockTypeCode,
     RoborockErrorCode,
@@ -49,7 +50,7 @@ def test_home_data():
     assert product.iconurl is None
     assert product.attribute is None
     assert product.capability == 0
-    assert product.category == "robot.vacuum.cleaner"
+    assert product.category == RoborockCategory.VACUUM
     schema = product.schema
     assert schema[0].id == "101"
     assert schema[0].name == "rpc_request"
