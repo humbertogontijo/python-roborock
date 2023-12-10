@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.37.0 (2023-12-10)
+
+### Feature
+
+* House keeping, version bumping, doc fixes, doc improvements, v2 home data api ([#157](https://github.com/humbertogontijo/python-roborock/issues/157)) ([`f3ca9b4`](https://github.com/humbertogontijo/python-roborock/commit/f3ca9b45d3de3a15c57e134421d3abc11095bc22))
+
 ## v0.36.2 (2023-11-22)
 
 ### Fix
