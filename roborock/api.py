@@ -575,11 +575,14 @@ class RoborockClient:
 
     def add_listener(
         self, protocol: RoborockDataProtocol, listener: Callable, cache: dict[CacheableAttribute, AttributeCache]
-    ):
+    ) -> None:
         self.listener_model.cache = cache
         if protocol not in self.listener_model.protocol_handlers:
             self.listener_model.protocol_handlers[protocol] = []
         self.listener_model.protocol_handlers[protocol].append(listener)
+
+    def remove_listener(self, protocol: RoborockDataProtocol, listener: Callable) -> None:
+        self.listener_model.protocol_handlers[protocol].remove(listener)
 
     async def get_from_cache(self, key: CacheableAttribute) -> AttributeCache | None:
         val = self.cache.get(key)
