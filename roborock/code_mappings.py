@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from enum import IntEnum
+from enum import Enum, IntEnum
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -302,3 +302,15 @@ class RoborockDockWashTowelModeCode(RoborockEnum):
     light = 0
     balanced = 1
     deep = 2
+
+
+class RoborockCategory(Enum):
+    """Describes the category of the device."""
+
+    WET_DRY_VAC = "roborock.wetdryvac"
+    VACUUM = "robot.vacuum.cleaner"
+    UNKNOWN = "UNKNOWN"
+
+    def __missing__(self, key):
+        _LOGGER.warning("Missing key %s from category", key)
+        return RoborockCategory.UNKNOWN

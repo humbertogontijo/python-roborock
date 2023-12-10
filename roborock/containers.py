@@ -11,6 +11,7 @@ from typing import Any, NamedTuple
 from dacite import Config, from_dict
 
 from .code_mappings import (
+    RoborockCategory,
     RoborockDockDustCollectionModeCode,
     RoborockDockErrorCode,
     RoborockDockTypeCode,
@@ -176,11 +177,11 @@ class HomeDataProduct(RoborockBase):
     id: str
     name: str
     model: str
+    category: RoborockCategory
     code: str | None = None
     iconurl: str | None = None
     attribute: Any | None = None
     capability: int | None = None
-    category: str | None = None
     schema: list[HomeDataProductSchema] | None = None
 
 
@@ -211,6 +212,8 @@ class HomeDataDevice(RoborockBase):
     new_feature_set: str | None = None
     device_status: dict | None = None
     silent_ota_switch: bool | None = None
+    setting: Any | None = None
+    f: bool | None = None
 
 
 @dataclass
