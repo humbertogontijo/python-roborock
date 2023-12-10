@@ -60,3 +60,9 @@ class RoborockNoUserAgreement(RoborockException):
 
 class RoborockInvalidCredentials(RoborockException):
     """Class for Roborock credentials have expired or changed."""
+
+class RoborockTooFrequentCodeRequests(RoborockException):
+    """Class for Roborock too frequent code requests exceptions."""
+
+class RoborockMissingParameters(RoborockException):
+    """Class for Roborock missing parameters exceptions."""

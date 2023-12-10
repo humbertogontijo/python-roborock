@@ -31,7 +31,7 @@ from .code_mappings import (
     RoborockMopModeCode,
     RoborockMopModeS7,
     RoborockMopModeS8ProUltra,
-    RoborockStateCode,
+    RoborockStateCode, RoborockCategory,
 )
 from .const import (
     FILTER_REPLACE_TIME,
@@ -180,7 +180,7 @@ class HomeDataProduct(RoborockBase):
     iconurl: str | None = None
     attribute: Any | None = None
     capability: int | None = None
-    category: str | None = None
+    category: RoborockCategory = None
     schema: list[HomeDataProductSchema] | None = None
 
 
@@ -211,6 +211,8 @@ class HomeDataDevice(RoborockBase):
     new_feature_set: str | None = None
     device_status: dict | None = None
     silent_ota_switch: bool | None = None
+    setting: Any | None = None
+    f: bool | None = None
 
 
 @dataclass
@@ -586,3 +588,4 @@ class ServerTimer(NamedTuple):
     id: str
     status: str
     dontknow: int
+

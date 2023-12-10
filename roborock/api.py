@@ -42,7 +42,7 @@ from .containers import (
     Status,
     UserData,
     ValleyElectricityTimer,
-    WashTowelMode,
+    WashTowelMode, RRiot, HomeDataRoom,
 )
 from .exceptions import (
     RoborockAccountDoesNotExist,
@@ -56,6 +56,8 @@ from .exceptions import (
     RoborockUrlException,
     UnknownMethodError,
     VacuumError,
+    RoborockMissingParameters,
+    RoborockTooFrequentCodeRequests,
 )
 from .protocol import Utils
 from .roborock_future import RoborockFuture
@@ -606,6 +608,9 @@ class RoborockApiClient:
             if response_code != 200:
                 if response_code == 2003:
                     raise RoborockInvalidEmail("Your email was incorrectly formatted.")
+                elif response_code == 1001:
+                    raise RoborockMissingParameters("You are missing parameters for this request, are you sure you "
+                                                    "entered your username?")
                 raise RoborockUrlException(response.get("error"))
             response_data = response.get("data")
             if response_data is None:
@@ -618,6 +623,24 @@ class RoborockApiClient:
         md5.update(self._username.encode())
         md5.update(self._device_identifier.encode())
         return base64.b64encode(md5.digest()).decode()
+
+    def _get_hawk_authentication(self, rriot: RRiot, url: str) -> str:
+        timestamp = math.floor(time.time())
+        nonce = secrets.token_urlsafe(6)
+        prestr = ":".join(
+            [
+                rriot.u,
+                rriot.s,
+                nonce,
+                str(timestamp),
+                hashlib.md5(url.encode()).hexdigest(),
+                "",
+                "",
+            ]
+        )
+        mac = base64.b64encode(hmac.new(rriot.h.encode(), prestr.encode(), hashlib.sha256).digest()).decode()
+        return f'Hawk id="{rriot.u}", s="{rriot.s}", ts="{timestamp}", nonce="{nonce}", mac="{mac}"'
+
 
     async def request_code(self) -> None:
         base_url = await self._get_base_url()
@@ -638,6 +661,8 @@ class RoborockApiClient:
         if response_code != 200:
             if response_code == 2008:
                 raise RoborockAccountDoesNotExist("Account does not exist - check your login and try again.")
+            elif response_code == 9002:
+                raise RoborockTooFrequentCodeRequests("You have attempted to request too many codes. Try again later")
             else:
                 raise RoborockException(f"{code_response.get('msg')} - response code: {code_response.get('code')}")
 
@@ -663,6 +688,22 @@ class RoborockApiClient:
         if not isinstance(user_data, dict):
             raise RoborockException("Got unexpected data type for user_data")
         return UserData.from_dict(user_data)
+
+    async def pass_login_v3(self, password: str) -> UserData:
+        """Seemingly it follows the format below, but password is encrypted in some manner.
+        # login_response = await login_request.request(
+        #     "post",
+        #     "/api/v3/auth/email/login",
+        #     params={
+        #         "email": self._username,
+        #         "password": password,
+        #         "twoStep": 1,
+        #         "version": 0
+        #     },
+        # )
+        """
+        raise NotImplementedError("Pass_login_v3 has not yet been implemented")
+
 
     async def code_login(self, code) -> UserData:
         base_url = await self._get_base_url()
@@ -696,12 +737,9 @@ class RoborockApiClient:
             raise RoborockException("Got unexpected data type for user_data")
         return UserData.from_dict(user_data)
 
-    async def get_home_data(self, user_data: UserData) -> HomeData:
+    async def _get_home_id(self, user_data: UserData):
         base_url = await self._get_base_url()
         header_clientid = self._get_header_client_id()
-        rriot = user_data.rriot
-        if rriot is None:
-            raise RoborockException("rriot is none")
         home_id_request = PreparedRequest(base_url, {"header_clientid": header_clientid})
         home_id_response = await home_id_request.request(
             "get",
@@ -717,27 +755,20 @@ class RoborockApiClient:
                 )
             raise RoborockException(f"{home_id_response.get('msg')} - response code: {home_id_response.get('code')}")
 
-        home_id = home_id_response["data"].get("rrHomeId")
-        timestamp = math.floor(time.time())
-        nonce = secrets.token_urlsafe(6)
-        prestr = ":".join(
-            [
-                rriot.u,
-                rriot.s,
-                nonce,
-                str(timestamp),
-                hashlib.md5(("/user/homes/" + str(home_id)).encode()).hexdigest(),
-                "",
-                "",
-            ]
-        )
-        mac = base64.b64encode(hmac.new(rriot.h.encode(), prestr.encode(), hashlib.sha256).digest()).decode()
+        return home_id_response["data"].get("rrHomeId")
+
+
+    async def get_home_data(self, user_data: UserData) -> HomeData:
+        rriot = user_data.rriot
+        if rriot is None:
+            raise RoborockException("rriot is none")
+        home_id = await self._get_home_id(user_data)
         if rriot.r.a is None:
             raise RoborockException("Missing field 'a' in rriot reference")
         home_request = PreparedRequest(
             rriot.r.a,
             {
-                "Authorization": f'Hawk id="{rriot.u}", s="{rriot.s}", ts="{timestamp}", nonce="{nonce}", mac="{mac}"',
+                "Authorization": self._get_hawk_authentication(rriot, f"/user/homes/{str(home_id)}"),
             },
         )
         home_response = await home_request.request("get", "/user/homes/" + str(home_id))
@@ -746,5 +777,54 @@ class RoborockApiClient:
         home_data = home_response.get("result")
         if isinstance(home_data, dict):
             return HomeData.from_dict(home_data)
+        else:
+            raise RoborockException("home_response result was an unexpected type")
+
+    async def get_home_data_v2(self, user_data: UserData) -> HomeData:
+        """This is the same as get_home_data, but uses a different endpoint and includes non-robotic vacuums."""
+        rriot = user_data.rriot
+        if rriot is None:
+            raise RoborockException("rriot is none")
+        home_id = await self._get_home_id(user_data)
+        if rriot.r.a is None:
+            raise RoborockException("Missing field 'a' in rriot reference")
+        home_request = PreparedRequest(
+            rriot.r.a,
+            {
+                "Authorization": self._get_hawk_authentication(rriot, "/v2/user/homes/" + str(home_id)),
+            },
+        )
+        home_response = await home_request.request("get", "/v2/user/homes/" + str(home_id))
+        if not home_response.get("success"):
+            raise RoborockException(home_response)
+        home_data = home_response.get("result")
+        if isinstance(home_data, dict):
+            return HomeData.from_dict(home_data)
+        else:
+            raise RoborockException("home_response result was an unexpected type")
+
+    async def get_rooms(self, user_data: UserData, home_id: int | None = None) -> list[HomeDataRoom]:
+        rriot = user_data.rriot
+        if rriot is None:
+            raise RoborockException("rriot is none")
+        if home_id is None:
+            home_id = await self._get_home_id(user_data)
+        if rriot.r.a is None:
+            raise RoborockException("Missing field 'a' in rriot reference")
+        room_request = PreparedRequest(
+            rriot.r.a,
+            {
+                "Authorization": self._get_hawk_authentication(rriot, "/v2/user/homes/" + str(home_id)),
+            },
+        )
+        room_response = await room_request.request("get", f"/user/homes/{str(home_id)}/rooms" + str(home_id))
+        if not room_response.get("success"):
+            raise RoborockException(room_response)
+        rooms = room_response.get("result")
+        if isinstance(rooms, list):
+            output_list = []
+            for room in rooms:
+                output_list.append(HomeDataRoom.from_dict(room))
+            return output_list
         else:
             raise RoborockException("home_response result was an unexpected type")
