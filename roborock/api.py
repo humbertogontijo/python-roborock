@@ -35,6 +35,7 @@ from .containers import (
     ModelStatus,
     MultiMapsList,
     NetworkInfo,
+    ProductResponse,
     RoborockBase,
     RoomMapping,
     RRiot,
@@ -831,3 +832,22 @@ class RoborockApiClient:
             return output_list
         else:
             raise RoborockException("home_response result was an unexpected type")
+
+    async def get_products(self, user_data: UserData) -> ProductResponse:
+        """Gets all products and their schemas, good for determining status codes and model numbers."""
+        base_url = await self._get_base_url()
+        header_clientid = self._get_header_client_id()
+        product_request = PreparedRequest(base_url, {"header_clientid": header_clientid})
+        product_response = await product_request.request(
+            "get",
+            "/api/v3/product",
+            headers={"Authorization": user_data.token},
+        )
+        if product_response is None:
+            raise RoborockException("home_id_response is None")
+        if product_response.get("code") != 200:
+            raise RoborockException(f"{product_response.get('msg')} - response code: {product_response.get('code')}")
+        result = product_response.get("data")
+        if isinstance(result, dict):
+            return ProductResponse.from_dict(result)
+        raise RoborockException("product result was an unexpected type")

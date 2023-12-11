@@ -18,11 +18,14 @@ ROBOROCK_T7 = "roborock.vacuum.a11"  # cn s7
 ROBOROCK_T7S = "roborock.vacuum.a14"
 ROBOROCK_T7SPLUS = "roborock.vacuum.a23"
 ROBOROCK_S7_MAXV = "roborock.vacuum.a27"
+ROBOROCK_S7_MAXV_ULTRA = "roborock.vacuum.a65"
 ROBOROCK_S7_PRO_ULTRA = "roborock.vacuum.a62"
 ROBOROCK_Q5 = "roborock.vacuum.a34"
-ROBOROCK_Q7 = "roborock.vacuum.a37"  # CHECK THIS
+ROBOROCK_Q5_PRO = "roborock.vacuum.a72"
+ROBOROCK_Q7 = "roborock.vacuum.a40"
 ROBOROCK_Q7_MAX = "roborock.vacuum.a38"
 ROBOROCK_Q7PLUS = "roborock.vacuum.a40"
+ROBOROCK_Q8_MAX = "roborock.vacuum.a73"
 ROBOROCK_G10S_PRO = "roborock.vacuum.a26"
 ROBOROCK_G10S = "roborock.vacuum.a46"
 ROBOROCK_G10 = "roborock.vacuum.a29"
@@ -35,6 +38,10 @@ ROBOROCK_C1 = "roborock.vacuum.c1"
 ROBOROCK_S8_PRO_ULTRA = "roborock.vacuum.a70"
 ROBOROCK_S8 = "roborock.vacuum.a51"
 ROBOROCK_P10 = "roborock.vacuum.a75"
+
+ROBOROCK_DYAD_AIR = "roborock.wetdryvac.a107"
+ROBOROCK_DYAD_PRO_COMBO = "roborock.wetdryvac.a83"
+ROBOROCK_DYAD_PRO = "roborock.wetdryvac.a56"
 
 SUPPORTED_VACUUMS = (
     [  # These are the devices that show up when you add a device - more could be supported and just not show up

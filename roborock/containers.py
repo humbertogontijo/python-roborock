@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import json
 import logging
 import re
 from dataclasses import asdict, dataclass, field
@@ -589,3 +590,79 @@ class ServerTimer(NamedTuple):
     id: str
     status: str
     dontknow: int
+
+
+@dataclass
+class RoborockProductStateValue(RoborockBase):
+    value: list
+    desc: dict
+
+
+@dataclass
+class RoborockProductState(RoborockBase):
+    dps: int
+    desc: dict
+    value: list[RoborockProductStateValue]
+
+
+@dataclass
+class RoborockProductSpec(RoborockBase):
+    state: RoborockProductState
+    battery: dict | None = None
+    dry_countdown: dict | None = None
+    extra: dict | None = None
+    offpeak: dict | None = None
+    countdown: dict | None = None
+    mode: dict | None = None
+    ota_nfo: dict | None = None
+    pause: dict | None = None
+    program: dict | None = None
+    shutdown: dict | None = None
+    washing_left: dict | None = None
+
+
+@dataclass
+class RoborockProduct(RoborockBase):
+    id: int
+    name: str
+    model: str
+    packagename: str
+    ssid: str
+    picurl: str
+    cardpicurl: str
+    medium_cardpicurl: str
+    resetwifipicurl: str
+    resetwifitext: dict
+    tuyaid: str
+    status: int
+    rriotid: str
+    cardspec: str
+    pictures: list
+    nc_mode: str
+    scope: None
+    product_tags: list
+    agreements: list
+    plugin_pic_url: None
+    products_specification: RoborockProductSpec | None = None
+
+    def __post_init__(self):
+        if self.cardspec:
+            self.products_specification = RoborockProductSpec.from_dict(json.loads(self.cardspec).get("data"))
+
+
+@dataclass
+class RoborockProductCategory(RoborockBase):
+    id: int
+    display_name: str
+    icon_url: str
+
+
+@dataclass
+class RoborockCategoryDetail(RoborockBase):
+    category: RoborockProductCategory
+    product_list: list[RoborockProduct]
+
+
+@dataclass
+class ProductResponse(RoborockBase):
+    category_detail_list: list[RoborockCategoryDetail]
