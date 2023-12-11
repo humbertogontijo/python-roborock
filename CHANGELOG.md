@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.38.0 (2023-12-11)
+
+### Feature
+
+* Add information from product api ([#158](https://github.com/humbertogontijo/python-roborock/issues/158)) ([`22720ae`](https://github.com/humbertogontijo/python-roborock/commit/22720aee79e582328ae642e61d57dc2e3a92ec1c))
+
 ## v0.37.0 (2023-12-10)
 
 ### Feature
