@@ -42,6 +42,51 @@ class RoborockDataProtocol(RoborockEnum):
         raise ValueError("%s not a valid key for Data Protocol", key)
 
 
+class RoborockDyadDataProtocol(RoborockEnum):
+    DRYING_STATUS = 134
+    START = 200
+    STATUS = 201
+    SELF_CLEAN_MODE = 202
+    SELF_CLEAN_LEVEL = 203
+    WARM_LEVEL = 204
+    CLEAN_MODE = 205
+    SUCTION = 206
+    WATER_LEVEL = 207
+    BRUSH_SPEED = 208
+    POWER = 209
+    COUNTDOWN_TIME = 210
+    AUTO_SELF_CLEAN_SET = 212
+    AUTO_DRY = 213
+    MESH_LEF = 214
+    BRUSH_LEFT = 215
+    ERROR = 216
+    MESH_RESET = 218
+    BRUSH_RESET = 219
+    VOLUME_SET = 221
+    STAND_LOCK_AUTO_RUN = 222
+    AUTO_SELF_CLEAN_SET_MODE = 223
+    AUTO_DRY_MODE = 224
+    SILENT_DRY_DURATION = 225
+    SILENT_MODE = 226
+    SILENT_MODE_START_TIME = 227
+    SILENT_MODE_END_TIME = 228
+    RECENT_RUN_TIMe = 229
+    TOTAL_RUN_TIME = 230
+    FEATURE_INFO = 235
+    RECOVER_SETTINGS = 236
+    DRY_COUNTDOWN = 237
+    ID_QUERY = 10000
+    F_C = 10001
+    SCHEDULE_TASK = 10002
+    SND_SWITCH = 10003
+    SND_STATE = 10004
+    PRODUCT_INFO = 10005
+    PRIVACY_INFO = 10006
+    OTA_NFO = 10007
+    RPC_REQUEST = 10101
+    RPC_RESPONSE = 10102
+
+
 ROBOROCK_DATA_STATUS_PROTOCOL = [
     RoborockDataProtocol.ERROR_CODE,
     RoborockDataProtocol.STATE,

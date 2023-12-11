@@ -65,8 +65,21 @@ class RoborockStateCode(RoborockEnum):
     emptying_the_bin = 22  # on s7+
     washing_the_mop = 23  # on a46
     going_to_wash_the_mop = 26  # on a46
+    in_call = 28
+    mapping = 29
     charging_complete = 100
     device_offline = 101
+
+
+class RoborockDyadStateCode(RoborockEnum):
+    washing = 1
+    ready = 2
+    charging = 3
+    mop_washing = 4
+    drying = 10
+    reserving = 12
+    mop_washing_paused = 13
+    dusting_mode = 14
 
 
 class RoborockErrorCode(RoborockEnum):
