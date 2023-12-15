@@ -281,7 +281,9 @@ app_goto_target
 
 Description: Got to target
 
-Parameters: To be determined
+Parameters:
+    - X coordinate as integer (e.g.: 23450)
+    - Y coordinate as integer (e.g.: 16450)
 
 Returns ok or error
 
