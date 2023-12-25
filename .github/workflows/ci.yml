@@ -79,7 +79,7 @@ jobs:
           repository_username: __token__
           repository_password: ${{ secrets.PYPI_TOKEN }}
       - name: Test release
-        uses: python-semantic-release/python-semantic-release@v7.34.6
+        uses: python-semantic-release/python-semantic-release@v8.7.0
         if: github.ref_name != 'main'
         with:
           additional_options: --noop
