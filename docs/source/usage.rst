@@ -15,7 +15,7 @@ Login
 
 .. code-block:: console
 
-      (.venv) $ roborock login --username username --password password
+      (.venv) $ roborock login --email username --password password
 
 List devices
 ------------
@@ -24,7 +24,7 @@ This will list all devices associated with the account:
 
 .. code-block:: console
 
-   (.venv) $ roborock list_devices
+   (.venv) $ roborock list-devices
 
    Known devices MyRobot: 7kI9d66UoPXd6sd9gfd75W
 
