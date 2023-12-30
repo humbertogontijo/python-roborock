@@ -36,8 +36,11 @@ from .code_mappings import (
     RoborockStateCode,
 )
 from .const import (
+    CLEANING_BRUSH_REPLACE_TIME,
+    DUST_COLLECTION_REPLACE_TIME,
     FILTER_REPLACE_TIME,
     MAIN_BRUSH_REPLACE_TIME,
+    MOP_ROLLER_REPLACE_TIME,
     ROBOROCK_G10S_PRO,
     ROBOROCK_P10,
     ROBOROCK_Q7_MAX,
@@ -52,6 +55,7 @@ from .const import (
     ROBOROCK_S8_PRO_ULTRA,
     SENSOR_DIRTY_REPLACE_TIME,
     SIDE_BRUSH_REPLACE_TIME,
+    STRAINER_REPLACE_TIME,
 )
 from .exceptions import RoborockException
 
@@ -485,10 +489,15 @@ class Consumable(RoborockBase):
     strainer_work_times: int | None = None
     dust_collection_work_times: int | None = None
     cleaning_brush_work_times: int | None = None
+    moproller_work_time: int | None = None
     main_brush_time_left: int | None = None
     side_brush_time_left: int | None = None
     filter_time_left: int | None = None
     sensor_time_left: int | None = None
+    strainer_time_left: int | None = None
+    dust_collection_time_left: int | None = None
+    cleaning_brush_time_left: int | None = None
+    mop_roller_time_left: int | None = None
 
     def __post_init__(self) -> None:
         self.main_brush_time_left = (
@@ -502,6 +511,22 @@ class Consumable(RoborockBase):
         )
         self.sensor_time_left = (
             SENSOR_DIRTY_REPLACE_TIME - self.sensor_dirty_time if self.sensor_dirty_time is not None else None
+        )
+        self.strainer_time_left = (
+            STRAINER_REPLACE_TIME - self.strainer_work_times if self.strainer_work_times is not None else None
+        )
+        self.dust_collection_time_left = (
+            DUST_COLLECTION_REPLACE_TIME - self.dust_collection_work_times
+            if self.dust_collection_work_times is not None
+            else None
+        )
+        self.cleaning_brush_time_left = (
+            CLEANING_BRUSH_REPLACE_TIME - self.cleaning_brush_work_times
+            if self.cleaning_brush_work_times is not None
+            else None
+        )
+        self.mop_roller_time_left = (
+            MOP_ROLLER_REPLACE_TIME - self.moproller_work_time if self.moproller_work_time is not None else None
         )
 
 

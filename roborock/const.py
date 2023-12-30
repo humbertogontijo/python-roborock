@@ -3,6 +3,11 @@ MAIN_BRUSH_REPLACE_TIME = 1080000
 SIDE_BRUSH_REPLACE_TIME = 720000
 FILTER_REPLACE_TIME = 540000
 SENSOR_DIRTY_REPLACE_TIME = 108000
+MOP_ROLLER_REPLACE_TIME = 1080000
+STRAINER_REPLACE_TIME = 540000
+CLEANING_BRUSH_REPLACE_TIME = 1080000
+DUST_COLLECTION_REPLACE_TIME = 81000
+FLOOR_CLEANER_REPLACE_TIME = 1080000
 
 
 ROBOROCK_V1 = "ROBOROCK.vacuum.v1"
@@ -43,24 +48,23 @@ ROBOROCK_DYAD_AIR = "roborock.wetdryvac.a107"
 ROBOROCK_DYAD_PRO_COMBO = "roborock.wetdryvac.a83"
 ROBOROCK_DYAD_PRO = "roborock.wetdryvac.a56"
 
-SUPPORTED_VACUUMS = (
-    [  # These are the devices that show up when you add a device - more could be supported and just not show up
-        ROBOROCK_G10,
-        ROBOROCK_G10S_PRO,
-        ROBOROCK_Q5,
-        ROBOROCK_Q7,
-        ROBOROCK_Q7_MAX,
-        ROBOROCK_S4,
-        ROBOROCK_S5_MAX,
-        ROBOROCK_S6,
-        ROBOROCK_S6_MAXV,
-        ROBOROCK_S6_PURE,
-        ROBOROCK_S7_MAXV,
-        ROBOROCK_S8_PRO_ULTRA,
-        ROBOROCK_S8,
-        ROBOROCK_S4_MAX,
-        ROBOROCK_S7,
-        ROBOROCK_P10,
-        ROCKROBO_G10_SG,
-    ]
-)
+# These are the devices that show up when you add a device - more could be supported and just not show up
+SUPPORTED_VACUUMS = [
+    ROBOROCK_G10,
+    ROBOROCK_G10S_PRO,
+    ROBOROCK_Q5,
+    ROBOROCK_Q7,
+    ROBOROCK_Q7_MAX,
+    ROBOROCK_S4,
+    ROBOROCK_S5_MAX,
+    ROBOROCK_S6,
+    ROBOROCK_S6_MAXV,
+    ROBOROCK_S6_PURE,
+    ROBOROCK_S7_MAXV,
+    ROBOROCK_S8_PRO_ULTRA,
+    ROBOROCK_S8,
+    ROBOROCK_S4_MAX,
+    ROBOROCK_S7,
+    ROBOROCK_P10,
+    ROCKROBO_G10_SG,
+]

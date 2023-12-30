@@ -44,6 +44,7 @@ class RoborockEnum(IntEnum):
 
 
 class RoborockStateCode(RoborockEnum):
+    unknown = 0
     starting = 1
     charger_disconnected = 2
     idle = 3
@@ -67,16 +68,38 @@ class RoborockStateCode(RoborockEnum):
     going_to_wash_the_mop = 26  # on a46
     in_call = 28
     mapping = 29
+    egg_attack = 30
     charging_complete = 100
     device_offline = 101
+    locked = 103
+    air_drying_stopping = 202
+    robot_status_mopping = 6301
+    clean_mop_cleaning = 6302
+    clean_mop_mopping = 6303
+    segment_mopping = 6304
+    segment_clean_mop_cleaning = 6305
+    segment_clean_mop_mopping = 6306
+    zoned_mopping = 6307
+    zoned_clean_mop_cleaning = 6308
+    zoned_clean_mop_mopping = 6309
+    back_to_dock_washing_duster = 6310
 
 
 class RoborockDyadStateCode(RoborockEnum):
+    unknown = -999
+    fetching = -998  # Obtaining Status
+    fetch_failed = -997  # Failed to obtain device status. Try again later.
+    updating = -996
     washing = 1
     ready = 2
     charging = 3
     mop_washing = 4
+    self_clean_cleaning = 5
+    self_clean_deep_cleaning = 6
+    self_clean_rinsing = 7
+    self_clean_dehydrating = 8
     drying = 10
+    ventilating = 11  # drying
     reserving = 12
     mop_washing_paused = 13
     dusting_mode = 14
@@ -93,6 +116,8 @@ class RoborockErrorCode(RoborockEnum):
     wheels_jammed = 7
     robot_trapped = 8
     no_dustbin = 9
+    strainer_error = 10  # Filter is wet or blocked
+    compass_error = 11  # Strong magnetic field detected
     low_battery = 12
     charging_error = 13
     battery_error = 14
@@ -100,16 +125,32 @@ class RoborockErrorCode(RoborockEnum):
     robot_tilted = 16
     side_brush_error = 17
     fan_error = 18
+    dock = 19  # Dock not connected to power
     vertical_bumper_pressed = 21
     dock_locator_error = 22
     return_to_dock_fail = 23
     nogo_zone_detected = 24
+    visual_sensor = 25  # Camera error
+    light_touch = 26  # Wall sensor error
     vibrarise_jammed = 27
     robot_on_carpet = 28
     filter_blocked = 29
     invisible_wall_detected = 30
     cannot_cross_carpet = 31
     internal_error = 32
+    collect_dust_error_3 = 34  # Clean auto-empty dock
+    collect_dust_error_4 = 35  # Auto empty dock voltage error
+    mopping_roller_1 = 36  # Wash roller may be jammed
+    mopping_roller_error_2 = 37  # wash roller not lowered properly
+    clear_water_box_hoare = 38  # Check the clean water tank
+    dirty_water_box_hoare = 39  # Check the dirty water tank
+    sink_strainer_hoare = 40  # Reinstall the water filter
+    clear_water_box_exception = 41  # Clean water tank empty
+    clear_brush_exception = 42  # Check that the water filter has been correctly installed
+    clear_brush_exception_2 = 43  # Positioning button error
+    filter_screen_exception = 44  # Clean the dock water filter
+    mopping_roller_2 = 45  # Wash roller may be jammed
+    temperature_protection = 51  # Unit temperature protection
 
 
 class RoborockFanPowerCode(RoborockEnum):

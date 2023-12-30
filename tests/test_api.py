@@ -10,9 +10,9 @@ from roborock import (
     RoborockDockWashTowelModeCode,
     UserData,
 )
-from roborock.api import PreparedRequest, RoborockApiClient
 from roborock.cloud_api import RoborockMqttClient
 from roborock.containers import DeviceData, S7MaxVStatus
+from roborock.web_api import PreparedRequest, RoborockApiClient
 from tests.mock_data import BASE_URL_REQUEST, GET_CODE_RESPONSE, HOME_DATA_RAW, STATUS, USER_DATA
 
 
