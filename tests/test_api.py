@@ -53,8 +53,8 @@ async def test_get_base_url_no_url():
 @pytest.mark.asyncio
 async def test_request_code():
     rc = RoborockApiClient("sample@gmail.com")
-    with patch("roborock.api.RoborockApiClient._get_base_url"), patch(
-        "roborock.api.RoborockApiClient._get_header_client_id"
+    with patch("roborock.web_api.RoborockApiClient._get_base_url"), patch(
+        "roborock.web_api.RoborockApiClient._get_header_client_id"
     ), patch("roborock.api.PreparedRequest.request") as mock_request:
         mock_request.return_value = GET_CODE_RESPONSE
         await rc.request_code()
@@ -63,8 +63,8 @@ async def test_request_code():
 @pytest.mark.asyncio
 async def test_get_home_data():
     rc = RoborockApiClient("sample@gmail.com")
-    with patch("roborock.api.RoborockApiClient._get_base_url"), patch(
-        "roborock.api.RoborockApiClient._get_header_client_id"
+    with patch("roborock.web_api.RoborockApiClient._get_base_url"), patch(
+        "roborock.web_api.RoborockApiClient._get_header_client_id"
     ), patch("roborock.api.PreparedRequest.request") as mock_prepared_request:
         mock_prepared_request.side_effect = [
             {"code": 200, "msg": "success", "data": {"rrHomeId": 1}},
