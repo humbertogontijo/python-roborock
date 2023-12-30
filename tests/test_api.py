@@ -44,7 +44,7 @@ async def test_sync_connect(mqtt_client):
 @pytest.mark.asyncio
 async def test_get_base_url_no_url():
     rc = RoborockApiClient("sample@gmail.com")
-    with patch("roborock.api.PreparedRequest.request") as mock_request:
+    with patch("roborock.web_api.PreparedRequest.request") as mock_request:
         mock_request.return_value = BASE_URL_REQUEST
         await rc._get_base_url()
     assert rc.base_url == "https://sample.com"
@@ -55,7 +55,7 @@ async def test_request_code():
     rc = RoborockApiClient("sample@gmail.com")
     with patch("roborock.web_api.RoborockApiClient._get_base_url"), patch(
         "roborock.web_api.RoborockApiClient._get_header_client_id"
-    ), patch("roborock.api.PreparedRequest.request") as mock_request:
+    ), patch("roborock.web_api.PreparedRequest.request") as mock_request:
         mock_request.return_value = GET_CODE_RESPONSE
         await rc.request_code()
 
@@ -121,7 +121,7 @@ async def test_get_prop():
     device_info = DeviceData(device=home_data.devices[0], model=home_data.products[0].model)
     rmc = RoborockMqttClient(UserData.from_dict(USER_DATA), device_info)
     with patch("roborock.cloud_api.RoborockMqttClient.get_status") as get_status, patch(
-        "roborock.web_api.RoborockClient.send_command"
+        "roborock.api.RoborockClient.send_command"
     ), patch("roborock.api.AttributeCache.async_value"), patch(
         "roborock.cloud_api.RoborockMqttClient.get_dust_collection_mode"
     ):
