@@ -65,7 +65,7 @@ async def test_get_home_data():
     rc = RoborockApiClient("sample@gmail.com")
     with patch("roborock.web_api.RoborockApiClient._get_base_url"), patch(
         "roborock.web_api.RoborockApiClient._get_header_client_id"
-    ), patch("roborock.api.PreparedRequest.request") as mock_prepared_request:
+    ), patch("roborock.web_api.PreparedRequest.request") as mock_prepared_request:
         mock_prepared_request.side_effect = [
             {"code": 200, "msg": "success", "data": {"rrHomeId": 1}},
             {"code": 200, "success": True, "result": HOME_DATA_RAW},
@@ -121,7 +121,7 @@ async def test_get_prop():
     device_info = DeviceData(device=home_data.devices[0], model=home_data.products[0].model)
     rmc = RoborockMqttClient(UserData.from_dict(USER_DATA), device_info)
     with patch("roborock.cloud_api.RoborockMqttClient.get_status") as get_status, patch(
-        "roborock.api.RoborockClient.send_command"
+        "roborock.web_api.RoborockClient.send_command"
     ), patch("roborock.api.AttributeCache.async_value"), patch(
         "roborock.cloud_api.RoborockMqttClient.get_dust_collection_mode"
     ):
