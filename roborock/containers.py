@@ -219,6 +219,142 @@ class HomeDataDevice(RoborockBase):
     silent_ota_switch: bool | None = None
     setting: Any | None = None
     f: bool | None = None
+    device_features: DeviceFeatures | None = None
+
+    def __post_init__(self):
+        if self.feature_set is not None and self.new_feature_set is not None and self.new_feature_set != "":
+            self.device_features = build_device_features(self.feature_set, self.new_feature_set)
+
+
+@dataclass
+class DeviceFeatures(RoborockBase):
+    map_carpet_add_supported: bool
+    show_clean_finish_reason_supported: bool
+    resegment_supported: bool
+    video_monitor_supported: bool
+    any_state_transit_goto_supported: bool
+    fw_filter_obstacle_supported: bool
+    video_setting_supported: bool
+    ignore_unknown_map_object_supported: bool
+    set_child_supported: bool
+    carpet_supported: bool
+    mop_path_supported: bool
+    multi_map_segment_timer_supported: bool
+    custom_water_box_distance_supported: bool
+    wash_then_charge_cmd_supported: bool
+    room_name_supported: bool
+    current_map_restore_enabled: bool
+    photo_upload_supported: bool
+    shake_mop_set_supported: bool
+    map_beautify_internal_debug_supported: bool
+    new_data_for_clean_history: bool
+    new_data_for_clean_history_detail: bool
+    flow_led_setting_supported: bool
+    dust_collection_setting_supported: bool
+    rpc_retry_supported: bool
+    avoid_collision_supported: bool
+    support_set_switch_map_mode: bool
+    support_smart_scene: bool
+    support_floor_edit: bool
+    support_furniture: bool
+    support_room_tag: bool
+    support_quick_map_builder: bool
+    support_smart_global_clean_with_custom_mode: bool
+    record_allowed: bool
+    careful_slow_map_supported: bool
+    egg_mode_supported: bool
+    unsave_map_reason_supported: bool
+    carpet_show_on_map: bool
+    supported_valley_electricity: bool
+    drying_supported: bool
+    download_test_voice_supported: bool
+    support_backup_map: bool
+    support_custom_mode_in_cleaning: bool
+    support_remote_control_in_call: bool
+    support_set_volume_in_call: bool
+    support_clean_estimate: bool
+    support_custom_dnd: bool
+    carpet_deep_clean_supported: bool
+    stuck_zone_supported: bool
+    custom_door_sill_supported: bool
+    clean_route_fast_mode_supported: bool
+    cliff_zone_supported: bool
+    smart_door_sill_supported: bool
+    support_floor_direction: bool
+    wifi_manage_supported: bool
+    back_charge_auto_wash_supported: bool
+    support_incremental_map: bool
+    offline_map_supported: bool
+
+
+def build_device_features(feature_set: str, new_feature_set: str) -> DeviceFeatures:
+    new_feature_set_int = int(new_feature_set)
+    feature_set_int = int(feature_set)
+    new_feature_set_divided = int(new_feature_set_int / (2**32))
+    # Convert last 8 digits of new feature set into hexadecimal number
+    converted_new_feature_set = int("0x" + new_feature_set[-8:], 16)
+    new_feature_set_mod_8: bool = len(new_feature_set) % 8 == 0
+    return DeviceFeatures(
+        map_carpet_add_supported=bool(1073741824 & new_feature_set_int),
+        show_clean_finish_reason_supported=bool(1 & new_feature_set_int),
+        resegment_supported=bool(4 & new_feature_set_int),
+        video_monitor_supported=bool(8 & new_feature_set_int),
+        any_state_transit_goto_supported=bool(16 & new_feature_set_int),
+        fw_filter_obstacle_supported=bool(32 & new_feature_set_int),
+        video_setting_supported=bool(64 & new_feature_set_int),
+        ignore_unknown_map_object_supported=bool(128 & new_feature_set_int),
+        set_child_supported=bool(256 & new_feature_set_int),
+        carpet_supported=bool(512 & new_feature_set_int),
+        mop_path_supported=bool(2048 & new_feature_set_int),
+        multi_map_segment_timer_supported=bool(feature_set_int and 4096 & new_feature_set_int),
+        custom_water_box_distance_supported=bool(new_feature_set_int and 2147483648 & new_feature_set_int),
+        wash_then_charge_cmd_supported=bool((new_feature_set_divided >> 5) & 1),
+        room_name_supported=bool(16384 & new_feature_set_int),
+        current_map_restore_enabled=bool(8192 & new_feature_set_int),
+        photo_upload_supported=bool(65536 & new_feature_set_int),
+        shake_mop_set_supported=bool(262144 & new_feature_set_int),
+        map_beautify_internal_debug_supported=bool(2097152 & new_feature_set_int),
+        new_data_for_clean_history=bool(4194304 & new_feature_set_int),
+        new_data_for_clean_history_detail=bool(8388608 & new_feature_set_int),
+        flow_led_setting_supported=bool(16777216 & new_feature_set_int),
+        dust_collection_setting_supported=bool(33554432 & new_feature_set_int),
+        rpc_retry_supported=bool(67108864 & new_feature_set_int),
+        avoid_collision_supported=bool(134217728 & new_feature_set_int),
+        support_set_switch_map_mode=bool(268435456 & new_feature_set_int),
+        support_smart_scene=bool(new_feature_set_divided & 2),
+        support_floor_edit=bool(new_feature_set_divided & 8),
+        support_furniture=bool((new_feature_set_divided >> 4) & 1),
+        support_room_tag=bool((new_feature_set_divided >> 6) & 1),
+        support_quick_map_builder=bool((new_feature_set_divided >> 7) & 1),
+        support_smart_global_clean_with_custom_mode=bool((new_feature_set_divided >> 8) & 1),
+        record_allowed=bool(1024 & new_feature_set_int),
+        careful_slow_map_supported=bool((new_feature_set_divided >> 9) & 1),
+        egg_mode_supported=bool((new_feature_set_divided >> 10) & 1),
+        unsave_map_reason_supported=bool((new_feature_set_divided >> 14) & 1),
+        carpet_show_on_map=bool((new_feature_set_divided >> 12) & 1),
+        supported_valley_electricity=bool((new_feature_set_divided >> 13) & 1),
+        # This one could actually be incorrect
+        # ((t.robotNewFeatures / 2 ** 32) >> 15) & 1 && (module422.DMM.isTopazSV_CE || 'cn' == t.deviceLocation));
+        drying_supported=bool((new_feature_set_divided >> 15) & 1),
+        download_test_voice_supported=bool((new_feature_set_divided >> 16) & 1),
+        support_backup_map=bool((new_feature_set_divided >> 17) & 1),
+        support_custom_mode_in_cleaning=bool((new_feature_set_divided >> 18) & 1),
+        support_remote_control_in_call=bool((new_feature_set_divided >> 19) & 1),
+        support_set_volume_in_call=new_feature_set_mod_8 and bool(1 & converted_new_feature_set),
+        support_clean_estimate=new_feature_set_mod_8 and bool(2 & converted_new_feature_set),
+        support_custom_dnd=new_feature_set_mod_8 and bool(4 & converted_new_feature_set),
+        carpet_deep_clean_supported=bool(8 & converted_new_feature_set),
+        stuck_zone_supported=new_feature_set_mod_8 and bool(16 & converted_new_feature_set),
+        custom_door_sill_supported=new_feature_set_mod_8 and bool(32 & converted_new_feature_set),
+        clean_route_fast_mode_supported=bool(256 & converted_new_feature_set),
+        cliff_zone_supported=new_feature_set_mod_8 and bool(512 & converted_new_feature_set),
+        smart_door_sill_supported=new_feature_set_mod_8 and bool(1024 & converted_new_feature_set),
+        support_floor_direction=new_feature_set_mod_8 and bool(2048 & converted_new_feature_set),
+        wifi_manage_supported=bool(128 & converted_new_feature_set),
+        back_charge_auto_wash_supported=bool(4096 & converted_new_feature_set),
+        support_incremental_map=bool(8192 & converted_new_feature_set),
+        offline_map_supported=bool(16384 & converted_new_feature_set),
+    )
 
 
 @dataclass
