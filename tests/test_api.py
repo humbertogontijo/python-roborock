@@ -10,9 +10,9 @@ from roborock import (
     RoborockDockWashTowelModeCode,
     UserData,
 )
-from roborock.api import PreparedRequest, RoborockApiClient
 from roborock.cloud_api import RoborockMqttClient
 from roborock.containers import DeviceData, S7MaxVStatus
+from roborock.web_api import PreparedRequest, RoborockApiClient
 from tests.mock_data import BASE_URL_REQUEST, GET_CODE_RESPONSE, HOME_DATA_RAW, STATUS, USER_DATA
 
 
@@ -44,7 +44,7 @@ async def test_sync_connect(mqtt_client):
 @pytest.mark.asyncio
 async def test_get_base_url_no_url():
     rc = RoborockApiClient("sample@gmail.com")
-    with patch("roborock.api.PreparedRequest.request") as mock_request:
+    with patch("roborock.web_api.PreparedRequest.request") as mock_request:
         mock_request.return_value = BASE_URL_REQUEST
         await rc._get_base_url()
     assert rc.base_url == "https://sample.com"
@@ -53,9 +53,9 @@ async def test_get_base_url_no_url():
 @pytest.mark.asyncio
 async def test_request_code():
     rc = RoborockApiClient("sample@gmail.com")
-    with patch("roborock.api.RoborockApiClient._get_base_url"), patch(
-        "roborock.api.RoborockApiClient._get_header_client_id"
-    ), patch("roborock.api.PreparedRequest.request") as mock_request:
+    with patch("roborock.web_api.RoborockApiClient._get_base_url"), patch(
+        "roborock.web_api.RoborockApiClient._get_header_client_id"
+    ), patch("roborock.web_api.PreparedRequest.request") as mock_request:
         mock_request.return_value = GET_CODE_RESPONSE
         await rc.request_code()
 
@@ -63,9 +63,9 @@ async def test_request_code():
 @pytest.mark.asyncio
 async def test_get_home_data():
     rc = RoborockApiClient("sample@gmail.com")
-    with patch("roborock.api.RoborockApiClient._get_base_url"), patch(
-        "roborock.api.RoborockApiClient._get_header_client_id"
-    ), patch("roborock.api.PreparedRequest.request") as mock_prepared_request:
+    with patch("roborock.web_api.RoborockApiClient._get_base_url"), patch(
+        "roborock.web_api.RoborockApiClient._get_header_client_id"
+    ), patch("roborock.web_api.PreparedRequest.request") as mock_prepared_request:
         mock_prepared_request.side_effect = [
             {"code": 200, "msg": "success", "data": {"rrHomeId": 1}},
             {"code": 200, "success": True, "result": HOME_DATA_RAW},

@@ -42,8 +42,6 @@ pytest = "*"
 pre-commit = "^3.5.0"
 mypy = "*"
 ruff = "*"
-isort = "*"
-black = "*"
 codespell = "*"
 pyshark = "^0.6"
 
@@ -55,11 +53,4 @@ build_command = "pip install poetry && poetry build"
 [tool.ruff]
 ignore = ["F403", "E741"]
 line-length = 120
-select=["E", "F", "UP"]
-
-[tool.black]
-line-length = 120
-
-[tool.isort]
-profile = "black"
-line_length = 120
+select=["E", "F", "UP", "I"]

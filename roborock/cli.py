@@ -11,11 +11,11 @@ from pyshark.capture.live_capture import LiveCapture, UnknownInterfaceException 
 from pyshark.packet.packet import Packet  # type: ignore
 
 from roborock import RoborockException
-from roborock.api import RoborockApiClient
 from roborock.cloud_api import RoborockMqttClient
 from roborock.containers import DeviceData, LoginData
 from roborock.protocol import MessageParser
 from roborock.util import run_sync
+from roborock.web_api import RoborockApiClient
 
 _LOGGER = logging.getLogger(__name__)
 
