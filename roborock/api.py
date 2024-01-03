@@ -180,6 +180,10 @@ class RoborockClient:
         self.sync_disconnect()
         [item.stop() for item in self.cache.values()]
 
+    async def async_release(self):
+        await self.async_disconnect()
+        [item.stop() for item in self.cache.values()]
+
     @property
     def diagnostic_data(self) -> dict:
         return self._diagnostic_data
