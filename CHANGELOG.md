@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.39.0 (2024-01-03)
+
+### Feature
+
+* Add async_release ([#179](https://github.com/humbertogontijo/python-roborock/issues/179)) ([`ae58627`](https://github.com/humbertogontijo/python-roborock/commit/ae58627bda324c29090b7c4ab78776288a30a64d))
+
 ## v0.38.0 (2023-12-11)
 
 ### Feature
