@@ -222,7 +222,7 @@ class HomeDataDevice(RoborockBase):
     device_features: DeviceFeatures | None = None
 
     # seemingly not just str like I thought - example: '0000000000002000' and '0000000000002F63'
-    
+
     # def __post_init__(self):
     #     if self.feature_set is not None and self.new_feature_set is not None and self.new_feature_set != "":
     #         self.device_features = build_device_features(self.feature_set, self.new_feature_set)
