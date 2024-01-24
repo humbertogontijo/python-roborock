@@ -221,9 +221,11 @@ class HomeDataDevice(RoborockBase):
     f: bool | None = None
     device_features: DeviceFeatures | None = None
 
-    def __post_init__(self):
-        if self.feature_set is not None and self.new_feature_set is not None and self.new_feature_set != "":
-            self.device_features = build_device_features(self.feature_set, self.new_feature_set)
+    # seemingly not just str like I thought - example: '0000000000002000' and '0000000000002F63'
+
+    # def __post_init__(self):
+    #     if self.feature_set is not None and self.new_feature_set is not None and self.new_feature_set != "":
+    #         self.device_features = build_device_features(self.feature_set, self.new_feature_set)
 
 
 @dataclass
