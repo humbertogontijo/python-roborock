@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.39.1 (2024-01-24)
+
+### Fix
+
+* Remove problematic code ([#189](https://github.com/humbertogontijo/python-roborock/issues/189)) ([`a9e12ca`](https://github.com/humbertogontijo/python-roborock/commit/a9e12ca122b467d74e9cd29dc031802cf0f551bc))
+
 ## v0.39.0 (2024-01-03)
 
 ### Feature
