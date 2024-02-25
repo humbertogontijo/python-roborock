@@ -363,6 +363,7 @@ class RoborockCategory(Enum):
 
     WET_DRY_VAC = "roborock.wetdryvac"
     VACUUM = "robot.vacuum.cleaner"
+    WASHING_MACHINE = "roborock.wm"
     UNKNOWN = "UNKNOWN"
 
     def __missing__(self, key):
