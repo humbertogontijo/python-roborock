@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.39.2 (2024-02-26)
+
+### Fix
+
+* Bump construct and add wm category ([#192](https://github.com/humbertogontijo/python-roborock/issues/192)) ([`2f18b35`](https://github.com/humbertogontijo/python-roborock/commit/2f18b35755776844e266c893b126a830622afd43))
+
 ## v0.39.1 (2024-01-24)
 
 ### Fix
