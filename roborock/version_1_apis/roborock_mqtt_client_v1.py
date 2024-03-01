@@ -10,10 +10,10 @@ from ..exceptions import CommandVacuumError, RoborockException
 from ..protocol import MessageParser, Utils
 from ..roborock_message import RoborockMessage, RoborockMessageProtocol
 from ..roborock_typing import RoborockCommand
-from .roborock_v1_client import COMMANDS_SECURED, RoborockV1Client
+from .roborock_client_v1 import COMMANDS_SECURED, RoborockClientV1
 
 
-class RoborockV1MqttClient(RoborockMqttClient, RoborockV1Client):
+class RoborockMqttClientV1(RoborockMqttClient, RoborockClientV1):
     def __init__(self, user_data: UserData, device_info: DeviceData, queue_timeout: int = 10) -> None:
         rriot = user_data.rriot
         if rriot is None:
@@ -21,7 +21,7 @@ class RoborockV1MqttClient(RoborockMqttClient, RoborockV1Client):
         endpoint = base64.b64encode(Utils.md5(rriot.k.encode())[8:14]).decode()
 
         RoborockMqttClient.__init__(self, user_data, device_info, queue_timeout)
-        RoborockV1Client.__init__(self, device_info, self.cache, self._logger, endpoint)
+        RoborockClientV1.__init__(self, device_info, self.cache, self._logger, endpoint)
 
     def _send_msg_raw(self, msg: bytes) -> None:
         info = self.publish(f"rr/m/i/{self._mqtt_user}/{self._hashed_user}/{self.device_info.device.duid}", msg)

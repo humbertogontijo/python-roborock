@@ -11,7 +11,7 @@ from roborock import (
     UserData,
 )
 from roborock.containers import DeviceData, S7MaxVStatus
-from roborock.version_1_apis.roborock_v1_mqtt_client import RoborockV1MqttClient
+from roborock.version_1_apis.roborock_mqtt_client_v1 import RoborockMqttClientV1
 from roborock.web_api import PreparedRequest, RoborockApiClient
 from tests.mock_data import BASE_URL_REQUEST, GET_CODE_RESPONSE, HOME_DATA_RAW, STATUS, USER_DATA
 
@@ -27,7 +27,7 @@ def test_can_create_prepared_request():
 def test_can_create_mqtt_roborock():
     home_data = HomeData.from_dict(HOME_DATA_RAW)
     device_info = DeviceData(device=home_data.devices[0], model=home_data.products[0].model)
-    RoborockV1MqttClient(UserData.from_dict(USER_DATA), device_info)
+    RoborockMqttClientV1(UserData.from_dict(USER_DATA), device_info)
 
 
 @pytest.mark.asyncio
@@ -81,7 +81,7 @@ async def test_get_home_data():
 async def test_get_dust_collection_mode():
     home_data = HomeData.from_dict(HOME_DATA_RAW)
     device_info = DeviceData(device=home_data.devices[0], model=home_data.products[0].model)
-    rmc = RoborockV1MqttClient(UserData.from_dict(USER_DATA), device_info)
+    rmc = RoborockMqttClientV1(UserData.from_dict(USER_DATA), device_info)
     with patch("roborock.api.AttributeCache.async_value") as command:
         command.return_value = {"mode": 1}
         dust = await rmc.get_dust_collection_mode()
@@ -93,7 +93,7 @@ async def test_get_dust_collection_mode():
 async def test_get_mop_wash_mode():
     home_data = HomeData.from_dict(HOME_DATA_RAW)
     device_info = DeviceData(device=home_data.devices[0], model=home_data.products[0].model)
-    rmc = RoborockV1MqttClient(UserData.from_dict(USER_DATA), device_info)
+    rmc = RoborockMqttClientV1(UserData.from_dict(USER_DATA), device_info)
     with patch("roborock.api.AttributeCache.async_value") as command:
         command.return_value = {"smart_wash": 0, "wash_interval": 1500}
         mop_wash = await rmc.get_smart_wash_params()
@@ -106,7 +106,7 @@ async def test_get_mop_wash_mode():
 async def test_get_washing_mode():
     home_data = HomeData.from_dict(HOME_DATA_RAW)
     device_info = DeviceData(device=home_data.devices[0], model=home_data.products[0].model)
-    rmc = RoborockV1MqttClient(UserData.from_dict(USER_DATA), device_info)
+    rmc = RoborockMqttClientV1(UserData.from_dict(USER_DATA), device_info)
     with patch("roborock.api.AttributeCache.async_value") as command:
         command.return_value = {"wash_mode": 2}
         washing_mode = await rmc.get_wash_towel_mode()
@@ -119,11 +119,11 @@ async def test_get_washing_mode():
 async def test_get_prop():
     home_data = HomeData.from_dict(HOME_DATA_RAW)
     device_info = DeviceData(device=home_data.devices[0], model=home_data.products[0].model)
-    rmc = RoborockV1MqttClient(UserData.from_dict(USER_DATA), device_info)
-    with patch("roborock.version_1_apis.roborock_v1_mqtt_client.RoborockV1MqttClient.get_status") as get_status, patch(
+    rmc = RoborockMqttClientV1(UserData.from_dict(USER_DATA), device_info)
+    with patch("roborock.version_1_apis.roborock_mqtt_client_v1.RoborockMqttClientV1.get_status") as get_status, patch(
         "roborock.api.RoborockClient.send_command"
     ), patch("roborock.api.AttributeCache.async_value"), patch(
-        "roborock.version_1_apis.roborock_v1_mqtt_client.RoborockV1MqttClient.get_dust_collection_mode"
+        "roborock.version_1_apis.roborock_mqtt_client_v1.RoborockMqttClientV1.get_dust_collection_mode"
     ):
         status = S7MaxVStatus.from_dict(STATUS)
         status.dock_type = RoborockDockTypeCode.auto_empty_dock_pure

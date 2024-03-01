@@ -2,7 +2,7 @@ import pytest
 
 from roborock import HomeData, UserData
 from roborock.containers import DeviceData
-from roborock.version_1_apis.roborock_v1_mqtt_client import RoborockV1MqttClient
+from roborock.version_1_apis.roborock_mqtt_client_v1 import RoborockMqttClientV1
 from tests.mock_data import HOME_DATA_RAW, USER_DATA
 
 
@@ -14,6 +14,6 @@ def mqtt_client():
         device=home_data.devices[0],
         model=home_data.products[0].model,
     )
-    client = RoborockV1MqttClient(user_data, device_info)
+    client = RoborockMqttClientV1(user_data, device_info)
     yield client
     # Clean up any resources after the test

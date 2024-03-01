@@ -43,7 +43,7 @@ WASH_N_FILL_DOCK = [
 ]
 
 
-class RoborockV1Client(RoborockClient):
+class RoborockClientV1(RoborockClient):
     def __init__(self, device_info: DeviceData, cache, logger, endpoint: str):
         super().__init__(endpoint, device_info)
         self._status_type: type[Status] = ModelStatus.get(device_info.model, S7MaxVStatus)

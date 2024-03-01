@@ -2,13 +2,13 @@ from roborock.local_api import RoborockLocalClient
 
 from .. import DeviceData, RoborockCommand
 from ..roborock_message import MessageRetry, RoborockMessage, RoborockMessageProtocol
-from .roborock_v1_client import COMMANDS_SECURED, RoborockV1Client
+from .roborock_client_v1 import COMMANDS_SECURED, RoborockClientV1
 
 
-class RoborockV1LocalClient(RoborockLocalClient, RoborockV1Client):
+class RoborockLocalClientV1(RoborockLocalClient, RoborockClientV1):
     def __init__(self, device_data: DeviceData, queue_timeout: int = 4):
         RoborockLocalClient.__init__(self, device_data, queue_timeout)
-        RoborockV1Client.__init__(self, device_data, self.cache, self._logger, "abc")
+        RoborockClientV1.__init__(self, device_data, self.cache, self._logger, "abc")
 
     def build_roborock_message(
         self, method: RoborockCommand | str, params: list | dict | int | None = None
