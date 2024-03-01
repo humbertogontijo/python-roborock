@@ -21,7 +21,6 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
     def __init__(self, device_data: DeviceData, queue_timeout: int = 4):
         if device_data.host is None:
             raise RoborockException("Host is required")
-        super().__init__("abc", device_data, queue_timeout)
         self.host = device_data.host
         self._batch_structs: list[RoborockMessage] = []
         self._executing = False
@@ -30,6 +29,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         self._mutex = Lock()
         self.keep_alive_task: TimerHandle | None = None
         self._logger = RoborockLoggerAdapter(device_data.device.name, _LOGGER)
+        RoborockClient.__init__(self, "abc", device_data, queue_timeout)
 
     def data_received(self, message):
         if self.remaining:
