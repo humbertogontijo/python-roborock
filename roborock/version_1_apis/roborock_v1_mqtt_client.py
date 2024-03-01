@@ -5,9 +5,11 @@ import paho.mqtt.client as mqtt
 
 from roborock.cloud_api import RoborockMqttClient
 
-from .. import CommandVacuumError, DeviceData, RoborockCommand, RoborockException, UserData
+from ..containers import DeviceData, UserData
+from ..exceptions import CommandVacuumError, RoborockException
 from ..protocol import MessageParser, Utils
 from ..roborock_message import RoborockMessage, RoborockMessageProtocol
+from ..roborock_typing import RoborockCommand
 from .roborock_v1_client import COMMANDS_SECURED, RoborockV1Client
 
 
