@@ -258,7 +258,7 @@ class RoborockClient:
                         try:
                             decrypted = Utils.decrypt_cbc(data.payload[24:], self._nonce)
                         except ValueError as err:
-                            raise RoborockException("Failed to decode %s for %s", data.payload, data.protocol) from err
+                            raise RoborockException(f"Failed to decode {data.payload!r} for {data.protocol}") from err
                         decompressed = Utils.decompress(decrypted)
                         queue = self._waiting_queue.get(request_id)
                         if queue:
