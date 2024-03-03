@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import base64
 import dataclasses
 import hashlib
 import json
@@ -156,7 +157,9 @@ class RoborockClient:
         self._last_device_msg_in = self.time_func()
         self._last_disconnection = self.time_func()
         self.keep_alive = KEEPALIVE
-        self._diagnostic_data: dict[str, dict[str, Any]] = {}
+        self._diagnostic_data: dict[str, dict[str, Any]] = {
+            "misc_info": {"Nonce": base64.b64encode(self._nonce).decode("utf-8")}
+        }
         self._logger = RoborockLoggerAdapter(device_info.device.name, _LOGGER)
         self.cache: dict[CacheableAttribute, AttributeCache] = {
             cacheable_attribute: AttributeCache(attr, self) for cacheable_attribute, attr in get_cache_map().items()
