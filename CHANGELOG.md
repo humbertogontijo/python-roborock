@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.40.0 (2024-03-03)
+
+### Feature
+
+* Add nonce to diagnostic data ([#195](https://github.com/humbertogontijo/python-roborock/issues/195)) ([`ceafcb6`](https://github.com/humbertogontijo/python-roborock/commit/ceafcb6e30c60f6f6ad3833ab73861c18413b806))
+
 ## v0.39.2 (2024-02-26)
 
 ### Fix
