@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.41.0 (2024-03-06)
+
+### Feature
+
+* Add v1 api ([#194](https://github.com/humbertogontijo/python-roborock/issues/194)) ([`9fb124e`](https://github.com/humbertogontijo/python-roborock/commit/9fb124ecdd0a979ff8f2c742eb4dd625b7e9292f))
+
 ## v0.40.0 (2024-03-03)
 
 ### Feature
