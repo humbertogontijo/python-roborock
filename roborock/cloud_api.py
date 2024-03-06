@@ -11,12 +11,12 @@ from urllib.parse import urlparse
 
 import paho.mqtt.client as mqtt
 
-from .api import COMMANDS_SECURED, KEEPALIVE, RoborockClient, md5hex
+from .api import KEEPALIVE, RoborockClient, md5hex
 from .containers import DeviceData, UserData
-from .exceptions import CommandVacuumError, RoborockException, VacuumError
+from .exceptions import RoborockException, VacuumError
 from .protocol import MessageParser, Utils
 from .roborock_future import RoborockFuture
-from .roborock_message import RoborockMessage, RoborockMessageProtocol
+from .roborock_message import RoborockMessage
 from .roborock_typing import RoborockCommand
 from .util import RoborockLoggerAdapter
 
@@ -167,44 +167,11 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
             raise RoborockException(f"Failed to publish ({mqtt.error_string(info.rc)})")
 
     async def send_message(self, roborock_message: RoborockMessage):
-        await self.validate_connection()
-        method = roborock_message.get_method()
-        params = roborock_message.get_params()
-        request_id = roborock_message.get_request_id()
-        if request_id is None:
-            raise RoborockException(f"Failed build message {roborock_message}")
-        response_protocol = (
-            RoborockMessageProtocol.MAP_RESPONSE if method in COMMANDS_SECURED else RoborockMessageProtocol.RPC_RESPONSE
-        )
-
-        local_key = self.device_info.device.local_key
-        msg = MessageParser.build(roborock_message, local_key, False)
-        self._logger.debug(f"id={request_id} Requesting method {method} with {params}")
-        async_response = asyncio.ensure_future(self._async_response(request_id, response_protocol))
-        self._send_msg_raw(msg)
-        (response, err) = await async_response
-        self._diagnostic_data[method if method is not None else "unknown"] = {
-            "params": roborock_message.get_params(),
-            "response": response,
-            "error": err,
-        }
-        if err:
-            raise CommandVacuumError(method, err) from err
-        if response_protocol == RoborockMessageProtocol.MAP_RESPONSE:
-            self._logger.debug(f"id={request_id} Response from {method}: {len(response)} bytes")
-        else:
-            self._logger.debug(f"id={request_id} Response from {method}: {response}")
-        return response
+        raise NotImplementedError
 
     async def _send_command(
         self,
         method: RoborockCommand | str,
         params: list | dict | int | None = None,
     ):
-        request_id, timestamp, payload = super()._get_payload(method, params, True)
-        request_protocol = RoborockMessageProtocol.RPC_REQUEST
-        roborock_message = RoborockMessage(timestamp=timestamp, protocol=request_protocol, payload=payload)
-        return await self.send_message(roborock_message)
-
-    async def get_map_v1(self):
-        return await self.send_command(RoborockCommand.GET_MAP_V1)
+        raise NotImplementedError
