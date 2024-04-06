@@ -4,6 +4,7 @@ import asyncio
 import base64
 import logging
 import threading
+import typing
 import uuid
 from asyncio import Lock, Task
 from typing import Any
@@ -11,15 +12,17 @@ from urllib.parse import urlparse
 
 import paho.mqtt.client as mqtt
 
-from .api import KEEPALIVE, RoborockClient, md5hex
+from .api import KEEPALIVE, RoborockClient
 from .containers import DeviceData, UserData
 from .exceptions import RoborockException, VacuumError
-from .protocol import MessageParser, Utils
+from .protocol import MessageParser, Utils, md5hex
 from .roborock_future import RoborockFuture
 from .roborock_message import RoborockMessage
 from .roborock_typing import RoborockCommand
 from .util import RoborockLoggerAdapter
 
+if typing.TYPE_CHECKING:
+    pass
 _LOGGER = logging.getLogger(__name__)
 CONNECT_REQUEST_ID = 0
 DISCONNECT_REQUEST_ID = 1
@@ -78,7 +81,7 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
             connection_queue.resolve((True, None))
 
     def on_message(self, *args, **kwargs):
-        _, __, msg = args
+        client, __, msg = args
         try:
             messages, _ = MessageParser.parse(msg.payload, local_key=self.device_info.device.local_key)
             super().on_message_received(messages)

@@ -13,7 +13,6 @@ from construct import (  # type: ignore
     Bytes,
     Checksum,
     ChecksumError,
-    Const,
     Construct,
     Container,
     GreedyBytes,
@@ -36,9 +35,17 @@ from roborock.roborock_message import RoborockMessage
 
 _LOGGER = logging.getLogger(__name__)
 SALT = b"TXdfu$jyZ#TZHsg4"
+A01_HASH = "726f626f726f636b2d67a6d6da"
+A01_AES_DECIPHER = "ELSYN0wTI4AUm7C4"
 BROADCAST_TOKEN = b"qWKYcdQWrbm9hPqe"
 AP_CONFIG = 1
 SOCK_DISCOVERY = 2
+
+
+def md5hex(message: str) -> str:
+    md5 = hashlib.md5()
+    md5.update(message.encode())
+    return md5.hexdigest()
 
 
 class RoborockProtocol(asyncio.DatagramProtocol):
@@ -199,12 +206,22 @@ class EncryptionAdapter(Construct):
 
         :param obj: JSON object to encrypt
         """
+        if context.version == b"A01":
+            iv = md5hex(format(context.random, "08x") + A01_HASH)[8:24]
+            decipher = AES.new(bytes(A01_AES_DECIPHER, "utf-8"), AES.MODE_CBC, bytes(iv, "utf-8"))
+            f = decipher.encrypt(obj)
+            return f
         token = self.token_func(context)
         encrypted = Utils.encrypt_ecb(obj, token)
         return encrypted
 
     def _decode(self, obj, context, _):
         """Decrypts the given payload with the token stored in the context."""
+        if context.version == b"A01":
+            iv = md5hex(format(context.random, "08x") + A01_HASH)[8:24]
+            decipher = AES.new(bytes(A01_AES_DECIPHER, "utf-8"), AES.MODE_CBC, bytes(iv, "utf-8"))
+            f = decipher.decrypt(obj)
+            return f
         token = self.token_func(context)
         decrypted = Utils.decrypt_ecb(obj, token)
         return decrypted
@@ -227,9 +244,9 @@ class OptionalChecksum(Checksum):
 
 class PrefixedStruct(Struct):
     def _parse(self, stream, context, path):
-        subcon1 = Peek(Optional(Const(b"1.0")))
+        subcon1 = Peek(Optional(Bytes(3)))
         peek_version = subcon1.parse_stream(stream, **context)
-        if peek_version is None:
+        if peek_version not in (b"1.0", b"A01"):
             subcon2 = Bytes(4)
             subcon2.parse_stream(stream, **context)
         return super()._parse(stream, context, path)
@@ -251,7 +268,7 @@ class PrefixedStruct(Struct):
 
 _Message = RawCopy(
     Struct(
-        "version" / Const(b"1.0"),
+        "version" / Bytes(3),
         "seq" / Int32ub,
         "random" / Int32ub,
         "timestamp" / Int32ub,
@@ -280,7 +297,7 @@ _BroadcastMessage = Struct(
     "message"
     / RawCopy(
         Struct(
-            "version" / Const(b"1.0"),
+            "version" / Bytes(3),
             "seq" / Int32ub,
             "protocol" / Int16ub,
             "payload" / EncryptionAdapter(lambda ctx: BROADCAST_TOKEN),

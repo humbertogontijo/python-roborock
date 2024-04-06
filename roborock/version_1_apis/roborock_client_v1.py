@@ -1,14 +1,30 @@
 import asyncio
+import dataclasses
 import json
 import math
+import struct
 import time
-from collections.abc import Coroutine
+from collections.abc import Callable, Coroutine
 from random import randint
-from typing import Any
+from typing import Any, TypeVar, final
 
-from roborock import DeviceProp, DockSummary, RoborockCommand, RoborockDockTypeCode
+from roborock import (
+    DeviceProp,
+    DockSummary,
+    RoborockCommand,
+    RoborockDockTypeCode,
+    RoborockException,
+    UnknownMethodError,
+    VacuumError,
+)
 from roborock.api import RoborockClient
-from roborock.command_cache import CacheableAttribute
+from roborock.command_cache import (
+    CacheableAttribute,
+    CommandType,
+    RoborockAttribute,
+    find_cacheable_attribute,
+    get_cache_map,
+)
 from roborock.containers import (
     ChildLockStatus,
     CleanRecord,
@@ -21,6 +37,7 @@ from roborock.containers import (
     ModelStatus,
     MultiMapsList,
     NetworkInfo,
+    RoborockBase,
     RoomMapping,
     S7MaxVStatus,
     ServerTimer,
@@ -29,7 +46,15 @@ from roborock.containers import (
     ValleyElectricityTimer,
     WashTowelMode,
 )
-from roborock.util import unpack_list
+from roborock.protocol import Utils
+from roborock.roborock_message import (
+    ROBOROCK_DATA_CONSUMABLE_PROTOCOL,
+    ROBOROCK_DATA_STATUS_PROTOCOL,
+    RoborockDataProtocol,
+    RoborockMessage,
+    RoborockMessageProtocol,
+)
+from roborock.util import RepeatableTask, unpack_list
 
 COMMANDS_SECURED = [
     RoborockCommand.GET_MAP_V1,
@@ -41,14 +66,96 @@ WASH_N_FILL_DOCK = [
     RoborockDockTypeCode.s8_dock,
     RoborockDockTypeCode.p10_dock,
 ]
+RT = TypeVar("RT", bound=RoborockBase)
+EVICT_TIME = 60
+
+
+class AttributeCache:
+    def __init__(self, attribute: RoborockAttribute, api: RoborockClient):
+        self.attribute = attribute
+        self.api = api
+        self.attribute = attribute
+        self.task = RepeatableTask(self.api.event_loop, self._async_value, EVICT_TIME)
+        self._value: Any = None
+        self._mutex = asyncio.Lock()
+        self.unsupported: bool = False
+
+    @property
+    def value(self):
+        return self._value
+
+    async def _async_value(self):
+        if self.unsupported:
+            return None
+        try:
+            self._value = await self.api._send_command(self.attribute.get_command)
+        except UnknownMethodError as err:
+            # Limit the amount of times we call unsupported methods
+            self.unsupported = True
+            raise err
+        return self._value
+
+    async def async_value(self):
+        async with self._mutex:
+            if self._value is None:
+                return await self.task.reset()
+            return self._value
+
+    def stop(self):
+        self.task.cancel()
+
+    async def update_value(self, params):
+        if self.attribute.set_command is None:
+            raise RoborockException(f"{self.attribute.attribute} have no set command")
+        response = await self.api._send_command(self.attribute.set_command, params)
+        await self._async_value()
+        return response
+
+    async def add_value(self, params):
+        if self.attribute.add_command is None:
+            raise RoborockException(f"{self.attribute.attribute} have no add command")
+        response = await self.api._send_command(self.attribute.add_command, params)
+        await self._async_value()
+        return response
+
+    async def close_value(self, params=None):
+        if self.attribute.close_command is None:
+            raise RoborockException(f"{self.attribute.attribute} have no close command")
+        response = await self.api._send_command(self.attribute.close_command, params)
+        await self._async_value()
+        return response
+
+    async def refresh_value(self):
+        await self._async_value()
+
+
+@dataclasses.dataclass
+class ListenerModel:
+    protocol_handlers: dict[RoborockDataProtocol, list[Callable[[Status | Consumable], None]]]
+    cache: dict[CacheableAttribute, AttributeCache]
 
 
 class RoborockClientV1(RoborockClient):
-    def __init__(self, device_info: DeviceData, cache, logger, endpoint: str):
+    _listeners: dict[str, ListenerModel] = {}
+
+    def __init__(self, device_info: DeviceData, logger, endpoint: str):
         super().__init__(endpoint, device_info)
         self._status_type: type[Status] = ModelStatus.get(device_info.model, S7MaxVStatus)
-        self.cache = cache
         self._logger = logger
+        self.cache: dict[CacheableAttribute, AttributeCache] = {
+            cacheable_attribute: AttributeCache(attr, self) for cacheable_attribute, attr in get_cache_map().items()
+        }
+        if device_info.device.duid not in self._listeners:
+            self._listeners[device_info.device.duid] = ListenerModel({}, self.cache)
+        self.listener_model = self._listeners[device_info.device.duid]
+
+    def release(self):
+        super().release()
+        [item.stop() for item in self.cache.values()]
+
+    async def async_release(self):
+        await super().async_release()
+        [item.stop() for item in self.cache.values()]
 
     @property
     def status_type(self) -> type[Status]:
@@ -225,3 +332,138 @@ class RoborockClientV1(RoborockClient):
             ).encode()
         )
         return request_id, timestamp, payload
+
+    def on_message_received(self, messages: list[RoborockMessage]) -> None:
+        try:
+            self._last_device_msg_in = self.time_func()
+            for data in messages:
+                protocol = data.protocol
+                if data.payload and protocol in [
+                    RoborockMessageProtocol.RPC_RESPONSE,
+                    RoborockMessageProtocol.GENERAL_REQUEST,
+                ]:
+                    payload = json.loads(data.payload.decode())
+                    for data_point_number, data_point in payload.get("dps").items():
+                        if data_point_number == "102":
+                            data_point_response = json.loads(data_point)
+                            request_id = data_point_response.get("id")
+                            queue = self._waiting_queue.get(request_id)
+                            if queue and queue.protocol == protocol:
+                                error = data_point_response.get("error")
+                                if error:
+                                    queue.resolve(
+                                        (
+                                            None,
+                                            VacuumError(
+                                                error.get("code"),
+                                                error.get("message"),
+                                            ),
+                                        )
+                                    )
+                                else:
+                                    result = data_point_response.get("result")
+                                    if isinstance(result, list) and len(result) == 1:
+                                        result = result[0]
+                                    queue.resolve((result, None))
+                        else:
+                            try:
+                                data_protocol = RoborockDataProtocol(int(data_point_number))
+                                self._logger.debug(f"Got device update for {data_protocol.name}: {data_point}")
+                                if data_protocol in ROBOROCK_DATA_STATUS_PROTOCOL:
+                                    if data_protocol not in self.listener_model.protocol_handlers:
+                                        self._logger.debug(
+                                            f"Got status update({data_protocol.name}) before get_status was called."
+                                        )
+                                        return
+                                    value = self.listener_model.cache[CacheableAttribute.status].value
+                                    value[data_protocol.name] = data_point
+                                    status = self._status_type.from_dict(value)
+                                    for listener in self.listener_model.protocol_handlers.get(data_protocol, []):
+                                        listener(status)
+                                elif data_protocol in ROBOROCK_DATA_CONSUMABLE_PROTOCOL:
+                                    if data_protocol not in self.listener_model.protocol_handlers:
+                                        self._logger.debug(
+                                            f"Got consumable update({data_protocol.name})"
+                                            + "before get_consumable was called."
+                                        )
+                                        return
+                                    value = self.listener_model.cache[CacheableAttribute.consumable].value
+                                    value[data_protocol.name] = data_point
+                                    consumable = Consumable.from_dict(value)
+                                    for listener in self.listener_model.protocol_handlers.get(data_protocol, []):
+                                        listener(consumable)
+                                return
+                            except ValueError:
+                                self._logger.warning(
+                                    f"Got listener data for {data_point_number}, data: {data_point}. "
+                                    f"This lets us update data quicker, please open an issue "
+                                    f"at https://github.com/humbertogontijo/python-roborock/issues"
+                                )
+
+                                pass
+                            dps = {data_point_number: data_point}
+                            self._logger.debug(f"Got unknown data point {dps}")
+                elif data.payload and protocol == RoborockMessageProtocol.MAP_RESPONSE:
+                    payload = data.payload[0:24]
+                    [endpoint, _, request_id, _] = struct.unpack("<8s8sH6s", payload)
+                    if endpoint.decode().startswith(self._endpoint):
+                        try:
+                            decrypted = Utils.decrypt_cbc(data.payload[24:], self._nonce)
+                        except ValueError as err:
+                            raise RoborockException(f"Failed to decode {data.payload!r} for {data.protocol}") from err
+                        decompressed = Utils.decompress(decrypted)
+                        queue = self._waiting_queue.get(request_id)
+                        if queue:
+                            if isinstance(decompressed, list):
+                                decompressed = decompressed[0]
+                            queue.resolve((decompressed, None))
+                else:
+                    queue = self._waiting_queue.get(data.seq)
+                    if queue:
+                        queue.resolve((data.payload, None))
+        except Exception as ex:
+            self._logger.exception(ex)
+
+    async def get_from_cache(self, key: CacheableAttribute) -> AttributeCache | None:
+        val = self.cache.get(key)
+        if val is not None:
+            return await val.async_value()
+        return None
+
+    def add_listener(
+        self, protocol: RoborockDataProtocol, listener: Callable, cache: dict[CacheableAttribute, AttributeCache]
+    ) -> None:
+        self.listener_model.cache = cache
+        if protocol not in self.listener_model.protocol_handlers:
+            self.listener_model.protocol_handlers[protocol] = []
+        self.listener_model.protocol_handlers[protocol].append(listener)
+
+    def remove_listener(self, protocol: RoborockDataProtocol, listener: Callable) -> None:
+        self.listener_model.protocol_handlers[protocol].remove(listener)
+
+    @final
+    async def send_command(
+        self,
+        method: RoborockCommand | str,
+        params: list | dict | int | None = None,
+        return_type: type[RT] | None = None,
+    ) -> RT:
+        cacheable_attribute_result = find_cacheable_attribute(method)
+
+        cache = None
+        command_type = None
+        if cacheable_attribute_result is not None:
+            cache = self.cache[cacheable_attribute_result.attribute]
+            command_type = cacheable_attribute_result.type
+
+        response: Any = None
+        if cache is not None and command_type == CommandType.GET:
+            response = await cache.async_value()
+        else:
+            response = await self._send_command(method, params)
+            if cache is not None and command_type == CommandType.CHANGE:
+                await cache.refresh_value()
+
+        if return_type:
+            return return_type.from_dict(response)
+        return response
