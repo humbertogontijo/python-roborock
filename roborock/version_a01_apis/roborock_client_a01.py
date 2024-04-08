@@ -89,6 +89,7 @@ class RoborockClientA01(RoborockClient):
                 for data_point_number, data_point in payload_json.get("dps").items():
                     data_point_protocol = RoborockDyadDataProtocol(int(data_point_number))
                     if data_point_protocol in protocol_entries:
+                        # Auto convert into data struct we want.
                         converted_response = protocol_entries[data_point_protocol].post_process_fn(data_point)
                         queue = self._waiting_queue.get(int(data_point_number))
                         if queue and queue.protocol == protocol:
