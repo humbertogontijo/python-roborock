@@ -57,7 +57,7 @@ class RoborockDyadDataProtocol(RoborockEnum):
     COUNTDOWN_TIME = 210
     AUTO_SELF_CLEAN_SET = 212
     AUTO_DRY = 213
-    MESH_LEF = 214
+    MESH_LEFT = 214
     BRUSH_LEFT = 215
     ERROR = 216
     MESH_RESET = 218
@@ -70,7 +70,7 @@ class RoborockDyadDataProtocol(RoborockEnum):
     SILENT_MODE = 226
     SILENT_MODE_START_TIME = 227
     SILENT_MODE_END_TIME = 228
-    RECENT_RUN_TIMe = 229
+    RECENT_RUN_TIME = 229
     TOTAL_RUN_TIME = 230
     FEATURE_INFO = 235
     RECOVER_SETTINGS = 236

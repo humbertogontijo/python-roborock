@@ -8,7 +8,7 @@ import async_timeout
 
 from . import DeviceData
 from .api import RoborockClient
-from .exceptions import CommandVacuumError, RoborockConnectionException, RoborockException
+from .exceptions import RoborockConnectionException, RoborockException
 from .protocol import MessageParser
 from .roborock_message import RoborockMessage, RoborockMessageProtocol
 from .roborock_typing import RoborockCommand
@@ -121,40 +121,3 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
             self.transport.write(data)
         except Exception as e:
             raise RoborockException(e) from e
-
-    async def send_message(self, roborock_message: RoborockMessage):
-        await self.validate_connection()
-        method = roborock_message.get_method()
-        params = roborock_message.get_params()
-        request_id: int | None
-        if not method or not method.startswith("get"):
-            request_id = roborock_message.seq
-            response_protocol = request_id + 1
-        else:
-            request_id = roborock_message.get_request_id()
-            response_protocol = RoborockMessageProtocol.GENERAL_REQUEST
-        if request_id is None:
-            raise RoborockException(f"Failed build message {roborock_message}")
-        local_key = self.device_info.device.local_key
-        msg = MessageParser.build(roborock_message, local_key=local_key)
-        if method:
-            self._logger.debug(f"id={request_id} Requesting method {method} with {params}")
-        # Send the command to the Roborock device
-        async_response = asyncio.ensure_future(self._async_response(request_id, response_protocol))
-        self._send_msg_raw(msg)
-        (response, err) = await async_response
-        self._diagnostic_data[method if method is not None else "unknown"] = {
-            "params": roborock_message.get_params(),
-            "response": response,
-            "error": err,
-        }
-        if err:
-            raise CommandVacuumError(method, err) from err
-        if roborock_message.protocol == RoborockMessageProtocol.GENERAL_REQUEST:
-            self._logger.debug(f"id={request_id} Response from method {roborock_message.get_method()}: {response}")
-        if response == "retry":
-            retry_id = roborock_message.get_retry_id()
-            return self.send_command(
-                RoborockCommand.RETRY_REQUEST, {"retry_id": retry_id, "retry_count": 8, "method": method}
-            )
-        return response
