@@ -49,6 +49,15 @@ pyshark = "^0.6"
 branch = "main"
 version_toml = "pyproject.toml:tool.poetry.version"
 build_command = "pip install poetry && poetry build"
+[tool.semantic_release.commit_parser_options]
+allowed_tags = [
+    "chore",
+    "docs",
+    "feat",
+    "fix",
+    "major"
+]
+major_tags= ["major"]
 
 [tool.ruff]
 ignore = ["F403", "E741"]
