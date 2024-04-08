@@ -63,3 +63,6 @@ major_tags= ["major"]
 ignore = ["F403", "E741"]
 line-length = 120
 select=["E", "F", "UP", "I"]
+
+[tool.ruff.lint.per-file-ignores]
+"*/__init__.py" = ["F401"]
