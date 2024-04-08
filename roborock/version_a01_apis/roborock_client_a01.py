@@ -96,4 +96,5 @@ class RoborockClientA01(RoborockClient):
                             queue.resolve((converted_response, None))
 
     async def update_values(self, dyad_data_protocols: list[RoborockDyadDataProtocol]):
+        """This should handle updating for each given protocol."""
         raise NotImplementedError
