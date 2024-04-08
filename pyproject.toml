@@ -55,9 +55,9 @@ allowed_tags = [
     "docs",
     "feat",
     "fix",
-    "major"
+    "refactor"
 ]
-major_tags= ["major"]
+major_tags= ["refactor"]
 
 [tool.ruff]
 ignore = ["F403", "E741"]
