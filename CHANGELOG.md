@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v1.0.0 (2024-04-09)
+
+### Breaking
+
+* You must now specify what version api you want to use with clients. ([`16b9e3e`](https://github.com/humbertogontijo/python-roborock/commit/16b9e3e8261db3ec38d6bc24661ecf40c6bb0870))
+
 ## v0.41.0 (2024-03-06)
 
 ### Feature
