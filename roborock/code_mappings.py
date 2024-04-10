@@ -450,3 +450,60 @@ class DyadError(RoborockEnum):
     dirty_charging_contacts = 10007  # Disconnection between the device and dock. Wipe charging contacts.
     low_battery = 20017  # Low battery level. Charge before starting self-cleaning.
     battery_under_10 = 20018  # Charge until the battery level exceeds 10% before manually starting self-cleaning.
+
+
+class ZeoMode(RoborockEnum):
+    wash = 1
+    wash_and_dry = 2
+    dry = 3
+
+
+class ZeoState(RoborockEnum):
+    standby = 1
+    weighing = 2
+    soaking = 3
+    washing = 4
+    rinsing = 5
+    spinning = 6
+    drying = 7
+    cooling = 8
+    under_delay_start = 9
+    done = 10
+
+
+class ZeoProgram(RoborockEnum):
+    standard = 1
+    quick = 2
+    sanitize = 3
+    wool = 4
+    air_refresh = 5
+    custom = 6
+    bedding = 7
+    down = 8
+    silk = 9
+    rinse_and_spin = 10
+    spin = 11
+    down_clean = 12
+    baby_care = 13
+    anti_allergen = 14
+    sportswear = 15
+    night = 16
+    new_clothes = 17
+    shirts = 18
+    synthetics = 19
+    underwear = 20
+    gentle = 21
+    intensive = 22
+    cotton_linen = 23
+    season = 24
+    warming = 25
+    bra = 26
+    panties = 27
+    boiling_wash = 28
+    socks = 30
+    towels = 31
+    anti_mite = 32
+    exo_40_60 = 33
+    twenty_c = 34
+    t_shirts = 35
+    stain_removal = 36

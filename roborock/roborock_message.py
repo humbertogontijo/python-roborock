@@ -87,6 +87,17 @@ class RoborockDyadDataProtocol(RoborockEnum):
     RPC_RESPONSE = 10102
 
 
+class RoborockZeoProtocol(RoborockEnum):
+    MODE = 204
+    PAUSE = 201
+    STATE = 203
+    OTA_NFO = 10007
+    PROGRAM = 205
+    SHUTDOWN = 202
+    COUNTDOWN = 217
+    WASHING_LEFT = 218
+
+
 ROBOROCK_DATA_STATUS_PROTOCOL = [
     RoborockDataProtocol.ERROR_CODE,
     RoborockDataProtocol.STATE,
