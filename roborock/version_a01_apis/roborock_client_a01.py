@@ -24,6 +24,7 @@ from roborock.code_mappings import (
     ZeoState,
 )
 from roborock.containers import DyadProductInfo, DyadSndState, RoborockCategory
+)
 from roborock.roborock_message import (
     RoborockDyadDataProtocol,
     RoborockMessage,
