@@ -1,6 +1,7 @@
 import asyncio
 import base64
 import json
+import typing
 
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
@@ -29,7 +30,7 @@ class RoborockMqttClientA01(RoborockMqttClient, RoborockClientA01):
         endpoint = base64.b64encode(Utils.md5(rriot.k.encode())[8:14]).decode()
 
         RoborockMqttClient.__init__(self, user_data, device_info, queue_timeout)
-        RoborockClientA01.__init__(self, endpoint, device_info, category)
+        RoborockClientA01.__init__(self, endpoint, device_info, category, queue_timeout)
 
     async def send_message(self, roborock_message: RoborockMessage):
         await self.validate_connection()
@@ -44,11 +45,16 @@ class RoborockMqttClientA01(RoborockMqttClient, RoborockClientA01):
             for dps in json.loads(payload["dps"]["10000"]):
                 futures.append(asyncio.ensure_future(self._async_response(dps, response_protocol)))
         self._send_msg_raw(m)
-        responses = await asyncio.gather(*futures)
-        dps_responses = {}
+        responses = await asyncio.gather(*futures, return_exceptions=True)
+        dps_responses: dict[int, typing.Any] = {}
         if "10000" in payload["dps"]:
             for i, dps in enumerate(json.loads(payload["dps"]["10000"])):
-                dps_responses[dps] = responses[i][0]
+                response = responses[i]
+                if isinstance(response, BaseException):
+                    self._logger.warning("Timed out get req for %s after %s s", dps, self.queue_timeout)
+                    dps_responses[dps] = None
+                else:
+                    dps_responses[dps] = response[0]
         return dps_responses
 
     async def update_values(self, dyad_data_protocols: list[RoborockDyadDataProtocol | RoborockZeoProtocol]):
