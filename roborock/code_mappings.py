@@ -507,3 +507,81 @@ class ZeoProgram(RoborockEnum):
     twenty_c = 34
     t_shirts = 35
     stain_removal = 36
+
+
+class ZeoSoak(RoborockEnum):
+    normal = 0
+    low = 1
+    medium = 2
+    high = 3
+    max = 4
+
+
+class ZeoTemperature(RoborockEnum):
+    normal = 1
+    low = 2
+    medium = 3
+    high = 4
+    max = 5
+    twenty_c = 6
+
+
+class ZeoRinse(RoborockEnum):
+    none = 0
+    min = 1
+    low = 2
+    mid = 3
+    high = 4
+    max = 5
+
+
+class ZeoSpin(RoborockEnum):
+    none = 1
+    very_low = 2
+    low = 3
+    mid = 4
+    high = 5
+    very_high = 6
+    max = 7
+
+
+class ZeoDryingMode(RoborockEnum):
+    none = 0
+    quick = 1
+    iron = 2
+    store = 3
+
+
+class ZeoDetergentType(RoborockEnum):
+    empty = 0
+    low = 1
+    medium = 2
+    high = 3
+
+
+class ZeoSoftenerType(RoborockEnum):
+    empty = 0
+    low = 1
+    medium = 2
+    high = 3
+
+
+class ZeoError(RoborockEnum):
+    none = 0
+    refill_error = 1
+    drain_error = 2
+    door_lock_error = 3
+    water_level_error = 4
+    inverter_error = 5
+    heating_error = 6
+    temperature_error = 7
+    communication_error = 10
+    drying_error = 11
+    drying_error_e_12 = 12
+    drying_error_e_13 = 13
+    drying_error_e_14 = 14
+    drying_error_e_15 = 15
+    drying_error_e_16 = 16
+    drying_error_water_flow = 17  # Check for normal water flow
+    drying_error_restart = 18  # Restart the washer and try again
+    spin_error = 19  # re-arrange clothes

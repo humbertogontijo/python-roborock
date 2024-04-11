@@ -19,9 +19,16 @@ from roborock.code_mappings import (
     DyadWarmLevel,
     DyadWaterLevel,
     RoborockDyadStateCode,
+    ZeoDetergentType,
+    ZeoDryingMode,
+    ZeoError,
     ZeoMode,
     ZeoProgram,
+    ZeoRinse,
+    ZeoSoftenerType,
+    ZeoSpin,
     ZeoState,
+    ZeoTemperature,
 )
 from roborock.containers import DyadProductInfo, DyadSndState, RoborockCategory
 from roborock.roborock_message import (
@@ -73,11 +80,24 @@ protocol_entries = {
 }
 
 zeo_data_protocol_entries = {
-    RoborockZeoProtocol.MODE: A01ProtocolCacheEntry(lambda val: ZeoMode(val).name),
+    # ro
     RoborockZeoProtocol.STATE: A01ProtocolCacheEntry(lambda val: ZeoState(val).name),
     RoborockZeoProtocol.COUNTDOWN: A01ProtocolCacheEntry(lambda val: int(val)),
-    RoborockZeoProtocol.PROGRAM: A01ProtocolCacheEntry(lambda val: ZeoProgram(val)),
-    RoborockZeoProtocol.WASHING_LEFT: A01ProtocolCacheEntry(lambda val: ZeoProgram(val)),
+    RoborockZeoProtocol.WASHING_LEFT: A01ProtocolCacheEntry(lambda val: int(val)),
+    RoborockZeoProtocol.ERROR: A01ProtocolCacheEntry(lambda val: ZeoError(val).name),
+    RoborockZeoProtocol.TIMES_AFTER_CLEAN: A01ProtocolCacheEntry(lambda val: int(val)),
+    RoborockZeoProtocol.DETERGENT_EMPTY: A01ProtocolCacheEntry(lambda val: bool(val)),
+    RoborockZeoProtocol.SOFTENER_EMPTY: A01ProtocolCacheEntry(lambda val: bool(val)),
+    # rw
+    RoborockZeoProtocol.MODE: A01ProtocolCacheEntry(lambda val: ZeoMode(val).name),
+    RoborockZeoProtocol.PROGRAM: A01ProtocolCacheEntry(lambda val: ZeoProgram(val).name),
+    RoborockZeoProtocol.TEMP: A01ProtocolCacheEntry(lambda val: ZeoTemperature(val).name),
+    RoborockZeoProtocol.RINSE_TIMES: A01ProtocolCacheEntry(lambda val: ZeoRinse(val).name),
+    RoborockZeoProtocol.SPIN_LEVEL: A01ProtocolCacheEntry(lambda val: ZeoSpin(val).name),
+    RoborockZeoProtocol.DRYING_MODE: A01ProtocolCacheEntry(lambda val: ZeoDryingMode(val).name),
+    RoborockZeoProtocol.DETERGENT_TYPE: A01ProtocolCacheEntry(lambda val: ZeoDetergentType(val).name),
+    RoborockZeoProtocol.SOFTENER_TYPE: A01ProtocolCacheEntry(lambda val: ZeoSoftenerType(val).name),
+    RoborockZeoProtocol.SOUND_SET: A01ProtocolCacheEntry(lambda val: bool(val)),
 }
 
 
