@@ -2,6 +2,16 @@
 
 <!--next-version-placeholder-->
 
+## v2.0.0 (2024-04-11)
+
+### Feature
+
+* Add zeo support and fix some a01 weirdness ([#200](https://github.com/humbertogontijo/python-roborock/issues/200)) ([`e825ff5`](https://github.com/humbertogontijo/python-roborock/commit/e825ff5811516b4034e9b41769e5912c99cf0166))
+
+### Breaking
+
+* You must now specify what version api you want to use with clients. ([`e825ff5`](https://github.com/humbertogontijo/python-roborock/commit/e825ff5811516b4034e9b41769e5912c99cf0166))
+
 ## v1.0.0 (2024-04-09)
 
 ### Breaking
