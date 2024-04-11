@@ -9,7 +9,12 @@ from roborock.cloud_api import RoborockMqttClient
 from roborock.containers import DeviceData, RoborockCategory, UserData
 from roborock.exceptions import RoborockException
 from roborock.protocol import MessageParser, Utils
-from roborock.roborock_message import RoborockDyadDataProtocol, RoborockMessage, RoborockMessageProtocol
+from roborock.roborock_message import (
+    RoborockDyadDataProtocol,
+    RoborockMessage,
+    RoborockMessageProtocol,
+    RoborockZeoProtocol,
+)
 
 from .roborock_client_a01 import RoborockClientA01
 
@@ -46,7 +51,7 @@ class RoborockMqttClientA01(RoborockMqttClient, RoborockClientA01):
                 dps_responses[dps] = responses[i][0]
         return dps_responses
 
-    async def update_values(self, dyad_data_protocols: list[RoborockDyadDataProtocol]):
+    async def update_values(self, dyad_data_protocols: list[RoborockDyadDataProtocol | RoborockZeoProtocol]):
         payload = {"dps": {RoborockDyadDataProtocol.ID_QUERY: str([int(protocol) for protocol in dyad_data_protocols])}}
         return await self.send_message(
             RoborockMessage(
