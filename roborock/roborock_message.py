@@ -87,6 +87,48 @@ class RoborockDyadDataProtocol(RoborockEnum):
     RPC_RESPONSE = 10102
 
 
+class RoborockZeoProtocol(RoborockEnum):
+    START = 200  # rw
+    PAUSE = 201  # rw
+    SHUTDOWN = 202  # rw
+    STATE = 203  # ro
+    MODE = 204  # rw
+    PROGRAM = 205  # rw
+    CHILD_LOCK = 206  # rw
+    TEMP = 207  # rw
+    RINSE_TIMES = 208  # rw
+    SPIN_LEVEL = 209  # rw
+    DRYING_MODE = 210  # rw
+    DETERGENT_SET = 211  # rw
+    SOFTENER_SET = 212  # rw
+    DETERGENT_TYPE = 213  # rw
+    SOFTENER_TYPE = 214  # rw
+    COUNTDOWN = 217  # rw
+    WASHING_LEFT = 218  # ro
+    DOORLOCK_STATE = 219  # ro
+    ERROR = 220  # ro
+    CUSTOM_PARAM_SAVE = 221  # rw
+    CUSTOM_PARAM_GET = 222  # ro
+    SOUND_SET = 223  # rw
+    TIMES_AFTER_CLEAN = 224  # ro
+    DEFAULT_SETTING = 225  # rw
+    DETERGENT_EMPTY = 226  # ro
+    SOFTENER_EMPTY = 227  # ro
+    LIGHT_SETTING = 229  # rw
+    DETERGENT_VOLUME = 230  # rw
+    SOFTENER_VOLUME = 231  # rw
+    APP_AUTHORIZATION = 232  # rw
+    ID_QUERY = 10000
+    F_C = 10001
+    SND_STATE = 10004
+    PRODUCT_INFO = 10005
+    PRIVACY_INFO = 10006
+    OTA_NFO = 10007
+    WASHING_LOG = 10008
+    RPC_REQ = 10101
+    RPC_RESp = 10102
+
+
 ROBOROCK_DATA_STATUS_PROTOCOL = [
     RoborockDataProtocol.ERROR_CODE,
     RoborockDataProtocol.STATE,

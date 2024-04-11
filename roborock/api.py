@@ -12,9 +12,6 @@ from typing import Any
 
 from .containers import (
     DeviceData,
-    ModelStatus,
-    S7MaxVStatus,
-    Status,
 )
 from .exceptions import (
     RoborockTimeout,
@@ -48,15 +45,9 @@ class RoborockClient:
         self._logger = RoborockLoggerAdapter(device_info.device.name, _LOGGER)
         self.is_available: bool = True
         self.queue_timeout = queue_timeout
-        self._status_type: type[Status] = ModelStatus.get(self.device_info.model, S7MaxVStatus)
 
     def __del__(self) -> None:
         self.release()
-
-    @property
-    def status_type(self) -> type[Status]:
-        """Gets the status type for this device"""
-        return self._status_type
 
     def release(self):
         self.sync_disconnect()

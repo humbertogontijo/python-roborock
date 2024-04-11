@@ -36,7 +36,6 @@ from roborock.roborock_message import RoborockMessage
 _LOGGER = logging.getLogger(__name__)
 SALT = b"TXdfu$jyZ#TZHsg4"
 A01_HASH = "726f626f726f636b2d67a6d6da"
-A01_AES_DECIPHER = "ELSYN0wTI4AUm7C4"
 BROADCAST_TOKEN = b"qWKYcdQWrbm9hPqe"
 AP_CONFIG = 1
 SOCK_DISCOVERY = 2
@@ -208,7 +207,7 @@ class EncryptionAdapter(Construct):
         """
         if context.version == b"A01":
             iv = md5hex(format(context.random, "08x") + A01_HASH)[8:24]
-            decipher = AES.new(bytes(A01_AES_DECIPHER, "utf-8"), AES.MODE_CBC, bytes(iv, "utf-8"))
+            decipher = AES.new(bytes(context.search("local_key"), "utf-8"), AES.MODE_CBC, bytes(iv, "utf-8"))
             f = decipher.encrypt(obj)
             return f
         token = self.token_func(context)
@@ -219,7 +218,7 @@ class EncryptionAdapter(Construct):
         """Decrypts the given payload with the token stored in the context."""
         if context.version == b"A01":
             iv = md5hex(format(context.random, "08x") + A01_HASH)[8:24]
-            decipher = AES.new(bytes(A01_AES_DECIPHER, "utf-8"), AES.MODE_CBC, bytes(iv, "utf-8"))
+            decipher = AES.new(bytes(context.search("local_key"), "utf-8"), AES.MODE_CBC, bytes(iv, "utf-8"))
             f = decipher.decrypt(obj)
             return f
         token = self.token_func(context)
