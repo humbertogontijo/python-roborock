@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v2.1.0 (2024-05-08)
+
+### Feature
+
+* Add s8_maxv_ultra info ([#202](https://github.com/humbertogontijo/python-roborock/issues/202)) ([`aaaf0f0`](https://github.com/humbertogontijo/python-roborock/commit/aaaf0f0c381924524a079f600de14db1cd61ed45))
+
 ## v2.0.0 (2024-04-11)
 
 ### Feature
