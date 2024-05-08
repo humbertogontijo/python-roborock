@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v2.1.1 (2024-05-08)
+
+### Fix
+
+* Set roommapping when it is only one room ([#203](https://github.com/humbertogontijo/python-roborock/issues/203)) ([`26af66b`](https://github.com/humbertogontijo/python-roborock/commit/26af66bd5d8dbfa4c94a9add317ccc9ca9161510))
+
 ## v2.1.0 (2024-05-08)
 
 ### Feature
