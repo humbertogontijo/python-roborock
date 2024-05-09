@@ -49,10 +49,10 @@ class RoborockClient:
     def __del__(self) -> None:
         self.release()
 
-    def release(self):
+    def release(self) -> None:
         self.sync_disconnect()
 
-    async def async_release(self):
+    async def async_release(self) -> None:
         await self.async_disconnect()
 
     @property

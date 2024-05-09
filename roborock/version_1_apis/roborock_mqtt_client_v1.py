@@ -71,5 +71,5 @@ class RoborockMqttClientV1(RoborockMqttClient, RoborockClientV1):
         roborock_message = RoborockMessage(timestamp=timestamp, protocol=request_protocol, payload=payload)
         return await self.send_message(roborock_message)
 
-    async def get_map_v1(self):
+    async def get_map_v1(self) -> bytes | None:
         return await self.send_command(RoborockCommand.GET_MAP_V1)
