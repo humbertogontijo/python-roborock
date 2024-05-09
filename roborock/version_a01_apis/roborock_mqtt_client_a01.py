@@ -59,7 +59,7 @@ class RoborockMqttClientA01(RoborockMqttClient, RoborockClientA01):
 
     async def update_values(
         self, dyad_data_protocols: list[RoborockDyadDataProtocol | RoborockZeoProtocol]
-    ) -> dict[RoborockDyadDataProtocol, typing.Any]:
+    ) -> dict[RoborockDyadDataProtocol | RoborockZeoProtocol, typing.Any]:
         payload = {"dps": {RoborockDyadDataProtocol.ID_QUERY: str([int(protocol) for protocol in dyad_data_protocols])}}
         return await self.send_message(
             RoborockMessage(

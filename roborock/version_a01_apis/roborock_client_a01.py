@@ -139,6 +139,6 @@ class RoborockClientA01(RoborockClient):
 
     async def update_values(
         self, dyad_data_protocols: list[RoborockDyadDataProtocol | RoborockZeoProtocol]
-    ) -> dict[RoborockDyadDataProtocol, typing.Any]:
+    ) -> dict[RoborockDyadDataProtocol | RoborockZeoProtocol, typing.Any]:
         """This should handle updating for each given protocol."""
         raise NotImplementedError
