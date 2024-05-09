@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v2.2.0 (2024-05-09)
+
+### Feature
+
+* Improve some typing ([#204](https://github.com/humbertogontijo/python-roborock/issues/204)) ([`7752db9`](https://github.com/humbertogontijo/python-roborock/commit/7752db9066fa49bb93a6268a491e2a0baa608cfc))
+
 ## v2.1.1 (2024-05-08)
 
 ### Fix
