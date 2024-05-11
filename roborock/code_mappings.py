@@ -323,6 +323,7 @@ class RoborockMopIntensityS8MaxVUltra(RoborockMopIntensityCode):
     off = 200
     low = 201
     medium = 202
+    high = 203
     smart_mode = 209
     custom_water_flow = 207
 
