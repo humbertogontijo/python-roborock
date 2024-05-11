@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v2.2.1 (2024-05-11)
+
+### Fix
+
+* Add missing value "high = 203" to RoborockMopIntensityS8MaxVUltra ([#205](https://github.com/humbertogontijo/python-roborock/issues/205)) ([`886b0e6`](https://github.com/humbertogontijo/python-roborock/commit/886b0e6a8a4b98ff74964d59f4c8c0fbbf569688))
+
 ## v2.2.0 (2024-05-09)
 
 ### Feature
