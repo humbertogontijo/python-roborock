@@ -197,6 +197,8 @@ class RoborockClientV1(RoborockClient):
         if isinstance(record, dict):
             return CleanRecord.from_dict(record)
         elif isinstance(record, list):
+            if isinstance(record[-1], dict):
+                return CleanRecord.from_dict(record[-1])
             # There are still a few unknown variables in this.
             begin, end, duration, area = unpack_list(record, 4)
             return CleanRecord(begin=begin, end=end, duration=duration, area=area)
