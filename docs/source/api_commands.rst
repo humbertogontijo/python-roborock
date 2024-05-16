@@ -992,7 +992,9 @@ reset_consumable
 
 Description:
 
-Parameters:
+Parameters: List of consumables to reset. For example, to reset consumables 'strainer_work_times' and 'sensor_dirty_time' the parameter would be
+
+ ['strainer_work_times', 'sensor_dirty_time']
 
 ======================  =========
 Vacuum Model            Supported
