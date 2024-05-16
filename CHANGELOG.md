@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v2.2.2 (2024-05-16)
+
+### Fix
+
+* Handle weird clean record response ([#206](https://github.com/humbertogontijo/python-roborock/issues/206)) ([`07ce71a`](https://github.com/humbertogontijo/python-roborock/commit/07ce71a2cd8085136952bd7639f6f4a2e273faf9))
+
 ## v2.2.1 (2024-05-11)
 
 ### Fix
