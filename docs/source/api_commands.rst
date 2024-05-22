@@ -1249,7 +1249,7 @@ load_multi_map
 
 Description:
 
-Parameters: ???
+Parameters: number (the floor/map index)
 
 ..
     Need to work out parameter format
