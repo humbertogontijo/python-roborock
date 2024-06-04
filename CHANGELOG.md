@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v2.2.3 (2024-06-04)
+
+### Fix
+
+* S8 maxv has a wash and fill dock ([#213](https://github.com/humbertogontijo/python-roborock/issues/213)) ([`018fd05`](https://github.com/humbertogontijo/python-roborock/commit/018fd052360dffd238919e336943809720457c4e))
+
 ## v2.2.2 (2024-05-16)
 
 ### Fix
