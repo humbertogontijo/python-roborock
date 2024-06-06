@@ -249,6 +249,8 @@ class RoborockFanSpeedP10(RoborockFanPowerCode):
 class RoborockFanSpeedS8MaxVUltra(RoborockFanPowerCode):
     off = 105
     balanced = 102
+    turbo = 103
+    max = 104
     custom = 106
     max_plus = 108
     smart_mode = 110
@@ -324,6 +326,7 @@ class RoborockMopIntensityS8MaxVUltra(RoborockMopIntensityCode):
     low = 201
     medium = 202
     high = 203
+    custom = 204
     max = 208
     smart_mode = 209
     custom_water_flow = 207
