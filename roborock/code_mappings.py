@@ -395,6 +395,7 @@ class RoborockDockWashTowelModeCode(RoborockEnum):
     light = 0
     balanced = 1
     deep = 2
+    smart = 10
 
 
 class RoborockCategory(Enum):
