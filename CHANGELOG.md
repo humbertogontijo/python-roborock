@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v2.3.0 (2024-06-07)
+
+### Feature
+
+* Add warning in web requests if it fails to decode ([#215](https://github.com/humbertogontijo/python-roborock/issues/215)) ([`6ae69e9`](https://github.com/humbertogontijo/python-roborock/commit/6ae69e9bcba6a98736f2f480114922186f6ca458))
+
 ## v2.2.3 (2024-06-04)
 
 ### Fix
