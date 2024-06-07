@@ -3,11 +3,13 @@ from __future__ import annotations
 import base64
 import hashlib
 import hmac
+import logging
 import math
 import secrets
 import time
 
 import aiohttp
+from aiohttp import ContentTypeError
 
 from roborock.containers import HomeData, HomeDataRoom, ProductResponse, RRiot, UserData
 from roborock.exceptions import (
@@ -22,6 +24,8 @@ from roborock.exceptions import (
     RoborockTooFrequentCodeRequests,
     RoborockUrlException,
 )
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class RoborockApiClient:
@@ -294,11 +298,23 @@ class PreparedRequest:
         _url = "/".join(s.strip("/") for s in [self.base_url, url])
         _headers = {**self.base_headers, **(headers or {})}
         async with aiohttp.ClientSession() as session:
-            async with session.request(
-                method,
-                _url,
-                params=params,
-                data=data,
-                headers=_headers,
-            ) as resp:
-                return await resp.json()
+            try:
+                async with session.request(
+                    method,
+                    _url,
+                    params=params,
+                    data=data,
+                    headers=_headers,
+                ) as resp:
+                    return await resp.json()
+            except ContentTypeError as err:
+                """If we get an error, lets log everything for debugging."""
+                try:
+                    resp_json = await resp.json(content_type=None)
+                    _LOGGER.info("Resp: %s", resp_json)
+                except ContentTypeError as err_2:
+                    _LOGGER.info(err_2)
+                resp_raw = await resp.read()
+                _LOGGER.info("Resp raw: %s", resp_raw)
+                # Still raise the err so that it's clear it failed.
+                raise err
