@@ -13,6 +13,7 @@ from dacite import Config, from_dict
 
 from .code_mappings import (
     RoborockCategory,
+    RoborockCleanType,
     RoborockDockDustCollectionModeCode,
     RoborockDockErrorCode,
     RoborockDockTypeCode,
@@ -25,6 +26,8 @@ from .code_mappings import (
     RoborockFanSpeedS7,
     RoborockFanSpeedS7MaxV,
     RoborockFanSpeedS8MaxVUltra,
+    RoborockFinishReason,
+    RoborockInCleaning,
     RoborockMopIntensityCode,
     RoborockMopIntensityP10,
     RoborockMopIntensityS5Max,
@@ -36,6 +39,7 @@ from .code_mappings import (
     RoborockMopModeS7,
     RoborockMopModeS8MaxVUltra,
     RoborockMopModeS8ProUltra,
+    RoborockStartType,
     RoborockStateCode,
 )
 from .const import (
@@ -47,6 +51,9 @@ from .const import (
     ROBOROCK_G10S_PRO,
     ROBOROCK_P10,
     ROBOROCK_Q7_MAX,
+    ROBOROCK_QREVO_MAXV,
+    ROBOROCK_QREVO_PRO,
+    ROBOROCK_QREVO_S,
     ROBOROCK_S4_MAX,
     ROBOROCK_S5_MAX,
     ROBOROCK_S6,
@@ -408,7 +415,7 @@ class Status(RoborockBase):
     square_meter_clean_area: float | None = None
     error_code: RoborockErrorCode | None = None
     map_present: int | None = None
-    in_cleaning: int | None = None
+    in_cleaning: RoborockInCleaning | None = None
     in_returning: int | None = None
     in_fresh_state: int | None = None
     lab_status: int | None = None
@@ -574,6 +581,12 @@ ModelStatus: dict[str, type[Status]] = {
     ROBOROCK_S8_PRO_ULTRA: S8ProUltraStatus,
     ROBOROCK_G10S_PRO: S7MaxVStatus,
     ROBOROCK_P10: P10Status,
+    # These likely are not correct,
+    # but i am currently unable to do my typical reverse engineering/ get any data from users on this,
+    # so this will be here in the mean time.
+    ROBOROCK_QREVO_S: P10Status,
+    ROBOROCK_QREVO_MAXV: P10Status,
+    ROBOROCK_QREVO_PRO: P10Status,
     ROBOROCK_S8_MAXV_ULTRA: S8MaxvUltraStatus,
 }
 
@@ -613,9 +626,9 @@ class CleanRecord(RoborockBase):
     square_meter_area: float | None = None
     error: int | None = None
     complete: int | None = None
-    start_type: int | None = None
-    clean_type: int | None = None
-    finish_reason: int | None = None
+    start_type: RoborockStartType | None = None
+    clean_type: RoborockCleanType | None = None
+    finish_reason: RoborockFinishReason | None = None
     dust_collection_status: int | None = None
     avoid_count: int | None = None
     wash_count: int | None = None
