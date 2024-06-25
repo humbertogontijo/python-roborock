@@ -105,7 +105,7 @@ class AttributeCache:
     def stop(self):
         self.task.cancel()
 
-    async def update_value(self, params):
+    async def update_value(self, params) -> None:
         if self.attribute.set_command is None:
             raise RoborockException(f"{self.attribute.attribute} have no set command")
         response = await self.api._send_command(self.attribute.set_command, params)
@@ -119,7 +119,7 @@ class AttributeCache:
         await self._async_value()
         return response
 
-    async def close_value(self, params=None):
+    async def close_value(self, params=None) -> None:
         if self.attribute.close_command is None:
             raise RoborockException(f"{self.attribute.attribute} have no close command")
         response = await self.api._send_command(self.attribute.close_command, params)
@@ -154,7 +154,7 @@ class RoborockClientV1(RoborockClient):
         super().release()
         [item.stop() for item in self.cache.values()]
 
-    async def async_release(self):
+    async def async_release(self) -> None:
         await super().async_release()
         [item.stop() for item in self.cache.values()]
 

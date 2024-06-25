@@ -96,7 +96,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         except Exception as e:
             self._logger.error(e)
 
-    async def ping(self):
+    async def ping(self) -> None:
         request_id = 2
         protocol = RoborockMessageProtocol.PING_REQUEST
         return await self.send_message(
