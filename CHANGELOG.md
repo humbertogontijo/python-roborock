@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v2.4.0 (2024-06-25)
+
+### Feature
+
+* Add some missing codes and make warnings only message once ([#218](https://github.com/humbertogontijo/python-roborock/issues/218)) ([`12361b5`](https://github.com/humbertogontijo/python-roborock/commit/12361b58e7a4d368281c4ffd9ac3d8e9d8155e62))
+
 ## v2.3.0 (2024-06-07)
 
 ### Feature
