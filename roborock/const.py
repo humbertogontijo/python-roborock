@@ -42,8 +42,11 @@ ROBOROCK_1S = "roborock.vacuum.m1s"
 ROBOROCK_C1 = "roborock.vacuum.c1"
 ROBOROCK_S8_PRO_ULTRA = "roborock.vacuum.a70"
 ROBOROCK_S8 = "roborock.vacuum.a51"
-ROBOROCK_P10 = "roborock.vacuum.a75"
+ROBOROCK_P10 = "roborock.vacuum.a75"  # also known as q_revo
 ROBOROCK_S8_MAXV_ULTRA = "roborock.vacuum.a97"
+ROBOROCK_QREVO_S = "roborock.vacuum.a104"
+ROBOROCK_QREVO_PRO = "roborock.vacuum.a101"
+ROBOROCK_QREVO_MAXV = "roborock.vacuum.a87"
 
 ROBOROCK_DYAD_AIR = "roborock.wetdryvac.a107"
 ROBOROCK_DYAD_PRO_COMBO = "roborock.wetdryvac.a83"

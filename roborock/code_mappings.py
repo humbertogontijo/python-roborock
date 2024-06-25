@@ -4,6 +4,7 @@ import logging
 from enum import Enum, IntEnum
 
 _LOGGER = logging.getLogger(__name__)
+completed_warnings = set()
 
 
 class RoborockEnum(IntEnum):
@@ -16,10 +17,16 @@ class RoborockEnum(IntEnum):
     @classmethod
     def _missing_(cls: type[RoborockEnum], key) -> RoborockEnum:
         if hasattr(cls, "unknown"):
-            _LOGGER.warning(f"Missing {cls.__name__} code: {key} - defaulting to 'unknown'")
+            warning = f"Missing {cls.__name__} code: {key} - defaulting to 'unknown'"
+            if warning not in completed_warnings:
+                completed_warnings.add(warning)
+                _LOGGER.warning(warning)
             return cls.unknown  # type: ignore
         default_value = next(item for item in cls)
-        _LOGGER.warning(f"Missing {cls.__name__} code: {key} - defaulting to {default_value}")
+        warning = f"Missing {cls.__name__} code: {key} - defaulting to {default_value}"
+        if warning not in completed_warnings:
+            completed_warnings.add(warning)
+            _LOGGER.warning(warning)
         return default_value
 
     @classmethod
@@ -413,6 +420,93 @@ class RoborockCategory(Enum):
     def __missing__(self, key):
         _LOGGER.warning("Missing key %s from category", key)
         return RoborockCategory.UNKNOWN
+
+
+class RoborockFinishReason(RoborockEnum):
+    manual_interrupt = 21  # Cleaning interrupted by user
+    cleanup_interrupted = 24  # Cleanup interrupted
+    manual_interrupt_2 = 21
+    breakpoint = 32  # Could not continue cleaning
+    breakpoint_2 = 33
+    cleanup_interrupted_2 = 34
+    manual_interrupt_3 = 35
+    manual_interrupt_4 = 36
+    manual_interrupt_5 = 37
+    manual_interrupt_6 = 43
+    locate_fail = 45  # Positioning Failed
+    cleanup_interrupted_3 = 64
+    locate_fail_2 = 65
+    manual_interrupt_7 = 48
+    manual_interrupt_8 = 49
+    manual_interrupt_9 = 50
+    cleanup_interrupted_4 = 51
+    finished_cleaning = 52  # Finished cleaning
+    finished_cleaning_2 = 54
+    finished_cleaning_3 = 55
+    finished_cleaning_4 = 56
+    finished_clenaing_5 = 57
+    manual_interrupt_10 = 60
+    area_unreachable = 61  # Area unreachable
+    area_unreachable_2 = 62
+    washing_error = 67  # Washing error
+    back_to_wash_failure = 68  # Failed to return to the dock
+    cleanup_interrupted_5 = 101
+    breakpoint_4 = 102
+    manual_interrupt_11 = 103
+    cleanup_interrupted_6 = 104
+    cleanup_interrupted_7 = 105
+    cleanup_interrupted_8 = 106
+    cleanup_interrupted_9 = 107
+    cleanup_interrupted_10 = 109
+    cleanup_interrupted_11 = 110
+    patrol_success = 114  # Cruise completed
+    patrol_fail = 115  # Cruise failed
+    pet_patrol_success = 116  # Pet found
+    pet_patrol_fail = 117  # Pet found failed
+
+
+class RoborockInCleaning(RoborockEnum):
+    complete = 0
+    global_clean_not_complete = 1
+    zone_clean_not_complete = 2
+    segment_clean_not_complete = 3
+
+
+class RoborockCleanType(RoborockEnum):
+    all_zone = 1
+    draw_zone = 2
+    select_zone = 3
+    quick_build = 4
+    video_patrol = 5
+    pet_patrol = 6
+
+
+class RoborockStartType(RoborockEnum):
+    button = 1
+    app = 2
+    schedule = 3
+    mi_home = 4
+    quick_start = 5
+    voice_control = 13
+    routines = 101
+    alexa = 801
+    google = 802
+    ifttt = 803
+    yandex = 804
+    homekit = 805
+    xiaoai = 806
+    tmall_genie = 807
+    duer = 808
+    dingdong = 809
+    siri = 810
+    clova = 811
+    wechat = 901
+    alipay = 902
+    aqara = 903
+    hisense = 904
+    huawei = 905
+    widget_launch = 820
+    smart_watch = 821
 
 
 class DyadSelfCleanMode(RoborockEnum):
