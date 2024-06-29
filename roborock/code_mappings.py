@@ -384,6 +384,7 @@ class RoborockDockTypeCode(RoborockEnum):
     s7_max_ultra_dock = 6
     s8_dock = 7
     p10_dock = 8
+    p10_pro_dock = 9
     s8_maxv_ultra_dock = 10
 
 
