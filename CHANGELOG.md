@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v2.6.0 (2024-06-29)
+
+### Feature
+
+* Add q revo pro/p10 pro support ([#220](https://github.com/humbertogontijo/python-roborock/issues/220)) ([`5e6a2d6`](https://github.com/humbertogontijo/python-roborock/commit/5e6a2d6a7171da146efb3e59ddb3215c2a573507))
+
 ## v2.5.0 (2024-06-25)
 
 ### Feature
