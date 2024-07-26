@@ -115,10 +115,8 @@ class RoborockBase(BaseModel):
         result = {
             camelize(key): value.value if isinstance(value, Enum) else value
             for key, value in self.model_dump(exclude_none=True).items()
-            if key not in ['_ignore_keys', 'is_cached']
+            if key != "is_cached"
         }
-        if self.is_cached:
-            result['is_cached'] = self.is_cached
         return result
 
     class Config:
@@ -203,7 +201,7 @@ class UserData(RoborockBase):
         result = {
             key: value.as_dict() if isinstance(value, RoborockBase) else value
             for key, value in super().as_dict().items()
-            if value is not None
+            if value is not None and key != "is_cached"
         }
         return result
 
