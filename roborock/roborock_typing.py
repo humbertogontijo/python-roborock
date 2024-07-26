@@ -1,10 +1,8 @@
 from __future__ import annotations
 
-import dataclasses
 from enum import Enum
-from typing import List, Dict, Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from .containers import (
     CleanRecord,
@@ -274,7 +272,7 @@ class RoborockCommand(str, Enum):
 
 
 class CommandInfo(BaseModel):
-    params: List | Dict | int | None = None
+    params: list | dict | int | None = None
 
 
 CommandInfoMap: dict[RoborockCommand | None, CommandInfo] = {
@@ -459,6 +457,7 @@ class DockSummary(RoborockBase):
         self.wash_towel_mode = wash_towel_mode
         self.smart_wash_params = smart_wash_params
 
+
 class DeviceProp(RoborockBase):
     status: Status | None = None
     clean_summary: CleanSummary | None = None
@@ -466,7 +465,24 @@ class DeviceProp(RoborockBase):
     last_clean_record: CleanRecord | None = None
     dock_summary: DockSummary | None = None
 
-    def update(self, device_prop: 'DeviceProp') -> None:
+    def update(self, device_prop: DeviceProp) -> None:
         for field in self.model_fields:
             if hasattr(device_prop, field):
                 setattr(self, field, getattr(device_prop, field))
+
+    @classmethod
+    def create(
+        cls,
+        status: Status | None = None,
+        clean_summary: CleanSummary | None = None,
+        consumable: Consumable | None = None,
+        last_clean_record: CleanRecord | None = None,
+        dock_summary: DockSummary | None = None,
+    ) -> DeviceProp:
+        return cls(
+            status=status,
+            clean_summary=clean_summary,
+            consumable=consumable,
+            last_clean_record=last_clean_record,
+            dock_summary=dock_summary,
+        )
