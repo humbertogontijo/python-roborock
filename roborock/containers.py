@@ -189,6 +189,12 @@ class UserData(RoborockBase):
     tuya_device_state: int | None = None
     avatarurl: str | None = None
 
+    def as_dict(self) -> dict:
+        result = super().as_dict()
+        if 'is_cached' in result:
+            del result['is_cached']
+        return result
+
 
 
 class HomeDataProductSchema(RoborockBase):
