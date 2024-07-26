@@ -120,11 +120,16 @@ class RoborockBase(BaseModel):
     class Config:
         arbitrary_types_allowed = True
 
-def decamelize_obj(d: dict | list, ignore_keys: list[str]):
+def decamelize_obj(d: dict | list, ignore_keys: list[str] | Any):
     if isinstance(d, RoborockBase):
         d = d.as_dict()
     if isinstance(d, list):
         return [decamelize_obj(i, ignore_keys) if isinstance(i, dict | list | RoborockBase) else i for i in d]
+    
+    # Extract the actual list from ModelPrivateAttr if necessary
+    if hasattr(ignore_keys, 'default'):
+        ignore_keys = ignore_keys.default
+    
     return {
         (decamelize(a) if a not in ignore_keys else a): decamelize_obj(b, ignore_keys)
         if isinstance(b, dict | list | RoborockBase)
