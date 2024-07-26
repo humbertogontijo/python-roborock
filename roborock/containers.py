@@ -105,9 +105,11 @@ class RoborockBase(BaseModel):
         if isinstance(data, dict):
             ignore_keys = cls._ignore_keys
             try:
-                return cls.model_validate(decamelize_obj(data, ignore_keys))
+                decamelized_data = decamelize_obj(data, ignore_keys)
+                return cls.model_validate(decamelized_data)
             except ValueError as err:
                 raise RoborockException("Error validating data with pydantic.") from err
+        return cls()
 
     def as_dict(self) -> dict:
         return {
@@ -117,6 +119,18 @@ class RoborockBase(BaseModel):
 
     class Config:
         arbitrary_types_allowed = True
+
+def decamelize_obj(d: dict | list, ignore_keys: list[str]):
+    if isinstance(d, RoborockBase):
+        d = d.as_dict()
+    if isinstance(d, list):
+        return [decamelize_obj(i, ignore_keys) if isinstance(i, dict | list | RoborockBase) else i for i in d]
+    return {
+        (decamelize(a) if a not in ignore_keys else a): decamelize_obj(b, ignore_keys)
+        if isinstance(b, dict | list | RoborockBase)
+        else b
+        for a, b in d.items()
+    }
 
 
 class RoborockBaseTimer(RoborockBase):
