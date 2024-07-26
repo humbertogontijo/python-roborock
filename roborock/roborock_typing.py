@@ -454,20 +454,13 @@ class DockSummary(RoborockBase):
 
 
 class DeviceProp(RoborockBase):
-    status: Status = Field(default_factory=Status)
-    clean_summary: CleanSummary = Field(default_factory=CleanSummary)
-    consumable: Consumable = Field(default_factory=Consumable)
+    status: Status | None = None
+    clean_summary: CleanSummary | None = None
+    consumable: Consumable | None = None
     last_clean_record: CleanRecord | None = None
     dock_summary: DockSummary | None = None
 
     def update(self, device_prop: 'DeviceProp') -> None:
-        if device_prop.status:
-            self.status = device_prop.status
-        if device_prop.clean_summary:
-            self.clean_summary = device_prop.clean_summary
-        if device_prop.consumable:
-            self.consumable = device_prop.consumable
-        if device_prop.last_clean_record:
-            self.last_clean_record = device_prop.last_clean_record
-        if device_prop.dock_summary:
-            self.dock_summary = device_prop.dock_summary
+        for field in self.__annotations__:
+            if hasattr(device_prop, field):
+                setattr(self, field, getattr(device_prop, field))
