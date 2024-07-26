@@ -83,17 +83,6 @@ def decamelize(s: str):
     return re.sub("([A-Z]+)", "_\\1", s).lower()
 
 
-def decamelize_obj(d: dict | list, ignore_keys: list[str]):
-    if isinstance(d, RoborockBase):
-        d = d.as_dict()
-    if isinstance(d, list):
-        return [decamelize_obj(i, ignore_keys) if isinstance(i, dict | list) else i for i in d]
-    return {
-        (decamelize(a) if a not in ignore_keys else a): decamelize_obj(b, ignore_keys)
-        if isinstance(b, dict | list)
-        else b
-        for a, b in d.items()
-    }
 
 
 class RoborockBase(BaseModel):
@@ -119,7 +108,7 @@ class RoborockBase(BaseModel):
         }
         return {k: v for k, v in result.items() if v is not None}
 
-def decamelize_obj(d: dict | list, ignore_keys: list[str] | Any):
+def decamelize_obj(d: dict | list | RoborockBase, ignore_keys: list[str] | Any):
     if isinstance(d, RoborockBase):
         d = d.as_dict()
     if isinstance(d, list):
@@ -128,6 +117,8 @@ def decamelize_obj(d: dict | list, ignore_keys: list[str] | Any):
     # Extract the actual list from ModelPrivateAttr if necessary
     if hasattr(ignore_keys, 'default'):
         ignore_keys = ignore_keys.default
+    elif not isinstance(ignore_keys, list):
+        ignore_keys = []
     
     return {
         (decamelize(a) if a not in ignore_keys else a): decamelize_obj(b, ignore_keys)
