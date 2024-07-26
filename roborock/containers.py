@@ -171,7 +171,7 @@ class UserData(RoborockBase):
     avatarurl: str | None = None
 
 
-@dataclass
+
 class HomeDataProductSchema(RoborockBase):
     id: Any | None = None
     name: Any | None = None
@@ -182,7 +182,7 @@ class HomeDataProductSchema(RoborockBase):
     desc: Any | None = None
 
 
-@dataclass
+
 class HomeDataProduct(RoborockBase):
     id: str
     name: str
@@ -195,7 +195,7 @@ class HomeDataProduct(RoborockBase):
     schema: list[HomeDataProductSchema] | None = None
 
 
-@dataclass
+
 class HomeDataDevice(RoborockBase):
     duid: str
     name: str
@@ -233,7 +233,7 @@ class HomeDataDevice(RoborockBase):
     #         self.device_features = build_device_features(self.feature_set, self.new_feature_set)
 
 
-@dataclass
+
 class DeviceFeatures(RoborockBase):
     map_carpet_add_supported: bool
     show_clean_finish_reason_supported: bool
@@ -364,7 +364,7 @@ def build_device_features(feature_set: str, new_feature_set: str) -> DeviceFeatu
     )
 
 
-@dataclass
+
 class HomeDataRoom(RoborockBase):
     id: int
     name: str
@@ -390,14 +390,14 @@ class HomeData(RoborockBase):
         return devices
 
 
-@dataclass
+
 class LoginData(RoborockBase):
     user_data: UserData
     email: str
     home_data: HomeData | None = None
 
 
-@dataclass
+
 class Status(RoborockBase):
     msg_ver: int | None = None
     msg_seq: int | None = None
@@ -489,72 +489,72 @@ class Status(RoborockBase):
         return self.mop_mode.as_dict().get(mop_mode)
 
 
-@dataclass
+
 class S4MaxStatus(Status):
     fan_power: RoborockFanSpeedS6Pure | None = None
     water_box_mode: RoborockMopIntensityS7 | None = None
     mop_mode: RoborockMopModeS7 | None = None
 
 
-@dataclass
+
 class S5MaxStatus(Status):
     fan_power: RoborockFanSpeedS6Pure | None = None
     water_box_mode: RoborockMopIntensityS5Max | None = None
 
 
-@dataclass
+
 class Q7MaxStatus(Status):
     fan_power: RoborockFanSpeedQ7Max | None = None
     water_box_mode: RoborockMopIntensityV2 | None = None
 
 
-@dataclass
+
 class S6MaxVStatus(Status):
     fan_power: RoborockFanSpeedS7MaxV | None = None
     water_box_mode: RoborockMopIntensityS6MaxV | None = None
 
 
-@dataclass
+
 class S6PureStatus(Status):
     fan_power: RoborockFanSpeedS6Pure | None = None
 
 
-@dataclass
+
 class S7MaxVStatus(Status):
     fan_power: RoborockFanSpeedS7MaxV | None = None
     water_box_mode: RoborockMopIntensityS7 | None = None
     mop_mode: RoborockMopModeS7 | None = None
 
 
-@dataclass
+
 class S7Status(Status):
     fan_power: RoborockFanSpeedS7 | None = None
     water_box_mode: RoborockMopIntensityS7 | None = None
     mop_mode: RoborockMopModeS7 | None = None
 
 
-@dataclass
+
 class S8ProUltraStatus(Status):
     fan_power: RoborockFanSpeedS7MaxV | None = None
     water_box_mode: RoborockMopIntensityS7 | None = None
     mop_mode: RoborockMopModeS8ProUltra | None = None
 
 
-@dataclass
+
 class S8Status(Status):
     fan_power: RoborockFanSpeedS7MaxV | None = None
     water_box_mode: RoborockMopIntensityS7 | None = None
     mop_mode: RoborockMopModeS8ProUltra | None = None
 
 
-@dataclass
+
 class P10Status(Status):
     fan_power: RoborockFanSpeedP10 | None = None
     water_box_mode: RoborockMopIntensityP10 | None = None
     mop_mode: RoborockMopModeS8ProUltra | None = None
 
 
-@dataclass
+
 class S8MaxvUltraStatus(Status):
     fan_power: RoborockFanSpeedS8MaxVUltra | None = None
     water_box_mode: RoborockMopIntensityS8MaxVUltra | None = None
@@ -584,17 +584,17 @@ ModelStatus: dict[str, type[Status]] = {
 }
 
 
-@dataclass
+
 class DnDTimer(RoborockBaseTimer):
     """DnDTimer"""
 
 
-@dataclass
+
 class ValleyElectricityTimer(RoborockBaseTimer):
     """ValleyElectricityTimer"""
 
 
-@dataclass
+
 class CleanSummary(RoborockBase):
     clean_time: int | None = None
     clean_area: int | None = None
@@ -608,7 +608,7 @@ class CleanSummary(RoborockBase):
         self.square_meter_clean_area = round(self.clean_area / 1000000, 1) if self.clean_area is not None else None
 
 
-@dataclass
+
 class CleanRecord(RoborockBase):
     begin: int | None = None
     begin_datetime: datetime.datetime | None = None
@@ -635,7 +635,7 @@ class CleanRecord(RoborockBase):
         self.end_datetime = datetime.datetime.fromtimestamp(self.end).astimezone(timezone.utc) if self.end else None
 
 
-@dataclass
+
 class Consumable(RoborockBase):
     main_brush_work_time: int | None = None
     side_brush_work_time: int | None = None
@@ -686,13 +686,13 @@ class Consumable(RoborockBase):
         )
 
 
-@dataclass
+
 class MultiMapsListMapInfoBakMaps(RoborockBase):
     mapflag: Any | None = None
     add_time: Any | None = None
 
 
-@dataclass
+
 class MultiMapsListMapInfo(RoborockBase):
     _ignore_keys = ["mapFlag"]
 
@@ -703,7 +703,7 @@ class MultiMapsListMapInfo(RoborockBase):
     bak_maps: list[MultiMapsListMapInfoBakMaps] | None = None
 
 
-@dataclass
+
 class MultiMapsList(RoborockBase):
     _ignore_keys = ["mapFlag"]
 
@@ -713,23 +713,23 @@ class MultiMapsList(RoborockBase):
     map_info: list[MultiMapsListMapInfo] | None = None
 
 
-@dataclass
+
 class SmartWashParams(RoborockBase):
     smart_wash: int | None = None
     wash_interval: int | None = None
 
 
-@dataclass
+
 class DustCollectionMode(RoborockBase):
     mode: RoborockDockDustCollectionModeCode | None = None
 
 
-@dataclass
+
 class WashTowelMode(RoborockBase):
     wash_mode: RoborockDockWashTowelModeCode | None = None
 
 
-@dataclass
+
 class NetworkInfo(RoborockBase):
     ip: str
     ssid: str | None = None
@@ -738,30 +738,30 @@ class NetworkInfo(RoborockBase):
     rssi: int | None = None
 
 
-@dataclass
+
 class DeviceData(RoborockBase):
     device: HomeDataDevice
     model: str
     host: str | None = None
 
 
-@dataclass
+
 class RoomMapping(RoborockBase):
     segment_id: int
     iot_id: str
 
 
-@dataclass
+
 class ChildLockStatus(RoborockBase):
     lock_status: int
 
 
-@dataclass
+
 class FlowLedStatus(RoborockBase):
     status: int
 
 
-@dataclass
+
 class BroadcastMessage(RoborockBase):
     duid: str
     ip: str
@@ -773,20 +773,20 @@ class ServerTimer(NamedTuple):
     dontknow: int
 
 
-@dataclass
+
 class RoborockProductStateValue(RoborockBase):
     value: list
     desc: dict
 
 
-@dataclass
+
 class RoborockProductState(RoborockBase):
     dps: int
     desc: dict
     value: list[RoborockProductStateValue]
 
 
-@dataclass
+
 class RoborockProductSpec(RoborockBase):
     state: RoborockProductState
     battery: dict | None = None
@@ -802,7 +802,7 @@ class RoborockProductSpec(RoborockBase):
     washing_left: dict | None = None
 
 
-@dataclass
+
 class RoborockProduct(RoborockBase):
     id: int
     name: str
@@ -831,25 +831,25 @@ class RoborockProduct(RoborockBase):
             self.products_specification = RoborockProductSpec.from_dict(json.loads(self.cardspec).get("data"))
 
 
-@dataclass
+
 class RoborockProductCategory(RoborockBase):
     id: int
     display_name: str
     icon_url: str
 
 
-@dataclass
+
 class RoborockCategoryDetail(RoborockBase):
     category: RoborockProductCategory
     product_list: list[RoborockProduct]
 
 
-@dataclass
+
 class ProductResponse(RoborockBase):
     category_detail_list: list[RoborockCategoryDetail]
 
 
-@dataclass
+
 class DyadProductInfo(RoborockBase):
     sn: str
     ssid: str
@@ -860,7 +860,7 @@ class DyadProductInfo(RoborockBase):
     oba: dict
 
 
-@dataclass
+
 class DyadSndState(RoborockBase):
     sid_in_use: int
     sid_version: int
@@ -869,6 +869,6 @@ class DyadSndState(RoborockBase):
     language: str
 
 
-@dataclass
+
 class DyadOtaNfo(RoborockBase):
     mqttOtaData: dict

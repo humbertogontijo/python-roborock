@@ -447,18 +447,16 @@ CommandInfoMap: dict[RoborockCommand | None, CommandInfo] = {
 }
 
 
-@dataclass
 class DockSummary(RoborockBase):
     dust_collection_mode: DustCollectionMode | None = None
     wash_towel_mode: WashTowelMode | None = None
     smart_wash_params: SmartWashParams | None = None
 
 
-@dataclass
 class DeviceProp(RoborockBase):
-    status: Status = field(default_factory=Status)
-    clean_summary: CleanSummary = field(default_factory=CleanSummary)
-    consumable: Consumable = field(default_factory=Consumable)
+    status: Status = Field(default_factory=Status)
+    clean_summary: CleanSummary = Field(default_factory=CleanSummary)
+    consumable: Consumable = Field(default_factory=Consumable)
     last_clean_record: CleanRecord | None = None
     dock_summary: DockSummary | None = None
 
