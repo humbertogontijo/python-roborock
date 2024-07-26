@@ -142,7 +142,6 @@ class RoborockBaseTimer(RoborockBase):
         )
 
 
-@dataclass
 class Reference(RoborockBase):
     r: str | None = None
     a: str | None = None
@@ -150,7 +149,6 @@ class Reference(RoborockBase):
     l: str | None = None
 
 
-@dataclass
 class RRiot(RoborockBase):
     u: str
     s: str
@@ -159,7 +157,6 @@ class RRiot(RoborockBase):
     r: Reference
 
 
-@dataclass
 class UserData(RoborockBase):
     uid: int | None = None
     tokentype: str | None = None
@@ -373,17 +370,16 @@ class HomeDataRoom(RoborockBase):
     name: str
 
 
-@dataclass
 class HomeData(RoborockBase):
     id: int
     name: str
-    products: list[HomeDataProduct] = field(default_factory=lambda: [])
-    devices: list[HomeDataDevice] = field(default_factory=lambda: [])
-    received_devices: list[HomeDataDevice] = field(default_factory=lambda: [])
+    products: list[HomeDataProduct] = Field(default_factory=list)
+    devices: list[HomeDataDevice] = Field(default_factory=list)
+    received_devices: list[HomeDataDevice] = Field(default_factory=list)
     lon: Any | None = None
     lat: Any | None = None
     geo_name: Any | None = None
-    rooms: list[HomeDataRoom] = field(default_factory=list)
+    rooms: list[HomeDataRoom] = Field(default_factory=list)
 
     def get_all_devices(self) -> list[HomeDataDevice]:
         devices = []
