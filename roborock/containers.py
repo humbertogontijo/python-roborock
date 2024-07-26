@@ -478,7 +478,7 @@ class Status(RoborockBase):
     fan_power_name: str | None = None
     mop_mode_name: str | None = None
 
-    def __post_init__(self) -> None:
+    def model_post_init(self, __context: Any) -> None:
         self.square_meter_clean_area = round(self.clean_area / 1000000, 1) if self.clean_area is not None else None
         if self.error_code is not None:
             self.error_code_name = self.error_code.name
@@ -623,7 +623,7 @@ class CleanSummary(RoborockBase):
     records: list[int] | None = None
     last_clean_t: int | None = None
 
-    def __post_init__(self) -> None:
+    def model_post_init(self, __context: Any) -> None:
         self.square_meter_clean_area = round(self.clean_area / 1000000, 1) if self.clean_area is not None else None
 
 
@@ -646,7 +646,7 @@ class CleanRecord(RoborockBase):
     wash_count: int | None = None
     map_flag: int | None = None
 
-    def __post_init__(self) -> None:
+    def model_post_init(self, __context: Any) -> None:
         self.square_meter_area = round(self.area / 1000000, 1) if self.area is not None else None
         self.begin_datetime = (
             datetime.datetime.fromtimestamp(self.begin).astimezone(timezone.utc) if self.begin else None

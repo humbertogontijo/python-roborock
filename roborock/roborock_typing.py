@@ -461,6 +461,6 @@ class DeviceProp(RoborockBase):
     dock_summary: DockSummary | None = None
 
     def update(self, device_prop: 'DeviceProp') -> None:
-        for field in self.__annotations__:
+        for field in self.model_fields:
             if hasattr(device_prop, field):
                 setattr(self, field, getattr(device_prop, field))
