@@ -247,7 +247,7 @@ class RoborockClientV1(RoborockClient):
             Coroutine[
                 Any,
                 Any,
-                DustCollectionMode | WashTowelMode | SmartWashParams | None,
+                DustCollectionMode | WashTowelMode | SmartWashParams | None
             ]
         ] = [self.get_dust_collection_mode()]
         if dock_type in WASH_N_FILL_DOCK:
