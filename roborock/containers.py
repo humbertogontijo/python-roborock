@@ -455,7 +455,7 @@ class Status(RoborockBase):
     error_code_name: str | None = None
     state_name: str | None = None
     water_box_mode_name: str | None = None
-    fan_power_options: list[str] = field(default_factory=list)
+    fan_power_options: list[str] = Field(default_factory=list)
     fan_power_name: str | None = None
     mop_mode_name: str | None = None
 

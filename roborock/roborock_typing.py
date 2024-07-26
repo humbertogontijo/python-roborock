@@ -460,7 +460,7 @@ class DeviceProp(RoborockBase):
     last_clean_record: CleanRecord | None = None
     dock_summary: DockSummary | None = None
 
-    def update(self, device_prop: DeviceProp) -> None:
+    def update(self, device_prop: 'DeviceProp') -> None:
         if device_prop.status:
             self.status = device_prop.status
         if device_prop.clean_summary:
