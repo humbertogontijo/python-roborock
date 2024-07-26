@@ -113,11 +113,11 @@ class RoborockBase(BaseModel):
 
     def as_dict(self) -> dict:
         result = {
-            camelize(key): value.value if isinstance(value, Enum) else value
+            camelize(key): value.as_dict() if isinstance(value, RoborockBase) else (value.value if isinstance(value, Enum) else value)
             for key, value in self.model_dump(exclude_none=True).items()
             if key != "is_cached"
         }
-        return result
+        return {k: v for k, v in result.items() if v is not None}
 
     class Config:
         arbitrary_types_allowed = True
