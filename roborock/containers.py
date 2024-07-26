@@ -98,7 +98,6 @@ def decamelize_obj(d: dict | list, ignore_keys: list[str]):
 
 class RoborockBase(BaseModel):
     _ignore_keys: list = []
-    is_cached: bool = False
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]):
@@ -115,6 +114,7 @@ class RoborockBase(BaseModel):
         return {
             camelize(key): value.value if isinstance(value, Enum) else value
             for key, value in self.model_dump(exclude_none=True).items()
+            if key != '_ignore_keys'
         }
 
     class Config:
@@ -199,7 +199,7 @@ class UserData(RoborockBase):
         result = {
             key: value.as_dict() if isinstance(value, RoborockBase) else value
             for key, value in super().as_dict().items()
-            if key != 'is_cached' and value is not None
+            if value is not None
         }
         return result
 
