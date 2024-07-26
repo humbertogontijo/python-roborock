@@ -8,7 +8,7 @@ from datetime import timezone
 from enum import Enum
 from typing import Any, NamedTuple
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 from .code_mappings import (
     RoborockCategory,
@@ -99,6 +99,8 @@ def decamelize_obj(d: dict | list, ignore_keys: list[str]):
 class RoborockBase(BaseModel):
     _ignore_keys: list = []
 
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     @classmethod
     def from_dict(cls, data: dict[str, Any]):
         if isinstance(data, dict):
@@ -116,9 +118,6 @@ class RoborockBase(BaseModel):
             for key, value in self.model_dump(exclude_none=True).items()
         }
         return {k: v for k, v in result.items() if v is not None}
-
-    class Config:
-        arbitrary_types_allowed = True
 
 def decamelize_obj(d: dict | list, ignore_keys: list[str] | Any):
     if isinstance(d, RoborockBase):
