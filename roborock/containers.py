@@ -191,8 +191,9 @@ class UserData(RoborockBase):
 
     def as_dict(self) -> dict:
         result = super().as_dict()
-        if 'is_cached' in result:
-            del result['is_cached']
+        result.pop('is_cached', None)
+        if self.rriot:
+            result['rriot'] = self.rriot.as_dict()
         return result
 
 
