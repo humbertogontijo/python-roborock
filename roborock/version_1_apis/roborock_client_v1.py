@@ -278,12 +278,12 @@ class RoborockClientV1(RoborockClient):
         if status and status.dock_type is not None and status.dock_type != RoborockDockTypeCode.no_dock:
             dock_summary = await self.get_dock_summary(status.dock_type)
         if any([status, clean_summary, consumable]):
-            return DeviceProp(
-                status,
-                clean_summary,
-                consumable,
-                last_clean_record,
-                dock_summary,
+            return DeviceProp.create(
+                status=status,
+                clean_summary=clean_summary,
+                consumable=consumable,
+                last_clean_record=last_clean_record,
+                dock_summary=dock_summary,
             )
         return None
 
