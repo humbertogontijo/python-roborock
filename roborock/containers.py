@@ -175,6 +175,12 @@ class RRiot(RoborockBase):
     k: str
     r: Reference
 
+    def as_dict(self) -> dict:
+        result = super().as_dict()
+        if self.r:
+            result['r'] = self.r.as_dict()
+        return result
+
 
 class UserData(RoborockBase):
     uid: int | None = None
@@ -190,10 +196,11 @@ class UserData(RoborockBase):
     avatarurl: str | None = None
 
     def as_dict(self) -> dict:
-        result = super().as_dict()
-        result.pop('is_cached', None)
-        if self.rriot:
-            result['rriot'] = self.rriot.as_dict()
+        result = {
+            key: value.as_dict() if isinstance(value, RoborockBase) else value
+            for key, value in super().as_dict().items()
+            if key != 'is_cached' and value is not None
+        }
         return result
 
 
