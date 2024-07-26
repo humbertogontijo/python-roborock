@@ -4,12 +4,11 @@ import datetime
 import json
 import logging
 import re
-from dataclasses import asdict, dataclass, field
 from datetime import timezone
 from enum import Enum
 from typing import Any, NamedTuple
 
-from dacite import Config, from_dict
+from pydantic import BaseModel, Field
 
 from .code_mappings import (
     RoborockCategory,
@@ -97,32 +96,29 @@ def decamelize_obj(d: dict | list, ignore_keys: list[str]):
     }
 
 
-@dataclass
-class RoborockBase:
-    _ignore_keys = []  # type: ignore
-    is_cached = False
+class RoborockBase(BaseModel):
+    _ignore_keys: list = []
+    is_cached: bool = False
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]):
         if isinstance(data, dict):
             ignore_keys = cls._ignore_keys
             try:
-                return from_dict(cls, decamelize_obj(data, ignore_keys), config=Config(cast=[Enum]))
-            except AttributeError as err:
-                raise RoborockException("It seems like you have an outdated version of dacite.") from err
+                return cls.model_validate(decamelize_obj(data, ignore_keys))
+            except ValueError as err:
+                raise RoborockException("Error validating data with pydantic.") from err
 
     def as_dict(self) -> dict:
-        return asdict(
-            self,
-            dict_factory=lambda _fields: {
-                camelize(key): value.value if isinstance(value, Enum) else value
-                for (key, value) in _fields
-                if value is not None
-            },
-        )
+        return {
+            camelize(key): value.value if isinstance(value, Enum) else value
+            for key, value in self.model_dump(exclude_none=True).items()
+        }
+
+    class Config:
+        arbitrary_types_allowed = True
 
 
-@dataclass
 class RoborockBaseTimer(RoborockBase):
     start_hour: int | None = None
     start_minute: int | None = None
@@ -132,7 +128,8 @@ class RoborockBaseTimer(RoborockBase):
     start_time: datetime.time | None = None
     end_time: datetime.time | None = None
 
-    def __post_init__(self) -> None:
+    def __init__(self, **data):
+        super().__init__(**data)
         self.start_time = (
             datetime.time(hour=self.start_hour, minute=self.start_minute)
             if self.start_hour is not None and self.start_minute is not None

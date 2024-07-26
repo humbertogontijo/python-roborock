@@ -1,7 +1,9 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
 from enum import Enum
+from typing import List, Dict, Any
+
+from pydantic import BaseModel, Field
 
 from .containers import (
     CleanRecord,
@@ -270,9 +272,8 @@ class RoborockCommand(str, Enum):
     APP_GET_ROBOT_SETTING = "app_get_robot_setting"
 
 
-@dataclass
-class CommandInfo:
-    params: list | dict | int | None = None
+class CommandInfo(BaseModel):
+    params: List | Dict | int | None = None
 
 
 CommandInfoMap: dict[RoborockCommand | None, CommandInfo] = {
