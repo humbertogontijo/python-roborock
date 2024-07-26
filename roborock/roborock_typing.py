@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import dataclasses
 from enum import Enum
 from typing import List, Dict, Any
 
@@ -452,6 +453,11 @@ class DockSummary(RoborockBase):
     wash_towel_mode: WashTowelMode | None = None
     smart_wash_params: SmartWashParams | None = None
 
+    def __init__(self, dust_collection_mode=None, wash_towel_mode=None, smart_wash_params=None, **data):
+        super().__init__(**data)
+        self.dust_collection_mode = dust_collection_mode
+        self.wash_towel_mode = wash_towel_mode
+        self.smart_wash_params = smart_wash_params
 
 class DeviceProp(RoborockBase):
     status: Status | None = None
