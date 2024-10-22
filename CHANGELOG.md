@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v2.6.1 (2024-10-22)
+
+### Fix
+
+* Add a warning for wrong type of clean area and add new dock ([#224](https://github.com/humbertogontijo/python-roborock/issues/224)) ([`c334eb2`](https://github.com/humbertogontijo/python-roborock/commit/c334eb2193091dccd23db0d3ee4863e838733e30))
+
 ## v2.6.0 (2024-06-29)
 
 ### Feature
