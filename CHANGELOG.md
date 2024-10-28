@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v2.7.0 (2024-10-28)
+
+### Feature
+
+* Remove dacite ([#227](https://github.com/humbertogontijo/python-roborock/issues/227)) ([`86878a7`](https://github.com/humbertogontijo/python-roborock/commit/86878a71d82c2cc707daa16dec109fc07360e3f6))
+
 ## v2.6.1 (2024-10-22)
 
 ### Fix
