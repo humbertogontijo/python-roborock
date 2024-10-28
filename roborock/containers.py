@@ -667,7 +667,7 @@ class CleanSummary(RoborockBase):
     last_clean_t: int | None = None
 
     def __post_init__(self) -> None:
-        if isinstance(self.clean_area, list):
+        if isinstance(self.clean_area, list | str):
             _LOGGER.warning(f"Clean area is a unexpected type! Please give the following in a issue: {self.clean_area}")
         else:
             self.square_meter_clean_area = round(self.clean_area / 1000000, 1) if self.clean_area is not None else None
