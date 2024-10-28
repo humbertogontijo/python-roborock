@@ -47,7 +47,7 @@ def test_home_data():
     assert product.name == "Roborock S7 MaxV"
     assert product.code == "a27"
     assert product.model == "roborock.vacuum.a27"
-    assert product.iconurl is None
+    assert product.icon_url is None
     assert product.attribute is None
     assert product.capability == 0
     assert product.category == RoborockCategory.VACUUM

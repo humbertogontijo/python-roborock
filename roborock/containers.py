@@ -7,9 +7,7 @@ import re
 from dataclasses import asdict, dataclass, field
 from datetime import timezone
 from enum import Enum
-from typing import Any, NamedTuple
-
-from dacite import Config, from_dict
+from typing import Any, NamedTuple, get_args, get_origin
 
 from .code_mappings import (
     RoborockCategory,
@@ -102,14 +100,70 @@ class RoborockBase:
     _ignore_keys = []  # type: ignore
     is_cached = False
 
+    @staticmethod
+    def convert_to_class_obj(type, value):
+        try:
+            class_type = eval(type)
+            if get_origin(class_type) is list:
+                return_list = []
+                cls_type = get_args(class_type)[0]
+                for obj in value:
+                    if issubclass(cls_type, RoborockBase):
+                        return_list.append(cls_type.from_dict(obj))
+                    elif cls_type in {str, int, float}:
+                        return_list.append(cls_type(obj))
+                    else:
+                        return_list.append(cls_type(**obj))
+                return return_list
+            if issubclass(class_type, RoborockBase):
+                converted_value = class_type.from_dict(value)
+            else:
+                converted_value = class_type(value)
+            return converted_value
+        except NameError as err:
+            _LOGGER.exception(err)
+        except ValueError as err:
+            _LOGGER.exception(err)
+        except Exception as err:
+            _LOGGER.exception(err)
+        raise Exception("Fail")
+
     @classmethod
     def from_dict(cls, data: dict[str, Any]):
         if isinstance(data, dict):
             ignore_keys = cls._ignore_keys
-            try:
-                return from_dict(cls, decamelize_obj(data, ignore_keys), config=Config(cast=[Enum]))
-            except AttributeError as err:
-                raise RoborockException("It seems like you have an outdated version of dacite.") from err
+            data = decamelize_obj(data, ignore_keys)
+            cls_annotations: dict[str, str] = {}
+            for base in reversed(cls.__mro__):
+                cls_annotations.update(getattr(base, "__annotations__", {}))
+            remove_keys = []
+            for key, value in data.items():
+                if value == "None" or value is None:
+                    data[key] = None
+                    continue
+                if key not in cls_annotations:
+                    remove_keys.append(key)
+                    continue
+                field_type: str = cls_annotations[key]
+                if "|" in field_type:
+                    # It's a union
+                    types = field_type.split("|")
+                    for type in types:
+                        if "None" in type or "Any" in type:
+                            continue
+                        try:
+                            data[key] = RoborockBase.convert_to_class_obj(type, value)
+                            break
+                        except Exception:
+                            ...
+                else:
+                    try:
+                        data[key] = RoborockBase.convert_to_class_obj(field_type, value)
+                    except Exception:
+                        ...
+            for key in remove_keys:
+                del data[key]
+            return cls(**data)
 
     def as_dict(self) -> dict:
         return asdict(
@@ -185,6 +239,7 @@ class HomeDataProductSchema(RoborockBase):
     mode: Any | None = None
     type: Any | None = None
     product_property: Any | None = None
+    property: Any | None = None
     desc: Any | None = None
 
 
@@ -195,7 +250,7 @@ class HomeDataProduct(RoborockBase):
     model: str
     category: RoborockCategory
     code: str | None = None
-    iconurl: str | None = None
+    icon_url: str | None = None
     attribute: Any | None = None
     capability: int | None = None
     schema: list[HomeDataProductSchema] | None = None
