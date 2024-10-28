@@ -5,7 +5,6 @@ import math
 import struct
 import time
 from collections.abc import Callable, Coroutine
-from random import randint
 from typing import Any, TypeVar, final
 
 from roborock import (
@@ -54,7 +53,7 @@ from roborock.roborock_message import (
     RoborockMessage,
     RoborockMessageProtocol,
 )
-from roborock.util import RepeatableTask, unpack_list
+from roborock.util import RepeatableTask, get_rand_int, unpack_list
 
 COMMANDS_SECURED = [
     RoborockCommand.GET_MAP_V1,
@@ -334,7 +333,7 @@ class RoborockClientV1(RoborockClient):
         secured=False,
     ):
         timestamp = math.floor(time.time())
-        request_id = randint(10000, 32767)
+        request_id = get_rand_int(10000, 32767)
         inner = {
             "id": request_id,
             "method": method,

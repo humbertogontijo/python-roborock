@@ -4,6 +4,7 @@ import asyncio
 import datetime
 import functools
 import logging
+import random
 from asyncio import AbstractEventLoop, TimerHandle
 from collections.abc import Callable, Coroutine, MutableMapping
 from typing import Any, TypeVar
@@ -108,3 +109,15 @@ class RoborockLoggerAdapter(logging.LoggerAdapter):
 
     def process(self, msg: str, kwargs: MutableMapping[str, Any]) -> tuple[str, MutableMapping[str, Any]]:
         return f"[{self.prefix}] {msg}", kwargs
+
+
+cached_numbers: dict[tuple[int, int], list[int]] = {}
+
+
+def get_rand_int(min_val: int, max_val: int):
+    """Gets a random int in the range, precached to help keep it fast."""
+    if (min_val, max_val) not in cached_numbers or len(cached_numbers[(min_val, max_val)]) < 25:
+        # If we have never seen this range, or if the cache is getting low, make a bunch of preshuffled values.
+        cached_numbers[(min_val, max_val)] = list(range(min_val, max_val + 1))
+        random.shuffle(cached_numbers[(min_val, max_val)])
+    return cached_numbers[(min_val, max_val)].pop()

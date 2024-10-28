@@ -23,7 +23,7 @@ from .roborock_message import (
     RoborockMessage,
 )
 from .roborock_typing import RoborockCommand
-from .util import RoborockLoggerAdapter, get_running_loop_or_create_one
+from .util import RoborockLoggerAdapter, get_rand_int, get_running_loop_or_create_one
 
 _LOGGER = logging.getLogger(__name__)
 KEEPALIVE = 60
@@ -113,6 +113,13 @@ class RoborockClient:
         self, request_id: int, protocol_id: int = 0
     ) -> Coroutine[Any, Any, tuple[Any, VacuumError | None]]:
         queue = RoborockFuture(protocol_id)
+        if request_id in self._waiting_queue:
+            new_id = get_rand_int(10000, 32767)
+            _LOGGER.warning(
+                f"Attempting to create a future with an existing request_id... New id is {new_id}. "
+                f"Code may not function properly."
+            )
+            request_id = new_id
         self._waiting_queue[request_id] = queue
         return self._wait_response(request_id, queue)
 
