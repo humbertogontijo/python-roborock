@@ -4,9 +4,9 @@ import json
 import math
 import time
 from dataclasses import dataclass
-from random import randint
 
 from roborock import RoborockEnum
+from roborock.util import get_next_int
 
 
 class RoborockMessageProtocol(RoborockEnum):
@@ -155,9 +155,9 @@ class MessageRetry:
 class RoborockMessage:
     protocol: RoborockMessageProtocol
     payload: bytes | None = None
-    seq: int = randint(100000, 999999)
+    seq: int = get_next_int(100000, 999999)
     version: bytes = b"1.0"
-    random: int = randint(10000, 99999)
+    random: int = get_next_int(10000, 99999)
     timestamp: int = math.floor(time.time())
     message_retry: MessageRetry | None = None
 
