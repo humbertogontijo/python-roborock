@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v2.7.1 (2024-10-28)
+
+### Fix
+
+* Check that clean area is not a str ([#230](https://github.com/humbertogontijo/python-roborock/issues/230)) ([`e66a91e`](https://github.com/humbertogontijo/python-roborock/commit/e66a91edaf6fedf5d4b2ab9117b7759295add492))
+
 ## v2.7.0 (2024-10-28)
 
 ### Feature
