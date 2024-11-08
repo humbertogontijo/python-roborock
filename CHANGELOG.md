@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v2.7.2 (2024-11-08)
+
+### Fix
+
+* Add some new roborock codes ([#233](https://github.com/humbertogontijo/python-roborock/issues/233)) ([`59546dd`](https://github.com/humbertogontijo/python-roborock/commit/59546dd68f7b40ad368d58fd502680ff9c03c81b))
+
 ## v2.7.1 (2024-10-28)
 
 ### Fix
