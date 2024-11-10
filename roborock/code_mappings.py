@@ -243,6 +243,15 @@ class RoborockFanSpeedQ7Max(RoborockFanPowerCode):
     max = 104
 
 
+class RoborockFanSpeedQRevoMaster(RoborockFanPowerCode):
+    quiet = 101
+    balanced = 102
+    turbo = 103
+    max = 104
+    max_plus = 105
+    custom = 110  # Smartplan
+
+
 class RoborockFanSpeedP10(RoborockFanPowerCode):
     off = 105
     quiet = 101
@@ -316,6 +325,17 @@ class RoborockMopIntensityV2(RoborockMopIntensityCode):
     medium = 202
     high = 203
     custom = 207
+
+
+class RoborockMopIntensityQRevoMaster(RoborockMopIntensityCode):
+    """Describes the mop intensity of the vacuum cleaner."""
+
+    off = 200
+    low = 201
+    medium = 202
+    high = 203
+    custom_water_flow = 207
+    custom = 209  # SmartPlan
 
 
 class RoborockMopIntensityP10(RoborockMopIntensityCode):

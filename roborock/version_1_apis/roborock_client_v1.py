@@ -56,10 +56,14 @@ from roborock.roborock_message import (
 )
 from roborock.util import RepeatableTask, unpack_list
 
-COMMANDS_SECURED = [
+COMMANDS_SECURED = {
     RoborockCommand.GET_MAP_V1,
     RoborockCommand.GET_MULTI_MAP,
-]
+}
+
+CUSTOM_COMMANDS = {RoborockCommand.GET_MAP_CALIBRATION}
+
+CLOUD_REQUIRED = COMMANDS_SECURED.union(CUSTOM_COMMANDS)
 
 WASH_N_FILL_DOCK = [
     RoborockDockTypeCode.empty_wash_fill_dock,

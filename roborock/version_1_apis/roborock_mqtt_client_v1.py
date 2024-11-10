@@ -2,6 +2,10 @@ import asyncio
 import base64
 
 import paho.mqtt.client as mqtt
+from vacuum_map_parser_base.config.color import ColorsPalette
+from vacuum_map_parser_base.config.image_config import ImageConfig
+from vacuum_map_parser_base.config.size import Sizes
+from vacuum_map_parser_roborock.map_data_parser import RoborockMapDataParser
 
 from roborock.cloud_api import RoborockMqttClient
 
@@ -13,7 +17,7 @@ from ..roborock_message import (
     RoborockMessageProtocol,
 )
 from ..roborock_typing import RoborockCommand
-from .roborock_client_v1 import COMMANDS_SECURED, RoborockClientV1
+from .roborock_client_v1 import COMMANDS_SECURED, CUSTOM_COMMANDS, RoborockClientV1
 
 
 class RoborockMqttClientV1(RoborockMqttClient, RoborockClientV1):
@@ -66,10 +70,21 @@ class RoborockMqttClientV1(RoborockMqttClient, RoborockClientV1):
         method: RoborockCommand | str,
         params: list | dict | int | None = None,
     ):
+        if method in CUSTOM_COMMANDS:
+            # When we have more custom commands do something more complicated here
+            return await self._get_calibration_points()
         request_id, timestamp, payload = self._get_payload(method, params, True)
         request_protocol = RoborockMessageProtocol.RPC_REQUEST
         roborock_message = RoborockMessage(timestamp=timestamp, protocol=request_protocol, payload=payload)
         return await self.send_message(roborock_message)
+
+    async def _get_calibration_points(self):
+        map: bytes = await self.send_command(RoborockCommand.GET_MAP_V1)
+        parser = RoborockMapDataParser(ColorsPalette(), Sizes(), [], ImageConfig(), [])
+        parsed_map = parser.parse(map)
+        calibration = parsed_map.calibration()
+        self._logger.info(parsed_map.calibration())
+        return calibration
 
     async def get_map_v1(self) -> bytes | None:
         return await self.send_command(RoborockCommand.GET_MAP_V1)
