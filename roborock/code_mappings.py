@@ -297,6 +297,7 @@ class RoborockMopModeS8ProUltra(RoborockMopModeCode):
 class RoborockMopModeS8MaxVUltra(RoborockMopModeCode):
     standard = 300
     deep = 301
+    custom = 302
     deep_plus = 303
     fast = 304
     deep_plus_pearl = 305
@@ -379,6 +380,16 @@ class RoborockMopIntensityS6MaxV(RoborockMopIntensityCode):
     medium = 202
     high = 203
     custom = 204
+    custom_water_flow = 207
+
+
+class RoborockMopIntensityQ7Max(RoborockMopIntensityCode):
+    """Describes the mop intensity of the vacuum cleaner."""
+
+    off = 200
+    low = 201
+    medium = 202
+    high = 203
     custom_water_flow = 207
 
 
