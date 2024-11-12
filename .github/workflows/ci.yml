@@ -59,6 +59,7 @@ jobs:
     needs:
       - test
     concurrency: release
+    if: github.ref == 'refs/heads/main'
     permissions:
       id-token: write
     environment:
@@ -72,7 +73,6 @@ jobs:
 
     - name: Python Semantic Release
       id: release
-      if: github.ref == 'refs/heads/main'
       uses: python-semantic-release/python-semantic-release@v8.7.0
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
