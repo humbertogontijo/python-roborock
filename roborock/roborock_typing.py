@@ -116,6 +116,7 @@ class RoborockCommand(str, Enum):
     GET_MAP_STATUS = "get_map_status"
     GET_MAP_V1 = "get_map_v1"
     GET_MAP_V2 = "get_map_v2"
+    GET_MAP_CALIBRATION = "get_map_calibration"  # Custom command
     GET_MOP_MOTOR_STATUS = "get_mop_motor_status"
     GET_MOP_TEMPLATE_PARAMS_BY_ID = "get_mop_template_params_by_id"
     GET_MOP_TEMPLATE_PARAMS_SUMMARY = "get_mop_template_params_summary"

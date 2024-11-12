@@ -21,7 +21,7 @@ keywords = ["roborock", "vacuum", "homeassistant"]
 roborock = "roborock.cli:main"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.11"
 click = ">=8"
 aiohttp = "^3.8.2"
 async-timeout = "*"
@@ -30,6 +30,7 @@ pycryptodomex = {version = "^3.18", markers = "sys_platform == 'darwin'"}
 paho-mqtt = "^1.6.1"
 dacite = "^1.8.0"
 construct = "^2.10.57"
+vacuum-map-parser-roborock = "*"
 
 
 [build-system]

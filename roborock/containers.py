@@ -20,6 +20,7 @@ from .code_mappings import (
     RoborockFanPowerCode,
     RoborockFanSpeedP10,
     RoborockFanSpeedQ7Max,
+    RoborockFanSpeedQRevoMaster,
     RoborockFanSpeedS6Pure,
     RoborockFanSpeedS7,
     RoborockFanSpeedS7MaxV,
@@ -29,6 +30,7 @@ from .code_mappings import (
     RoborockMopIntensityCode,
     RoborockMopIntensityP10,
     RoborockMopIntensityQ7Max,
+    RoborockMopIntensityQRevoMaster,
     RoborockMopIntensityS5Max,
     RoborockMopIntensityS6MaxV,
     RoborockMopIntensityS7,
@@ -49,6 +51,7 @@ from .const import (
     ROBOROCK_G10S_PRO,
     ROBOROCK_P10,
     ROBOROCK_Q7_MAX,
+    ROBOROCK_QREVO_MASTER,
     ROBOROCK_QREVO_MAXV,
     ROBOROCK_QREVO_PRO,
     ROBOROCK_QREVO_S,
@@ -571,6 +574,12 @@ class Q7MaxStatus(Status):
 
 
 @dataclass
+class QRevoMasterStatus(Status):
+    fan_power: RoborockFanSpeedQRevoMaster | None = None
+    water_box_mode: RoborockMopIntensityQRevoMaster | None = None
+
+
+@dataclass
 class S6MaxVStatus(Status):
     fan_power: RoborockFanSpeedS7MaxV | None = None
     water_box_mode: RoborockMopIntensityS6MaxV | None = None
@@ -627,6 +636,7 @@ ModelStatus: dict[str, type[Status]] = {
     ROBOROCK_S4_MAX: S4MaxStatus,
     ROBOROCK_S5_MAX: S5MaxStatus,
     ROBOROCK_Q7_MAX: Q7MaxStatus,
+    ROBOROCK_QREVO_MASTER: QRevoMasterStatus,
     ROBOROCK_S6: S6PureStatus,
     ROBOROCK_S6_MAXV: S6MaxVStatus,
     ROBOROCK_S6_PURE: S6PureStatus,
