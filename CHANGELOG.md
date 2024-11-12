@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v2.8.0 (2024-11-12)
+
+### Feature
+
+* Add some new roborock codes and add custom command ([#234](https://github.com/humbertogontijo/python-roborock/issues/234)) ([`c8507ef`](https://github.com/humbertogontijo/python-roborock/commit/c8507eff9cdc24654034fbe4fd63ac89b6de6f99))
+
 ## v2.7.2 (2024-11-08)
 
 ### Fix
