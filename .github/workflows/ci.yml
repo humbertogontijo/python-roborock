@@ -61,6 +61,9 @@ jobs:
     concurrency: release
     if: github.ref == 'refs/heads/main'
     permissions:
+      contents: write
+      issues: write
+      pull-requests: write
       id-token: write
     environment:
       name: pypi
