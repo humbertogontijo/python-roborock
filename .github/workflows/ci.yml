@@ -70,17 +70,25 @@ jobs:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+
+    - uses: snok/install-poetry@v1.4.1
+
+    - name: Install Dependencies
+      run: poetry install
+      shell: bash
 
     - name: Python Semantic Release
       id: release
-      uses: python-semantic-release/python-semantic-release@v8.7.0
+      uses: python-semantic-release/python-semantic-release@v9.14.0
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Publish package distributions to PyPI
       uses: pypa/gh-action-pypi-publish@v1.12.2
-      with:
-        password: ${{ secrets.PYPI_TOKEN }}
 
       # NOTE: DO NOT wrap the conditional in ${{ }} as it will always evaluate to true.
       # See https://github.com/actions/runner/issues/1173
