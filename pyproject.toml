@@ -48,7 +48,7 @@ pyshark = "^0.6"
 
 [tool.semantic_release]
 branch = "main"
-version_toml = "pyproject.toml:tool.poetry.version"
+version_toml = ["pyproject.toml", "tool.poetry.version"]
 build_command = "pip install poetry && poetry build"
 [tool.semantic_release.commit_parser_options]
 allowed_tags = [
