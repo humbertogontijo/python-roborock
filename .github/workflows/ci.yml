@@ -65,6 +65,7 @@ jobs:
       issues: write
       pull-requests: write
       id-token: write
+      packages: write
     environment:
       name: pypi
       url: https://pypi.org/project/python-roborock/
