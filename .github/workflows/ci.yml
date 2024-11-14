@@ -88,8 +88,8 @@ jobs:
     - name: Python Semantic Release
       id: release
       uses: python-semantic-release/python-semantic-release@v9.14.0
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Publish package distributions to PyPI
       uses: pypa/gh-action-pypi-publish@v1.12.2
