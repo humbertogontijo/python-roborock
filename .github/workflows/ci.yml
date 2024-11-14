@@ -61,7 +61,11 @@ jobs:
     concurrency: release
     if: github.ref == 'refs/heads/main'
     permissions:
+      contents: write
+      issues: write
+      pull-requests: write
       id-token: write
+      packages: write
     environment:
       name: pypi
       url: https://pypi.org/project/python-roborock/
