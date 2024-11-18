@@ -68,13 +68,11 @@ jobs:
       packages: write
     environment:
       name: pypi
-      url: https://pypi.org/project/python-roborock/
 
     steps:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
-        persist-credentials: false
     - name: Set up Python 3.11
       uses: actions/setup-python@v5
       with:
@@ -85,18 +83,13 @@ jobs:
     - name: Install Dependencies
       run: poetry install
       shell: bash
-    - name: Configure Git for authentication
-      run: |
-        git config --global user.name "GitHub Actions"
-        git config --global user.email "actions@github.com"
-        git remote set-url origin https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}
-
     - name: Python Semantic Release
       id: release
       uses: python-semantic-release/python-semantic-release@v9.14.0
-      env:
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        github_token: ${{ secrets.GH_TOKEN }}
+        git_committer_name: "github-actions"
+        git_committer_email: "actions@users.noreply.github.com"
 
     - name: Publish package distributions to PyPI
       uses: pypa/gh-action-pypi-publish@v1.12.2
@@ -109,4 +102,4 @@ jobs:
       uses: python-semantic-release/upload-to-gh-release@v8.7.0
       if: steps.release.outputs.released == 'true'
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        github_token: ${{ secrets.GH_TOKEN }}
