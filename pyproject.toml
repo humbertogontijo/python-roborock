@@ -51,11 +51,11 @@ version_toml = ["pyproject.toml:tool.poetry.version"]
 build_command = "pip install poetry && poetry build"
 
 [semantic_release.branches.main]
-match = "main"
+match = "release"
 prerelease = false
 
-[semantic_release.branches.release]
-match = "release"
+[tool.semantic_release.branches.other]
+match = ".*"
 prerelease_token = "rc"
 prerelease = true
 
