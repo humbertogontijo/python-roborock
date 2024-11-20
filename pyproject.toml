@@ -55,6 +55,10 @@ match = "(main|release)"
 prerelease_token = "rc"
 prerelease = false
 
+[semantic_release.branches.release]
+match = "(main|release)"
+prerelease_token = "rc"
+prerelease = false
 
 [tool.semantic_release.commit_parser_options]
 allowed_tags = [
