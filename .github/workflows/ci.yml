@@ -85,13 +85,16 @@ jobs:
     - name: Install Dependencies
       run: poetry install
       shell: bash
+    - name: Configure Git
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@users.noreply.github.com"
+          git remote set-url origin https://${{ secrets.GH_TOKEN }}@github.com/humbertogontijo/python-roborock.git
     - name: Python Semantic Release
       id: release
       uses: python-semantic-release/python-semantic-release@v9.14.0
       with:
         github_token: ${{ secrets.GH_TOKEN }}
-        git_committer_name: "github-actions"
-        git_committer_email: "actions@users.noreply.github.com"
 
     - name: Publish package distributions to PyPI
       uses: pypa/gh-action-pypi-publish@v1.12.2
