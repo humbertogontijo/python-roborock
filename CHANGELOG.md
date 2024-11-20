@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v2.9.0-rc.1 (2024-11-20)
+
+### Features
+
+- Update
+  ([`9cbe4d5`](https://github.com/humbertogontijo/python-roborock/commit/9cbe4d5aac896445ca21b71a376295fa6976931e))
+
+
 ## v2.8.1-rc.1 (2024-11-20)
 
 ### Bug Fixes
