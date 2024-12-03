@@ -291,6 +291,8 @@ class RoborockMopModeQRevoCurv(RoborockMopModeCode):
     smart_mode = 306
 
 class RoborockMopModeS7(RoborockMopModeCode):
+    """Describes the mop mode of the vacuum cleaner."""
+
     standard = 300
     deep = 301
     custom = 302
