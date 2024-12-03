@@ -436,6 +436,7 @@ class RoborockDockTypeCode(RoborockEnum):
     p10_pro_dock = 9
     s8_maxv_ultra_dock = 10
     qrevo_s_dock = 15
+    qrevo_curv_dock = 17
 
 
 class RoborockDockDustCollectionModeCode(RoborockEnum):
