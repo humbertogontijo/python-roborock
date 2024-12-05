@@ -59,6 +59,7 @@ jobs:
     needs:
       - test
     concurrency: release
+    if: github.ref == 'refs/heads/main'
     permissions:
       contents: write
       issues: write
@@ -74,19 +75,15 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-  
+
       - name: Python Semantic Release
         id: release
         uses: python-semantic-release/python-semantic-release@v9.14.0
         with:
           github_token: ${{ secrets.GH_TOKEN }}
-          root_options: ${{ github.ref != 'refs/heads/main' && '-vv --noop' || '-vv' }}
-  
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@v1.12.2
-        if: github.ref == 'refs/heads/main' && steps.release.outputs.released == 'true'
-  
+        if: steps.release.outputs.released == 'true'
       - name: Publish package distributions to GitHub Releases
         uses: python-semantic-release/upload-to-gh-release@v8.7.0
-        if: github.ref == 'refs/heads/main' && steps.release.outputs.released == 'true'
-  
+        if: steps.release.outputs.released == 'true'
