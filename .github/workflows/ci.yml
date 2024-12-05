@@ -76,11 +76,12 @@ jobs:
         ref: release
         fetch-depth: 0
         persist-credentials: false
+        ssh-key: ${{ secrets.DEPLOY_KEY }}
     - name: Python Semantic Release
       id: release
       uses: python-semantic-release/python-semantic-release@v9.14.0
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        ssh-key: ${{ secrets.DEPLOY_KEY }}
 
     - name: Publish package distributions to PyPI
       uses: pypa/gh-action-pypi-publish@v1.12.2
