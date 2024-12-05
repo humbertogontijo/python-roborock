@@ -95,6 +95,8 @@ jobs:
         run: |
           gh auth status
       - name: Create Merge Request
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           gh pr create \
             --base main \
