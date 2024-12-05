@@ -78,45 +78,26 @@ jobs:
         run: |
           git config user.name "${{ github.actor }}"
           git config user.email "${{ github.actor }}@users.noreply.github.com"
-
-      # - name: Python Semantic Release
-      #   id: release
-      #   uses: python-semantic-release/python-semantic-release@v9.14.0
-      #   with:
-      #     github_token: ${{ secrets.GH_TOKEN }}
-      #     push: false
-      #     commit_author: "${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>"
-
+      - name: Python Semantic Release
+        uses: python-semantic-release/python-semantic-release@v9.14.0
+        with:
+          github_token: ${{ secrets.GH_TOKEN }}
+          push: false
       - name: Install GitHub CLI
         run: |
           sudo apt update
           sudo apt install -y gh
-
       - name: Authenticate GitHub CLI
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           gh auth status
-
-
-          
-
-      - name: Prepare Release with Semantic Release
-        id: release
-        run: |
-          RELEASE_BRANCH="release/$(python-semantic-release version --noop)"
-          git checkout -b "$RELEASE_BRANCH"
-          python-semantic-release changelog
-          git add .
-          git commit -m "chore(release): prepare release $(python-semantic-release version --noop)"
-          git push origin "$RELEASE_BRANCH"
-
       - name: Create Merge Request
         run: |
           gh pr create \
             --base main \
             --head "$RELEASE_BRANCH" \
-            --title "Release $(python-semantic-release version --noop)" \
+            --title "Release $(python-semantic-release version)" \
             --body "This PR contains the release changes for version $(python-semantic-release version --noop)."
       # - name: Publish package distributions to PyPI
       #   uses: pypa/gh-action-pypi-publish@v1.12.2
