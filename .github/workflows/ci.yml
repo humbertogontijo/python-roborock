@@ -74,6 +74,8 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+      - name: Check out the target branch
+        run: git checkout Lash-L-patch-19
       - name: Configure Git
         run: |
           git config user.name "${{ github.actor }}"
