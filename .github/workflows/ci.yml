@@ -92,20 +92,34 @@ jobs:
       #     push: false
       #     commit_author: "${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>"
 
-      - name: Create Release Branch and MR
-        # if: steps.release.outputs.released == 'true'
+      - name: Install GitHub CLI
         run: |
-          # Create a release branch
-          RELEASE_BRANCH="release/${{ steps.release.outputs.version }}"
+          sudo apt update
+          sudo apt install -y gh
+
+      - name: Authenticate GitHub CLI
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          echo "${{ secrets.GH_TOKEN }}" | gh auth login --with-token
+
+      - name: Prepare Release with Semantic Release
+        id: release
+        run: |
+          RELEASE_BRANCH="release/$(python-semantic-release version --noop)"
           git checkout -b "$RELEASE_BRANCH"
+          python-semantic-release changelog
+          git add .
+          git commit -m "chore(release): prepare release $(python-semantic-release version --noop)"
           git push origin "$RELEASE_BRANCH"
 
-          # Create a merge request using GitHub CLI
+      - name: Create Merge Request
+        run: |
           gh pr create \
             --base main \
             --head "$RELEASE_BRANCH" \
-            --title "Release ${{ steps.release.outputs.version }}" \
-            --body "This MR contains the latest release changes for version ${{ steps.release.outputs.version }}."
+            --title "Release $(python-semantic-release version --noop)" \
+            --body "This PR contains the release changes for version $(python-semantic-release version --noop)."
       # - name: Publish package distributions to PyPI
       #   uses: pypa/gh-action-pypi-publish@v1.12.2
       #   if: steps.release.outputs.released == 'true'
