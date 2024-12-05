@@ -47,7 +47,6 @@ codespell = "*"
 pyshark = "^0.6"
 
 [tool.semantic_release]
-branch = "main"
 version_toml = ["pyproject.toml:tool.poetry.version"]
 build_command = "pip install poetry && poetry build"
 [tool.semantic_release.commit_parser_options]
@@ -59,6 +58,14 @@ allowed_tags = [
     "refactor"
 ]
 major_tags= ["refactor"]
+[semantic_release.branches.main]
+match = "release"
+prerelease = false
+
+[tool.semantic_release.branches.other]
+match = ".*"
+prerelease_token = "rc"
+prerelease = true
 
 [tool.ruff]
 ignore = ["F403", "E741"]
