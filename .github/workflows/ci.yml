@@ -59,7 +59,7 @@ jobs:
     needs:
       - test
     concurrency: release
-    if: github.ref == 'refs/heads/main'
+    # if: github.ref == 'refs/heads/main'
     permissions:
       contents: write
       issues: write
@@ -69,13 +69,11 @@ jobs:
       packages: write
     environment:
       name: release
-  
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           persist-credentials: false
-
       - name: Python Semantic Release
         id: release
         uses: python-semantic-release/python-semantic-release@v9.14.0
