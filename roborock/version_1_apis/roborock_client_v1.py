@@ -71,6 +71,7 @@ WASH_N_FILL_DOCK = [
     RoborockDockTypeCode.p10_pro_dock,
     RoborockDockTypeCode.s8_maxv_ultra_dock,
     RoborockDockTypeCode.qrevo_s_dock,
+    RoborockDockTypeCode.qrevo_curv_dock,
 ]
 RT = TypeVar("RT", bound=RoborockBase)
 EVICT_TIME = 60
