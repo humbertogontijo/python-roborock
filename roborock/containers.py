@@ -141,11 +141,11 @@ class RoborockBase:
                 cls_annotations.update(getattr(base, "__annotations__", {}))
             remove_keys = []
             for key, value in data.items():
-                if value == "None" or value is None:
-                    data[key] = None
-                    continue
                 if key not in cls_annotations:
                     remove_keys.append(key)
+                    continue
+                if value == "None" or value is None:
+                    data[key] = None
                     continue
                 field_type: str = cls_annotations[key]
                 if "|" in field_type:
