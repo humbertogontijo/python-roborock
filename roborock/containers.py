@@ -39,6 +39,7 @@ from .code_mappings import (
     RoborockMopModeS7,
     RoborockMopModeS8MaxVUltra,
     RoborockMopModeS8ProUltra,
+    RoborockMopModeQRevoMaster,
     RoborockStartType,
     RoborockStateCode,
 )
@@ -577,7 +578,7 @@ class Q7MaxStatus(Status):
 class QRevoMasterStatus(Status):
     fan_power: RoborockFanSpeedQRevoMaster | None = None
     water_box_mode: RoborockMopIntensityQRevoMaster | None = None
-    mop_mode: RoborockMopModeS7 | None = None
+    mop_mode: RoborockMopModeQRevoMaster | None = None
 
 
 @dataclass
