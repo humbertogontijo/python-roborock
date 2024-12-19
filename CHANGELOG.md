@@ -1,6 +1,15 @@
 # CHANGELOG
 
 
+## v2.8.2 (2024-12-19)
+
+### Bug Fixes
+
+- Add a mop mode to QRevoMaster
+  ([#258](https://github.com/humbertogontijo/python-roborock/pull/258),
+  [`bf0feb7`](https://github.com/humbertogontijo/python-roborock/commit/bf0feb7ee8bc9933232e8235e6efa92a451ee19e))
+
+
 ## v2.8.1 (2024-12-18)
 
 ### Bug Fixes
