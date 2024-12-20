@@ -1,6 +1,24 @@
 # CHANGELOG
 
 
+## v2.8.3 (2024-12-19)
+
+### Bug Fixes
+
+- Add support for QRevo Master mop mode
+  ([#259](https://github.com/humbertogontijo/python-roborock/pull/259),
+  [`db11c0f`](https://github.com/humbertogontijo/python-roborock/commit/db11c0f8ca7c08d2f795f77f7a652db4bfaa91ae))
+
+
+## v2.8.2 (2024-12-19)
+
+### Bug Fixes
+
+- Add a mop mode to QRevoMaster
+  ([#258](https://github.com/humbertogontijo/python-roborock/pull/258),
+  [`bf0feb7`](https://github.com/humbertogontijo/python-roborock/commit/bf0feb7ee8bc9933232e8235e6efa92a451ee19e))
+
+
 ## v2.8.1 (2024-12-18)
 
 ### Bug Fixes
