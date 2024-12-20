@@ -36,10 +36,10 @@ from .code_mappings import (
     RoborockMopIntensityS7,
     RoborockMopIntensityS8MaxVUltra,
     RoborockMopModeCode,
+    RoborockMopModeQRevoMaster,
     RoborockMopModeS7,
     RoborockMopModeS8MaxVUltra,
     RoborockMopModeS8ProUltra,
-    RoborockMopModeQRevoMaster,
     RoborockStartType,
     RoborockStateCode,
 )
