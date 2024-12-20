@@ -1,6 +1,21 @@
 # CHANGELOG
 
 
+## v2.8.4 (2024-12-20)
+
+### Bug Fixes
+
+- Update mop intensity, fan speed, and dock mappings for the QRevo Master
+  ([#260](https://github.com/humbertogontijo/python-roborock/pull/260),
+  [`77f6d6f`](https://github.com/humbertogontijo/python-roborock/commit/77f6d6fc917831f1966d2138bc7355292fa1e5e2))
+
+* fix: update mop intensity, fan speed, and dock mappings for QRevo Master
+
+* Fix sorting of imports
+
+* Rerun precommit
+
+
 ## v2.8.3 (2024-12-19)
 
 ### Bug Fixes
