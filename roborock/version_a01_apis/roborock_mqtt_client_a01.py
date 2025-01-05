@@ -43,7 +43,7 @@ class RoborockMqttClientA01(RoborockMqttClient, RoborockClientA01):
         futures = []
         if "10000" in payload["dps"]:
             for dps in json.loads(payload["dps"]["10000"]):
-                futures.append(asyncio.ensure_future(self._async_response(dps, response_protocol)))
+                futures.append(self._async_response(dps, response_protocol))
         self._send_msg_raw(m)
         responses = await asyncio.gather(*futures, return_exceptions=True)
         dps_responses: dict[int, typing.Any] = {}
@@ -54,7 +54,7 @@ class RoborockMqttClientA01(RoborockMqttClient, RoborockClientA01):
                     self._logger.warning("Timed out get req for %s after %s s", dps, self.queue_timeout)
                     dps_responses[dps] = None
                 else:
-                    dps_responses[dps] = response[0]
+                    dps_responses[dps] = response
         return dps_responses
 
     async def update_values(

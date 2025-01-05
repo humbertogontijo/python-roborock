@@ -1,4 +1,3 @@
-import asyncio
 import base64
 
 import paho.mqtt.client as mqtt
@@ -10,7 +9,7 @@ from vacuum_map_parser_roborock.map_data_parser import RoborockMapDataParser
 from roborock.cloud_api import RoborockMqttClient
 
 from ..containers import DeviceData, UserData
-from ..exceptions import CommandVacuumError, RoborockException
+from ..exceptions import CommandVacuumError, RoborockException, VacuumError
 from ..protocol import MessageParser, Utils
 from ..roborock_message import (
     RoborockMessage,
@@ -49,16 +48,21 @@ class RoborockMqttClientV1(RoborockMqttClient, RoborockClientV1):
         local_key = self.device_info.device.local_key
         msg = MessageParser.build(roborock_message, local_key, False)
         self._logger.debug(f"id={request_id} Requesting method {method} with {params}")
-        async_response = asyncio.ensure_future(self._async_response(request_id, response_protocol))
+        async_response = self._async_response(request_id, response_protocol)
         self._send_msg_raw(msg)
-        (response, err) = await async_response
-        self._diagnostic_data[method if method is not None else "unknown"] = {
+        diagnostic_key = method if method is not None else "unknown"
+        try:
+            response = await async_response
+        except VacuumError as err:
+            self._diagnostic_data[diagnostic_key] = {
+                "params": roborock_message.get_params(),
+                "error": err,
+            }
+            raise CommandVacuumError(method, err) from err
+        self._diagnostic_data[diagnostic_key] = {
             "params": roborock_message.get_params(),
             "response": response,
-            "error": err,
         }
-        if err:
-            raise CommandVacuumError(method, err) from err
         if response_protocol == RoborockMessageProtocol.MAP_RESPONSE:
             self._logger.debug(f"id={request_id} Response from {method}: {len(response)} bytes")
         else:

@@ -2,6 +2,7 @@ import asyncio
 
 import pytest
 
+from roborock.exceptions import VacuumError
 from roborock.roborock_future import RoborockFuture
 
 
@@ -10,10 +11,18 @@ def test_can_create():
 
 
 @pytest.mark.asyncio
-async def test_put():
+async def test_set_result():
     rq = RoborockFuture(1)
-    rq.resolve(("test", None))
-    assert await rq.async_get(1) == ("test", None)
+    rq.set_result("test")
+    assert await rq.async_get(1) == "test"
+
+
+@pytest.mark.asyncio
+async def test_set_exception():
+    rq = RoborockFuture(1)
+    rq.set_exception(VacuumError("test"))
+    with pytest.raises(VacuumError):
+        assert await rq.async_get(1)
 
 
 @pytest.mark.asyncio

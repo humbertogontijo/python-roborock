@@ -7,7 +7,6 @@ import base64
 import logging
 import secrets
 import time
-from collections.abc import Coroutine
 from typing import Any
 
 from .containers import (
@@ -16,7 +15,6 @@ from .containers import (
 from .exceptions import (
     RoborockTimeout,
     UnknownMethodError,
-    VacuumError,
 )
 from .roborock_future import RoborockFuture
 from .roborock_message import (
@@ -89,20 +87,18 @@ class RoborockClient:
             await self.async_disconnect()
         await self.async_connect()
 
-    async def _wait_response(self, request_id: int, queue: RoborockFuture) -> tuple[Any, VacuumError | None]:
+    async def _wait_response(self, request_id: int, queue: RoborockFuture) -> Any:
         try:
-            (response, err) = await queue.async_get(self.queue_timeout)
+            response = await queue.async_get(self.queue_timeout)
             if response == "unknown_method":
                 raise UnknownMethodError("Unknown method")
-            return response, err
+            return response
         except (asyncio.TimeoutError, asyncio.CancelledError):
             raise RoborockTimeout(f"id={request_id} Timeout after {self.queue_timeout} seconds") from None
         finally:
             self._waiting_queue.pop(request_id, None)
 
-    def _async_response(
-        self, request_id: int, protocol_id: int = 0
-    ) -> Coroutine[Any, Any, tuple[Any, VacuumError | None]]:
+    def _async_response(self, request_id: int, protocol_id: int = 0) -> Any:
         queue = RoborockFuture(protocol_id)
         if request_id in self._waiting_queue:
             new_id = get_next_int(10000, 32767)
@@ -115,7 +111,7 @@ class RoborockClient:
             )
             request_id = new_id
         self._waiting_queue[request_id] = queue
-        return self._wait_response(request_id, queue)
+        return asyncio.ensure_future(self._wait_response(request_id, queue))
 
     async def send_message(self, roborock_message: RoborockMessage):
         raise NotImplementedError

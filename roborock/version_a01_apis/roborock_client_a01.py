@@ -135,7 +135,7 @@ class RoborockClientA01(RoborockClient):
                         converted_response = entries[data_point_protocol].post_process_fn(data_point)
                         queue = self._waiting_queue.get(int(data_point_number))
                         if queue and queue.protocol == protocol:
-                            queue.resolve((converted_response, None))
+                            queue.set_result(converted_response)
 
     async def update_values(
         self, dyad_data_protocols: list[RoborockDyadDataProtocol | RoborockZeoProtocol]

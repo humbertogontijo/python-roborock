@@ -1,8 +1,7 @@
-import asyncio
-
 from roborock.local_api import RoborockLocalClient
 
 from .. import CommandVacuumError, DeviceData, RoborockCommand, RoborockException
+from ..exceptions import VacuumError
 from ..protocol import MessageParser
 from ..roborock_message import MessageRetry, RoborockMessage, RoborockMessageProtocol
 from .roborock_client_v1 import COMMANDS_SECURED, RoborockClientV1
@@ -53,16 +52,21 @@ class RoborockLocalClientV1(RoborockLocalClient, RoborockClientV1):
         if method:
             self._logger.debug(f"id={request_id} Requesting method {method} with {params}")
         # Send the command to the Roborock device
-        async_response = asyncio.ensure_future(self._async_response(request_id, response_protocol))
+        async_response = self._async_response(request_id, response_protocol)
         self._send_msg_raw(msg)
-        (response, err) = await async_response
-        self._diagnostic_data[method if method is not None else "unknown"] = {
+        diagnostic_key = method if method is not None else "unknown"
+        try:
+            response = await async_response
+        except VacuumError as err:
+            self._diagnostic_data[diagnostic_key] = {
+                "params": roborock_message.get_params(),
+                "error": err,
+            }
+            raise CommandVacuumError(method, err) from err
+        self._diagnostic_data[diagnostic_key] = {
             "params": roborock_message.get_params(),
             "response": response,
-            "error": err,
         }
-        if err:
-            raise CommandVacuumError(method, err) from err
         if roborock_message.protocol == RoborockMessageProtocol.GENERAL_REQUEST:
             self._logger.debug(f"id={request_id} Response from method {roborock_message.get_method()}: {response}")
         if response == "retry":
