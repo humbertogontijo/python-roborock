@@ -361,7 +361,7 @@ class RoborockClientV1(RoborockClient):
 
     def on_message_received(self, messages: list[RoborockMessage]) -> None:
         try:
-            self._last_device_msg_in = self.time_func()
+            self._last_device_msg_in = time.monotonic()
             for data in messages:
                 protocol = data.protocol
                 if data.payload and protocol in [
