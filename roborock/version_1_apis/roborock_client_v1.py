@@ -363,7 +363,6 @@ class RoborockClientV1(RoborockClient):
         try:
             self._last_device_msg_in = self.time_func()
             for data in messages:
-                self._logger.debug(f"Got message: {data}")
                 protocol = data.protocol
                 if data.payload and protocol in [
                     RoborockMessageProtocol.RPC_RESPONSE,
