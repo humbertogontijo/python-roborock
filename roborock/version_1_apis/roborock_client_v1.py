@@ -391,6 +391,8 @@ class RoborockClientV1(RoborockClient):
                                     if isinstance(result, list) and len(result) == 1:
                                         result = result[0]
                                     queue.resolve((result, None))
+                            else:
+                                self._logger.debug("Received response for unknown request id %s", request_id)
                         else:
                             try:
                                 data_protocol = RoborockDataProtocol(int(data_point_number))
@@ -443,10 +445,14 @@ class RoborockClientV1(RoborockClient):
                             if isinstance(decompressed, list):
                                 decompressed = decompressed[0]
                             queue.resolve((decompressed, None))
+                        else:
+                            self._logger.debug("Received response for unknown request id %s", request_id)
                 else:
                     queue = self._waiting_queue.get(data.seq)
                     if queue:
                         queue.resolve((data.payload, None))
+                    else:
+                        self._logger.debug("Received response for unknown request id %s", data.seq)
         except Exception as ex:
             self._logger.exception(ex)
 
