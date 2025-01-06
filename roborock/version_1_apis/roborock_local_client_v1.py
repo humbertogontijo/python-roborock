@@ -18,6 +18,7 @@ class RoborockLocalClientV1(RoborockLocalClient, RoborockClientV1):
     ) -> RoborockMessage:
         secured = True if method in COMMANDS_SECURED else False
         request_id, timestamp, payload = self._get_payload(method, params, secured)
+        self._logger.debug("Building message id %s for method %s", request_id, method)
         request_protocol = RoborockMessageProtocol.GENERAL_REQUEST
         message_retry: MessageRetry | None = None
         if method == RoborockCommand.RETRY_REQUEST and isinstance(params, dict):
