@@ -1,6 +1,28 @@
 # CHANGELOG
 
 
+## v2.8.5 (2025-01-06)
+
+### Bug Fixes
+
+- Add additional log messages to track down concurrency errors
+  ([#266](https://github.com/humbertogontijo/python-roborock/pull/266),
+  [`d750234`](https://github.com/humbertogontijo/python-roborock/commit/d75023482e58689009c4df96cfc69b6080f5ada9))
+
+- Update log message to include existing request id
+  ([#264](https://github.com/humbertogontijo/python-roborock/pull/264),
+  [`ac8d23a`](https://github.com/humbertogontijo/python-roborock/commit/ac8d23aa59342d9ae9f7c5d7c857de353e288ffa))
+
+* fix: Update log message to include existing request id
+
+* fix: Add protocol to log message
+
+### Chores
+
+- Always use time.monotonic ([#265](https://github.com/humbertogontijo/python-roborock/pull/265),
+  [`e14802c`](https://github.com/humbertogontijo/python-roborock/commit/e14802cadde404d548cdff0c6b5906740a7e8c00))
+
+
 ## v2.8.4 (2024-12-20)
 
 ### Bug Fixes
