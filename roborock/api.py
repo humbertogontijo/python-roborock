@@ -116,9 +116,10 @@ class RoborockClient:
         if request_id in self._waiting_queue:
             new_id = get_next_int(10000, 32767)
             _LOGGER.warning(
-                "Attempting to create a future with an existing id %s... New id is %s. "
+                "Attempting to create a future with an existing id %s (%s)... New id is %s. "
                 "Code may not function properly.",
                 request_id,
+                protocol_id,
                 new_id,
             )
             request_id = new_id
