@@ -881,26 +881,28 @@ class RoborockProductSpec(RoborockBase):
 
 @dataclass
 class RoborockProduct(RoborockBase):
-    id: int
-    name: str
-    model: str
-    packagename: str
-    ssid: str
-    picurl: str
-    cardpicurl: str
-    medium_cardpicurl: str
-    resetwifipicurl: str
-    resetwifitext: dict
-    tuyaid: str
-    status: int
-    rriotid: str
-    cardspec: str
-    pictures: list
-    nc_mode: str
-    scope: None
-    product_tags: list
-    agreements: list
-    plugin_pic_url: None
+    id: int | None = None
+    name: str | None = None
+    model: str | None = None
+    packagename: str | None = None
+    ssid: str | None = None
+    picurl: str | None = None
+    cardpicurl: str | None = None
+    mediumCardpicurl: str | None = None
+    resetwifipicurl: str | None = None
+    configPicUrl: str | None = None
+    pluginPicUrl: str | None = None
+    resetwifitext: dict | None = None
+    tuyaid: str | None = None
+    status: int | None = None
+    rriotid: str | None = None
+    pictures: list | None = None
+    ncMode: str | None = None
+    scope: str | None = None
+    product_tags: list | None = None
+    agreements: list | None = None
+    cardspec: str | None = None
+    plugin_pic_url: str | None = None
     products_specification: RoborockProductSpec | None = None
 
     def __post_init__(self):
