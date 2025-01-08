@@ -7,7 +7,7 @@ import base64
 import logging
 import secrets
 import time
-from collections.abc import Callable, Coroutine
+from collections.abc import Coroutine
 from typing import Any
 
 from .containers import (
@@ -36,8 +36,8 @@ class RoborockClient:
         self._endpoint = endpoint
         self._nonce = secrets.token_bytes(16)
         self._waiting_queue: dict[int, RoborockFuture] = {}
-        self._last_device_msg_in = self.time_func()
-        self._last_disconnection = self.time_func()
+        self._last_device_msg_in = time.monotonic()
+        self._last_disconnection = time.monotonic()
         self.keep_alive = KEEPALIVE
         self._diagnostic_data: dict[str, dict[str, Any]] = {
             "misc_info": {"Nonce": base64.b64encode(self._nonce).decode("utf-8")}
@@ -59,15 +59,6 @@ class RoborockClient:
     def diagnostic_data(self) -> dict:
         return self._diagnostic_data
 
-    @property
-    def time_func(self) -> Callable[[], float]:
-        try:
-            # Use monotonic clock if available
-            time_func = time.monotonic
-        except AttributeError:
-            time_func = time.time
-        return time_func
-
     async def async_connect(self):
         raise NotImplementedError
 
@@ -81,13 +72,13 @@ class RoborockClient:
         raise NotImplementedError
 
     def on_connection_lost(self, exc: Exception | None) -> None:
-        self._last_disconnection = self.time_func()
+        self._last_disconnection = time.monotonic()
         self._logger.info("Roborock client disconnected")
         if exc is not None:
             self._logger.warning(exc)
 
     def should_keepalive(self) -> bool:
-        now = self.time_func()
+        now = time.monotonic()
         # noinspection PyUnresolvedReferences
         if now - self._last_disconnection > self.keep_alive**2 and now - self._last_device_msg_in > self.keep_alive:
             return False
@@ -116,8 +107,11 @@ class RoborockClient:
         if request_id in self._waiting_queue:
             new_id = get_next_int(10000, 32767)
             _LOGGER.warning(
-                f"Attempting to create a future with an existing request_id... New id is {new_id}. "
-                f"Code may not function properly."
+                "Attempting to create a future with an existing id %s (%s)... New id is %s. "
+                "Code may not function properly.",
+                request_id,
+                protocol_id,
+                new_id,
             )
             request_id = new_id
         self._waiting_queue[request_id] = queue

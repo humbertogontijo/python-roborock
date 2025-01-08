@@ -74,6 +74,7 @@ class RoborockMqttClientV1(RoborockMqttClient, RoborockClientV1):
             # When we have more custom commands do something more complicated here
             return await self._get_calibration_points()
         request_id, timestamp, payload = self._get_payload(method, params, True)
+        self._logger.debug("Building message id %s for method %s", request_id, method)
         request_protocol = RoborockMessageProtocol.RPC_REQUEST
         roborock_message = RoborockMessage(timestamp=timestamp, protocol=request_protocol, payload=payload)
         return await self.send_message(roborock_message)
