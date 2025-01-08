@@ -20,8 +20,8 @@ from .code_mappings import (
     RoborockFanPowerCode,
     RoborockFanSpeedP10,
     RoborockFanSpeedQ7Max,
-    RoborockFanSpeedQRevoMaster,
     RoborockFanSpeedQRevoCurv,
+    RoborockFanSpeedQRevoMaster,
     RoborockFanSpeedS6Pure,
     RoborockFanSpeedS7,
     RoborockFanSpeedS7MaxV,
@@ -31,8 +31,8 @@ from .code_mappings import (
     RoborockMopIntensityCode,
     RoborockMopIntensityP10,
     RoborockMopIntensityQ7Max,
-    RoborockMopIntensityQRevoMaster,
     RoborockMopIntensityQRevoCurv,
+    RoborockMopIntensityQRevoMaster,
     RoborockMopIntensityS5Max,
     RoborockMopIntensityS6MaxV,
     RoborockMopIntensityS7,
@@ -54,8 +54,8 @@ from .const import (
     ROBOROCK_G10S_PRO,
     ROBOROCK_P10,
     ROBOROCK_Q7_MAX,
-    ROBOROCK_QREVO_MASTER,
     ROBOROCK_QREVO_CURV,
+    ROBOROCK_QREVO_MASTER,
     ROBOROCK_QREVO_MAXV,
     ROBOROCK_QREVO_PRO,
     ROBOROCK_QREVO_S,
@@ -582,11 +582,13 @@ class QRevoMasterStatus(Status):
     fan_power: RoborockFanSpeedQRevoMaster | None = None
     water_box_mode: RoborockMopIntensityQRevoMaster | None = None
 
+
 @dataclass
 class QRevoCurvStatus(Status):
     fan_power: RoborockFanSpeedQRevoCurv | None = None
     water_box_mode: RoborockMopIntensityQRevoCurv | None = None
     mop_mode: RoborockMopModeQRevoCurv | None = None
+
 
 @dataclass
 class S6MaxVStatus(Status):
