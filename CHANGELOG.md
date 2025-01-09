@@ -1,6 +1,47 @@
 # CHANGELOG
 
 
+## v2.9.0 (2025-01-09)
+
+### Chores
+
+- Add some testing and mocks for the web api
+  ([#270](https://github.com/humbertogontijo/python-roborock/pull/270),
+  [`2356c16`](https://github.com/humbertogontijo/python-roborock/commit/2356c16cd08cdf7210f605f9c890eb1c5631a792))
+
+- Add example ([#269](https://github.com/humbertogontijo/python-roborock/pull/269),
+  [`d7a3af2`](https://github.com/humbertogontijo/python-roborock/commit/d7a3af29c91bf2066f88a941789c0dc725eb7431))
+
+### Features
+
+- Add dust collection mode name for typing ease
+  ([#271](https://github.com/humbertogontijo/python-roborock/pull/271),
+  [`c85232a`](https://github.com/humbertogontijo/python-roborock/commit/c85232a00b997dbc84a4b9b99b18ae1c714b7df7))
+
+- Add product v4 and downloading code
+  ([#267](https://github.com/humbertogontijo/python-roborock/pull/267),
+  [`b669117`](https://github.com/humbertogontijo/python-roborock/commit/b6691174607a66959f4d9046dffb4cd4e782695d))
+
+* feat: add product v4 and downloading code
+
+* fix: remove got message
+
+- Add support for qrevo curv ([#253](https://github.com/humbertogontijo/python-roborock/pull/253),
+  [`e42729a`](https://github.com/humbertogontijo/python-roborock/commit/e42729aa5aedd2c77f68230825d6ce832a146f33))
+
+* add support for qrevo curv
+
+* add dock support
+
+* revert unnecessary changes
+
+* fix: lint
+
+---------
+
+Co-authored-by: Luke Lashley <conway220@gmail.com>
+
+
 ## v2.8.5 (2025-01-06)
 
 ### Bug Fixes
