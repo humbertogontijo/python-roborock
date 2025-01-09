@@ -54,7 +54,7 @@ class RoborockApiClient:
                     raise RoborockMissingParameters(
                         "You are missing parameters for this request, are you sure you " "entered your username?"
                     )
-                raise RoborockUrlException(response.get("error"))
+                raise RoborockUrlException(f"error code: {response_code} msg: {response.get('error')}")
             response_data = response.get("data")
             if response_data is None:
                 raise RoborockUrlException("response does not have 'data'")
@@ -276,7 +276,7 @@ class RoborockApiClient:
         product_request = PreparedRequest(base_url, {"header_clientid": header_clientid})
         product_response = await product_request.request(
             "get",
-            "/api/v3/product",
+            "/api/v4/product",
             headers={"Authorization": user_data.token},
         )
         if product_response is None:
@@ -288,24 +288,44 @@ class RoborockApiClient:
             return ProductResponse.from_dict(result)
         raise RoborockException("product result was an unexpected type")
 
+    async def download_code(self, user_data: UserData, product_id: int):
+        base_url = await self._get_base_url()
+        header_clientid = self._get_header_client_id()
+        product_request = PreparedRequest(base_url, {"header_clientid": header_clientid})
+        request = {"apilevel": 99999, "productids": [product_id], "type": 2}
+        response = await product_request.request(
+            "post",
+            "/api/v1/appplugin",
+            json=request,
+            headers={"Authorization": user_data.token, "Content-Type": "application/json"},
+        )
+        return response["data"][0]["url"]
+
+    async def download_category_code(self, user_data: UserData):
+        base_url = await self._get_base_url()
+        header_clientid = self._get_header_client_id()
+        product_request = PreparedRequest(base_url, {"header_clientid": header_clientid})
+        response = await product_request.request(
+            "get",
+            "api/v1/plugins?apiLevel=99999&type=2",
+            headers={
+                "Authorization": user_data.token,
+            },
+        )
+        return {r["category"]: r["url"] for r in response["data"]["categoryPluginList"]}
+
 
 class PreparedRequest:
     def __init__(self, base_url: str, base_headers: dict | None = None) -> None:
         self.base_url = base_url
         self.base_headers = base_headers or {}
 
-    async def request(self, method: str, url: str, params=None, data=None, headers=None) -> dict:
+    async def request(self, method: str, url: str, params=None, data=None, headers=None, json=None) -> dict:
         _url = "/".join(s.strip("/") for s in [self.base_url, url])
         _headers = {**self.base_headers, **(headers or {})}
         async with aiohttp.ClientSession() as session:
             try:
-                async with session.request(
-                    method,
-                    _url,
-                    params=params,
-                    data=data,
-                    headers=_headers,
-                ) as resp:
+                async with session.request(method, _url, params=params, data=data, headers=_headers, json=json) as resp:
                     return await resp.json()
             except ContentTypeError as err:
                 """If we get an error, lets log everything for debugging."""
