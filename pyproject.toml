@@ -45,6 +45,7 @@ mypy = "*"
 ruff = "*"
 codespell = "*"
 pyshark = "^0.6"
+aioresponses = "^0.7.7"
 
 [tool.semantic_release]
 branch = "main"
@@ -67,3 +68,6 @@ select=["E", "F", "UP", "I"]
 
 [tool.ruff.lint.per-file-ignores]
 "*/__init__.py" = ["F401"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"

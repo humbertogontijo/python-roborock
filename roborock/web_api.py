@@ -146,7 +146,7 @@ class RoborockApiClient:
         """
         raise NotImplementedError("Pass_login_v3 has not yet been implemented")
 
-    async def code_login(self, code) -> UserData:
+    async def code_login(self, code: int | str) -> UserData:
         base_url = await self._get_base_url()
         header_clientid = self._get_header_client_id()
 
