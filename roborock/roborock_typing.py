@@ -461,6 +461,11 @@ class DeviceProp(RoborockBase):
     consumable: Consumable = field(default_factory=Consumable)
     last_clean_record: CleanRecord | None = None
     dock_summary: DockSummary | None = None
+    dust_collection_mode_name: str | None = None
+
+    def __post_init__(self) -> None:
+        if self.dock_summary and self.dock_summary.dust_collection_mode and self.dock_summary.dust_collection_mode.mode:
+            self.dust_collection_mode_name = self.dock_summary.dust_collection_mode.mode.name
 
     def update(self, device_prop: DeviceProp) -> None:
         if device_prop.status:
@@ -473,3 +478,4 @@ class DeviceProp(RoborockBase):
             self.last_clean_record = device_prop.last_clean_record
         if device_prop.dock_summary:
             self.dock_summary = device_prop.dock_summary
+        self.__post_init__()
