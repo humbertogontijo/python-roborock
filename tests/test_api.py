@@ -1,7 +1,6 @@
 from unittest.mock import patch
 
 import paho.mqtt.client as mqtt
-import pytest
 
 from roborock import (
     HomeData,
@@ -24,13 +23,12 @@ def test_can_create_prepared_request():
     PreparedRequest("https://sample.com")
 
 
-def test_can_create_mqtt_roborock():
+async def test_can_create_mqtt_roborock():
     home_data = HomeData.from_dict(HOME_DATA_RAW)
     device_info = DeviceData(device=home_data.devices[0], model=home_data.products[0].model)
     RoborockMqttClientV1(UserData.from_dict(USER_DATA), device_info)
 
 
-@pytest.mark.asyncio
 async def test_sync_connect(mqtt_client):
     with patch("paho.mqtt.client.Client.connect", return_value=mqtt.MQTT_ERR_SUCCESS):
         with patch("paho.mqtt.client.Client.loop_start", return_value=mqtt.MQTT_ERR_SUCCESS):
@@ -41,7 +39,6 @@ async def test_sync_connect(mqtt_client):
             connected_future.cancel()
 
 
-@pytest.mark.asyncio
 async def test_get_base_url_no_url():
     rc = RoborockApiClient("sample@gmail.com")
     with patch("roborock.web_api.PreparedRequest.request") as mock_request:
@@ -50,7 +47,6 @@ async def test_get_base_url_no_url():
     assert rc.base_url == "https://sample.com"
 
 
-@pytest.mark.asyncio
 async def test_request_code():
     rc = RoborockApiClient("sample@gmail.com")
     with patch("roborock.web_api.RoborockApiClient._get_base_url"), patch(
@@ -60,7 +56,6 @@ async def test_request_code():
         await rc.request_code()
 
 
-@pytest.mark.asyncio
 async def test_get_home_data():
     rc = RoborockApiClient("sample@gmail.com")
     with patch("roborock.web_api.RoborockApiClient._get_base_url"), patch(
@@ -77,7 +72,6 @@ async def test_get_home_data():
         assert result == HomeData.from_dict(HOME_DATA_RAW)
 
 
-@pytest.mark.asyncio
 async def test_get_dust_collection_mode():
     home_data = HomeData.from_dict(HOME_DATA_RAW)
     device_info = DeviceData(device=home_data.devices[0], model=home_data.products[0].model)
@@ -89,7 +83,6 @@ async def test_get_dust_collection_mode():
         assert dust.mode == RoborockDockDustCollectionModeCode.light
 
 
-@pytest.mark.asyncio
 async def test_get_mop_wash_mode():
     home_data = HomeData.from_dict(HOME_DATA_RAW)
     device_info = DeviceData(device=home_data.devices[0], model=home_data.products[0].model)
@@ -102,7 +95,6 @@ async def test_get_mop_wash_mode():
         assert mop_wash.wash_interval == 1500
 
 
-@pytest.mark.asyncio
 async def test_get_washing_mode():
     home_data = HomeData.from_dict(HOME_DATA_RAW)
     device_info = DeviceData(device=home_data.devices[0], model=home_data.products[0].model)
@@ -115,7 +107,6 @@ async def test_get_washing_mode():
         assert washing_mode.wash_mode == 2
 
 
-@pytest.mark.asyncio
 async def test_get_prop():
     home_data = HomeData.from_dict(HOME_DATA_RAW)
     device_info = DeviceData(device=home_data.devices[0], model=home_data.products[0].model)
