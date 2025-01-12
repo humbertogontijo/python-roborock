@@ -1,3 +1,4 @@
+import asyncio
 import json
 from collections.abc import AsyncGenerator
 from queue import Queue
@@ -15,7 +16,7 @@ from roborock import (
     UserData,
 )
 from roborock.containers import DeviceData, RoomMapping, S7MaxVStatus
-from roborock.exceptions import RoborockException
+from roborock.exceptions import RoborockException, RoborockTimeout
 from roborock.protocol import MessageParser
 from roborock.roborock_message import RoborockMessage, RoborockMessageProtocol
 from roborock.version_1_apis import RoborockMqttClientV1
@@ -154,8 +155,6 @@ async def connected_mqtt_client_fixture(
     response_queue.put(mqtt_packet.gen_suback(1, 0))
     await mqtt_client.async_connect()
     yield mqtt_client
-    if mqtt_client.is_connected():
-        await mqtt_client.async_disconnect()
 
 
 async def test_async_connect(received_requests: Queue, connected_mqtt_client: RoborockMqttClientV1) -> None:
@@ -185,6 +184,58 @@ async def test_connect_failure(
         await mqtt_client.async_connect()
     assert not mqtt_client.is_connected()
     assert received_requests.qsize() == 1  # Connect attempt
+
+
+async def test_disconnect_already_disconnected(connected_mqtt_client: RoborockMqttClientV1) -> None:
+    """Test the MQTT client error handling for a no-op disconnect."""
+
+    assert connected_mqtt_client.is_connected()
+
+    # Make the MQTT client simulate returning that it already thinks it is disconnected
+    with patch("roborock.cloud_api.mqtt.Client.disconnect", return_value=mqtt.MQTT_ERR_NO_CONN):
+        await connected_mqtt_client.async_disconnect()
+
+
+async def test_disconnect_failure(connected_mqtt_client: RoborockMqttClientV1) -> None:
+    """Test that the MQTT client ignores  MQTT client error handling for a no-op disconnect."""
+
+    assert connected_mqtt_client.is_connected()
+
+    # Make the MQTT client returns with an error when disconnecting
+    with patch("roborock.cloud_api.mqtt.Client.disconnect", return_value=mqtt.MQTT_ERR_PROTOCOL), pytest.raises(
+        RoborockException, match="Failed to disconnect"
+    ):
+        await connected_mqtt_client.async_disconnect()
+
+
+async def test_async_release(connected_mqtt_client: RoborockMqttClientV1) -> None:
+    """Test the async_release API will disconnect the client."""
+    await connected_mqtt_client.async_release()
+    assert not connected_mqtt_client.is_connected()
+
+
+async def test_subscribe_failure(
+    received_requests: Queue, response_queue: Queue, mqtt_client: RoborockMqttClientV1
+) -> None:
+    """Test the broker responding with the wrong message type on subscribe."""
+
+    response_queue.put(mqtt_packet.gen_connack(rc=0, flags=2))
+
+    with patch("roborock.cloud_api.mqtt.Client.subscribe", return_value=(mqtt.MQTT_ERR_NO_CONN, None)), pytest.raises(
+        RoborockException, match="Failed to subscribe"
+    ):
+        await mqtt_client.async_connect()
+
+    assert received_requests.qsize() == 1  # Connect attempt
+
+    # NOTE: The client is "connected" but not "subscribed" and cannot recover
+    # from this state without disconnecting first. This can likely be improved.
+    assert mqtt_client.is_connected()
+
+    # Attempting to reconnect is a no-op since the client already thinks it is connected
+    await mqtt_client.async_connect()
+    assert mqtt_client.is_connected()
+    assert received_requests.qsize() == 1
 
 
 def build_rpc_response(message: dict[str, Any]) -> bytes:
@@ -228,3 +279,26 @@ async def test_get_room_mapping(
         RoomMapping(segment_id=16, iot_id="2362048"),
         RoomMapping(segment_id=17, iot_id="2362044"),
     ]
+
+
+async def test_publish_failure(
+    connected_mqtt_client: RoborockMqttClientV1,
+) -> None:
+    """Test a failure return code when publishing a messaage."""
+
+    msg = mqtt.MQTTMessageInfo(0)
+    msg.rc = mqtt.MQTT_ERR_PROTOCOL
+    with patch("roborock.cloud_api.mqtt.Client.publish", return_value=msg), pytest.raises(
+        RoborockException, match="Failed to publish"
+    ):
+        await connected_mqtt_client.get_room_mapping()
+
+
+async def test_future_timeout(
+    connected_mqtt_client: RoborockMqttClientV1,
+) -> None:
+    """Test a timeout raised while waiting for an RPC response."""
+    with patch("roborock.roborock_future.async_timeout.timeout", side_effect=asyncio.TimeoutError), pytest.raises(
+        RoborockTimeout, match="Timeout after"
+    ):
+        await connected_mqtt_client.get_room_mapping()
