@@ -4,7 +4,6 @@ import asyncio
 import base64
 import logging
 import threading
-import typing
 import uuid
 from asyncio import Lock, Task
 from typing import Any
@@ -21,8 +20,6 @@ from .roborock_message import RoborockMessage
 from .roborock_typing import RoborockCommand
 from .util import RoborockLoggerAdapter
 
-if typing.TYPE_CHECKING:
-    pass
 _LOGGER = logging.getLogger(__name__)
 CONNECT_REQUEST_ID = 0
 DISCONNECT_REQUEST_ID = 1
