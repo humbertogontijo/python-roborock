@@ -29,7 +29,7 @@ def test_user_data():
     assert ud.rriot.k == "domain123"
     assert ud.rriot.r.r == "US"
     assert ud.rriot.r.a == "https://api-us.roborock.com"
-    assert ud.rriot.r.m == "ssl://mqtt-us.roborock.com:8883"
+    assert ud.rriot.r.m == "tcp://mqtt-us.roborock.com:8883"
     assert ud.rriot.r.l == "https://wood-us.roborock.com"
     assert ud.tuya_device_state == 2
     assert ud.avatarurl == "https://files.roborock.com/iottest/default_avatar.png"

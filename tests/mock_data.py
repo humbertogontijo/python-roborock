@@ -21,14 +21,14 @@ USER_DATA = {
         "r": {
             "r": "US",
             "a": "https://api-us.roborock.com",
-            "m": "ssl://mqtt-us.roborock.com:8883",
+            "m": "tcp://mqtt-us.roborock.com:8883",  # Skip SSL code in MQTT client library
             "l": "https://wood-us.roborock.com",
         },
     },
     "tuyaDeviceState": 2,
     "avatarurl": "https://files.roborock.com/iottest/default_avatar.png",
 }
-
+LOCAL_KEY = "key123"
 HOME_DATA_RAW = {
     "id": 123456,
     "name": "My Home",
@@ -199,7 +199,7 @@ HOME_DATA_RAW = {
             "name": "Roborock S7 MaxV",
             "attribute": None,
             "activeTime": 1672364449,
-            "localKey": "key123",
+            "localKey": LOCAL_KEY,
             "runtimeEnv": None,
             "timeZoneId": "America/Los_Angeles",
             "iconUrl": "no_url",
@@ -339,3 +339,5 @@ BASE_URL_REQUEST = {
 }
 
 GET_CODE_RESPONSE = {"code": 200, "msg": "success", "data": None}
+
+MQTT_PUBLISH_TOPIC = "rr/m/o/user123/6ac2e6f8/abc123"
