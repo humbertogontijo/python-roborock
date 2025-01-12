@@ -1,6 +1,11 @@
+import json
+from collections.abc import AsyncGenerator
+from queue import Queue
+from typing import Any
 from unittest.mock import patch
 
 import paho.mqtt.client as mqtt
+import pytest
 
 from roborock import (
     HomeData,
@@ -9,10 +14,23 @@ from roborock import (
     RoborockDockWashTowelModeCode,
     UserData,
 )
-from roborock.containers import DeviceData, S7MaxVStatus
-from roborock.version_1_apis.roborock_mqtt_client_v1 import RoborockMqttClientV1
+from roborock.containers import DeviceData, RoomMapping, S7MaxVStatus
+from roborock.exceptions import RoborockException
+from roborock.protocol import MessageParser
+from roborock.roborock_message import RoborockMessage, RoborockMessageProtocol
+from roborock.version_1_apis import RoborockMqttClientV1
 from roborock.web_api import PreparedRequest, RoborockApiClient
-from tests.mock_data import BASE_URL_REQUEST, GET_CODE_RESPONSE, HOME_DATA_RAW, STATUS, USER_DATA
+from tests.mock_data import (
+    BASE_URL_REQUEST,
+    GET_CODE_RESPONSE,
+    HOME_DATA_RAW,
+    LOCAL_KEY,
+    MQTT_PUBLISH_TOPIC,
+    STATUS,
+    USER_DATA,
+)
+
+from . import mqtt_packet
 
 
 def test_can_create_roborock_client():
@@ -126,3 +144,87 @@ async def test_get_prop():
         assert props.dock_summary.wash_towel_mode is None
         assert props.dock_summary.smart_wash_params is None
         assert props.dock_summary.dust_collection_mode is not None
+
+
+@pytest.fixture(name="connected_mqtt_client")
+async def connected_mqtt_client_fixture(
+    response_queue: Queue, mqtt_client: RoborockMqttClientV1
+) -> AsyncGenerator[RoborockMqttClientV1, None]:
+    response_queue.put(mqtt_packet.gen_connack(rc=0, flags=2))
+    response_queue.put(mqtt_packet.gen_suback(1, 0))
+    await mqtt_client.async_connect()
+    yield mqtt_client
+    if mqtt_client.is_connected():
+        await mqtt_client.async_disconnect()
+
+
+async def test_async_connect(received_requests: Queue, connected_mqtt_client: RoborockMqttClientV1) -> None:
+    """Test connecting to the MQTT broker."""
+
+    assert connected_mqtt_client.is_connected()
+    # Connecting again is a no-op
+    await connected_mqtt_client.async_connect()
+    assert connected_mqtt_client.is_connected()
+
+    await connected_mqtt_client.async_disconnect()
+    assert not connected_mqtt_client.is_connected()
+
+    # Broker received a connect and subscribe. Disconnect packet is not
+    # guaranteed to be captured by the time the async_disconnect returns
+    assert received_requests.qsize() >= 2  # Connect and Subscribe
+
+
+async def test_connect_failure(
+    received_requests: Queue, response_queue: Queue, mqtt_client: RoborockMqttClientV1
+) -> None:
+    """Test the broker responding with a connect failure."""
+
+    response_queue.put(mqtt_packet.gen_connack(rc=1))
+
+    with pytest.raises(RoborockException, match="Failed to connect"):
+        await mqtt_client.async_connect()
+    assert not mqtt_client.is_connected()
+    assert received_requests.qsize() == 1  # Connect attempt
+
+
+def build_rpc_response(message: dict[str, Any]) -> bytes:
+    """Build an encoded RPC response message."""
+    return MessageParser.build(
+        [
+            RoborockMessage(
+                protocol=RoborockMessageProtocol.RPC_RESPONSE,
+                payload=json.dumps(
+                    {
+                        "dps": {102: json.dumps(message)},
+                    }
+                ).encode(),
+                seq=2020,
+            ),
+        ],
+        local_key=LOCAL_KEY,
+    )
+
+
+async def test_get_room_mapping(
+    received_requests: Queue,
+    response_queue: Queue,
+    connected_mqtt_client: RoborockMqttClientV1,
+) -> None:
+    """Test sending an arbitrary MQTT message and parsing the response."""
+
+    test_request_id = 5050
+    message = build_rpc_response(
+        {
+            "id": test_request_id,
+            "result": [[16, "2362048"], [17, "2362044"]],
+        }
+    )
+    response_queue.put(mqtt_packet.gen_publish(MQTT_PUBLISH_TOPIC, payload=message))
+
+    with patch("roborock.version_1_apis.roborock_client_v1.get_next_int", return_value=test_request_id):
+        room_mapping = await connected_mqtt_client.get_room_mapping()
+
+    assert room_mapping == [
+        RoomMapping(segment_id=16, iot_id="2362048"),
+        RoomMapping(segment_id=17, iot_id="2362044"),
+    ]
