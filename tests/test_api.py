@@ -1,4 +1,5 @@
 import json
+from collections.abc import AsyncGenerator
 from queue import Queue
 from typing import Any
 from unittest.mock import patch
@@ -145,19 +146,28 @@ async def test_get_prop():
         assert props.dock_summary.dust_collection_mode is not None
 
 
-async def test_async_connect(
-    received_requests: Queue, response_queue: Queue, mqtt_client: RoborockMqttClientV1
-) -> None:
-    """Test connecting to the MQTT broker."""
-
+@pytest.fixture(name="connected_mqtt_client")
+async def connected_mqtt_client_fixture(
+    response_queue: Queue, mqtt_client: RoborockMqttClientV1
+) -> AsyncGenerator[RoborockMqttClientV1, None]:
     response_queue.put(mqtt_packet.gen_connack(rc=0, flags=2))
     response_queue.put(mqtt_packet.gen_suback(1, 0))
-
     await mqtt_client.async_connect()
-    assert mqtt_client.is_connected()
+    yield mqtt_client
+    if mqtt_client.is_connected():
+        await mqtt_client.async_disconnect()
 
-    await mqtt_client.async_disconnect()
-    assert not mqtt_client.is_connected()
+
+async def test_async_connect(received_requests: Queue, connected_mqtt_client: RoborockMqttClientV1) -> None:
+    """Test connecting to the MQTT broker."""
+
+    assert connected_mqtt_client.is_connected()
+    # Connecting again is a no-op
+    await connected_mqtt_client.async_connect()
+    assert connected_mqtt_client.is_connected()
+
+    await connected_mqtt_client.async_disconnect()
+    assert not connected_mqtt_client.is_connected()
 
     # Broker received a connect and subscribe. Disconnect packet is not
     # guaranteed to be captured by the time the async_disconnect returns
@@ -198,14 +208,9 @@ def build_rpc_response(message: dict[str, Any]) -> bytes:
 async def test_get_room_mapping(
     received_requests: Queue,
     response_queue: Queue,
-    mqtt_client: RoborockMqttClientV1,
+    connected_mqtt_client: RoborockMqttClientV1,
 ) -> None:
     """Test sending an arbitrary MQTT message and parsing the response."""
-
-    response_queue.put(mqtt_packet.gen_connack(rc=0, flags=2))
-    response_queue.put(mqtt_packet.gen_suback(1, 0))
-    await mqtt_client.async_connect()
-    assert mqtt_client.is_connected()
 
     test_request_id = 5050
     message = build_rpc_response(
@@ -217,11 +222,9 @@ async def test_get_room_mapping(
     response_queue.put(mqtt_packet.gen_publish(MQTT_PUBLISH_TOPIC, payload=message))
 
     with patch("roborock.version_1_apis.roborock_client_v1.get_next_int", return_value=test_request_id):
-        room_mapping = await mqtt_client.get_room_mapping()
+        room_mapping = await connected_mqtt_client.get_room_mapping()
 
     assert room_mapping == [
         RoomMapping(segment_id=16, iot_id="2362048"),
         RoomMapping(segment_id=17, iot_id="2362044"),
     ]
-
-    await mqtt_client.async_disconnect()

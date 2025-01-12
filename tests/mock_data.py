@@ -1,9 +1,14 @@
 """Mock data for Roborock tests."""
+
+import hashlib
+
 # All data is based on a U.S. customer with a Roborock S7 MaxV Ultra
 USER_EMAIL = "user@domain.com"
 
 BASE_URL = "https://usiot.roborock.com"
 
+USER_ID = "user123"
+K_VALUE = "domain123"
 USER_DATA = {
     "uid": 123456,
     "tokentype": "token_type",
@@ -14,10 +19,10 @@ USER_DATA = {
     "country": "US",
     "nickname": "user_nickname",
     "rriot": {
-        "u": "user123",
+        "u": USER_ID,
         "s": "pass123",
         "h": "unknown123",
-        "k": "domain123",
+        "k": K_VALUE,
         "r": {
             "r": "US",
             "a": "https://api-us.roborock.com",
@@ -29,6 +34,7 @@ USER_DATA = {
     "avatarurl": "https://files.roborock.com/iottest/default_avatar.png",
 }
 LOCAL_KEY = "key123"
+PRODUCT_ID = "product-id-123"
 HOME_DATA_RAW = {
     "id": 123456,
     "name": "My Home",
@@ -37,7 +43,7 @@ HOME_DATA_RAW = {
     "geoName": None,
     "products": [
         {
-            "id": "abc123",
+            "id": PRODUCT_ID,
             "name": "Roborock S7 MaxV",
             "code": "a27",
             "model": "roborock.vacuum.a27",
@@ -339,5 +345,5 @@ BASE_URL_REQUEST = {
 }
 
 GET_CODE_RESPONSE = {"code": 200, "msg": "success", "data": None}
-
-MQTT_PUBLISH_TOPIC = "rr/m/o/user123/6ac2e6f8/abc123"
+HASHED_USER = hashlib.md5((USER_ID + ":" + K_VALUE).encode()).hexdigest()[2:10]
+MQTT_PUBLISH_TOPIC = f"rr/m/o/{USER_ID}/{HASHED_USER}/{PRODUCT_ID}"

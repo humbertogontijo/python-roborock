@@ -10,7 +10,7 @@ from roborock.code_mappings import (
     RoborockStateCode,
 )
 
-from .mock_data import CLEAN_RECORD, CLEAN_SUMMARY, CONSUMABLE, DND_TIMER, HOME_DATA_RAW, STATUS, USER_DATA
+from .mock_data import CLEAN_RECORD, CLEAN_SUMMARY, CONSUMABLE, DND_TIMER, HOME_DATA_RAW, PRODUCT_ID, STATUS, USER_DATA
 
 
 def test_user_data():
@@ -43,7 +43,7 @@ def test_home_data():
     assert hd.lat is None
     assert hd.geo_name is None
     product = hd.products[0]
-    assert product.id == "abc123"
+    assert product.id == PRODUCT_ID
     assert product.name == "Roborock S7 MaxV"
     assert product.code == "a27"
     assert product.model == "roborock.vacuum.a27"

@@ -1,8 +1,8 @@
 import io
 import logging
-import queue
 import re
 from collections.abc import Callable, Generator
+from queue import Queue
 from typing import Any
 from unittest.mock import Mock, patch
 
@@ -63,21 +63,21 @@ class FakeSocketHandler:
 
 
 @pytest.fixture(name="received_requests")
-def received_requests_fixture() -> queue.Queue[bytes]:
+def received_requests_fixture() -> Queue[bytes]:
     """Fixture that provides access to the received requests."""
-    return queue.Queue()
+    return Queue()
 
 
 @pytest.fixture(name="response_queue")
-def response_queue_fixture() -> queue.Queue[bytes]:
+def response_queue_fixture() -> Generator[Queue[bytes], None, None]:
     """Fixture that provides access to the received requests."""
-    return queue.Queue()
+    response_queue: Queue[bytes] = Queue()
+    yield response_queue
+    assert response_queue.empty(), "Not all fake responses were consumed"
 
 
 @pytest.fixture(name="request_handler")
-def request_handler_fixture(
-    received_requests: queue.Queue[bytes], response_queue: queue.Queue[bytes]
-) -> RequestHandler:
+def request_handler_fixture(received_requests: Queue[bytes], response_queue: Queue[bytes]) -> RequestHandler:
     """Fixture records incoming requests and replies with responses from the queue."""
 
     def handle_request(client_request: bytes) -> bytes | None:
@@ -85,7 +85,7 @@ def request_handler_fixture(
         received_requests.put(client_request)
 
         # Insert a prepared response into the response buffer
-        if response_queue.qsize() > 0:
+        if not response_queue.empty():
             return response_queue.get()
         return None
 
