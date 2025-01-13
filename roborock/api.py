@@ -7,6 +7,7 @@ import base64
 import logging
 import secrets
 import time
+from abc import ABC, abstractmethod
 from typing import Any
 
 from .containers import (
@@ -21,17 +22,21 @@ from .roborock_message import (
     RoborockMessage,
 )
 from .roborock_typing import RoborockCommand
-from .util import RoborockLoggerAdapter, get_next_int, get_running_loop_or_create_one
+from .util import get_next_int, get_running_loop_or_create_one
 
 _LOGGER = logging.getLogger(__name__)
 KEEPALIVE = 60
 
 
-class RoborockClient:
-    def __init__(self, endpoint: str, device_info: DeviceData, queue_timeout: int = 4) -> None:
+class RoborockClient(ABC):
+    """Roborock client base class."""
+
+    _logger: logging.LoggerAdapter
+
+    def __init__(self, device_info: DeviceData, queue_timeout: int = 4) -> None:
+        """Initialize RoborockClient."""
         self.event_loop = get_running_loop_or_create_one()
         self.device_info = device_info
-        self._endpoint = endpoint
         self._nonce = secrets.token_bytes(16)
         self._waiting_queue: dict[int, RoborockFuture] = {}
         self._last_device_msg_in = time.monotonic()
@@ -40,7 +45,6 @@ class RoborockClient:
         self._diagnostic_data: dict[str, dict[str, Any]] = {
             "misc_info": {"Nonce": base64.b64encode(self._nonce).decode("utf-8")}
         }
-        self._logger = RoborockLoggerAdapter(device_info.device.name, _LOGGER)
         self.is_available: bool = True
         self.queue_timeout = queue_timeout
 
@@ -57,17 +61,21 @@ class RoborockClient:
     def diagnostic_data(self) -> dict:
         return self._diagnostic_data
 
+    @abstractmethod
     async def async_connect(self):
-        raise NotImplementedError
+        """Connect to the Roborock device."""
 
+    @abstractmethod
     def sync_disconnect(self) -> Any:
-        raise NotImplementedError
+        """Disconnect from the Roborock device."""
 
+    @abstractmethod
     async def async_disconnect(self) -> Any:
-        raise NotImplementedError
+        """Disconnect from the Roborock device."""
 
+    @abstractmethod
     def on_message_received(self, messages: list[RoborockMessage]) -> None:
-        raise NotImplementedError
+        """Handle received incoming messages from the device."""
 
     def on_connection_lost(self, exc: Exception | None) -> None:
         self._last_disconnection = time.monotonic()
@@ -102,7 +110,7 @@ class RoborockClient:
         queue = RoborockFuture(protocol_id)
         if request_id in self._waiting_queue:
             new_id = get_next_int(10000, 32767)
-            _LOGGER.warning(
+            self._logger.warning(
                 "Attempting to create a future with an existing id %s (%s)... New id is %s. "
                 "Code may not function properly.",
                 request_id,
@@ -113,12 +121,14 @@ class RoborockClient:
         self._waiting_queue[request_id] = queue
         return asyncio.ensure_future(self._wait_response(request_id, queue))
 
+    @abstractmethod
     async def send_message(self, roborock_message: RoborockMessage):
-        raise NotImplementedError
+        """Send a message to the Roborock device."""
 
+    @abstractmethod
     async def _send_command(
         self,
         method: RoborockCommand | str,
         params: list | dict | int | None = None,
     ):
-        raise NotImplementedError
+        """Send a command to the Roborock device."""

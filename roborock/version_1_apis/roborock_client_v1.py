@@ -4,6 +4,7 @@ import json
 import math
 import struct
 import time
+from abc import ABC
 from collections.abc import Callable, Coroutine
 from typing import Any, TypeVar, final
 
@@ -142,19 +143,22 @@ class ListenerModel:
     cache: dict[CacheableAttribute, AttributeCache]
 
 
-class RoborockClientV1(RoborockClient):
+class RoborockClientV1(RoborockClient, ABC):
+    """Roborock client base class for version 1 devices."""
+
     _listeners: dict[str, ListenerModel] = {}
 
-    def __init__(self, device_info: DeviceData, logger, endpoint: str):
-        super().__init__(endpoint, device_info)
+    def __init__(self, device_info: DeviceData, endpoint: str):
+        """Initializes the Roborock client."""
+        super().__init__(device_info)
         self._status_type: type[Status] = ModelStatus.get(device_info.model, S7MaxVStatus)
-        self._logger = logger
         self.cache: dict[CacheableAttribute, AttributeCache] = {
             cacheable_attribute: AttributeCache(attr, self) for cacheable_attribute, attr in get_cache_map().items()
         }
         if device_info.device.duid not in self._listeners:
             self._listeners[device_info.device.duid] = ListenerModel({}, self.cache)
         self.listener_model = self._listeners[device_info.device.duid]
+        self._endpoint = endpoint
 
     def release(self):
         super().release()

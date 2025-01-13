@@ -1,6 +1,6 @@
 import base64
+import logging
 
-import paho.mqtt.client as mqtt
 from vacuum_map_parser_base.config.color import ColorsPalette
 from vacuum_map_parser_base.config.image_config import ImageConfig
 from vacuum_map_parser_base.config.size import Sizes
@@ -16,23 +16,25 @@ from ..roborock_message import (
     RoborockMessageProtocol,
 )
 from ..roborock_typing import RoborockCommand
+from ..util import RoborockLoggerAdapter
 from .roborock_client_v1 import COMMANDS_SECURED, CUSTOM_COMMANDS, RoborockClientV1
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class RoborockMqttClientV1(RoborockMqttClient, RoborockClientV1):
+    """Roborock mqtt client for v1 devices."""
+
     def __init__(self, user_data: UserData, device_info: DeviceData, queue_timeout: int = 10) -> None:
+        """Initialize the Roborock mqtt client."""
         rriot = user_data.rriot
         if rriot is None:
             raise RoborockException("Got no rriot data from user_data")
         endpoint = base64.b64encode(Utils.md5(rriot.k.encode())[8:14]).decode()
 
         RoborockMqttClient.__init__(self, user_data, device_info, queue_timeout)
-        RoborockClientV1.__init__(self, device_info, self._logger, endpoint)
-
-    def _send_msg_raw(self, msg: bytes) -> None:
-        info = self.publish(f"rr/m/i/{self._mqtt_user}/{self._hashed_user}/{self.device_info.device.duid}", msg)
-        if info.rc != mqtt.MQTT_ERR_SUCCESS:
-            raise RoborockException(f"Failed to publish ({mqtt.error_string(info.rc)})")
+        RoborockClientV1.__init__(self, device_info, endpoint)
+        self._logger = RoborockLoggerAdapter(device_info.device.name, _LOGGER)
 
     async def send_message(self, roborock_message: RoborockMessage):
         await self.validate_connection()

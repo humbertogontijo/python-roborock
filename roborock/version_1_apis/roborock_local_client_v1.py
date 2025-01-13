@@ -1,16 +1,25 @@
+import logging
+
 from roborock.local_api import RoborockLocalClient
 
 from .. import CommandVacuumError, DeviceData, RoborockCommand, RoborockException
 from ..exceptions import VacuumError
 from ..protocol import MessageParser
 from ..roborock_message import MessageRetry, RoborockMessage, RoborockMessageProtocol
+from ..util import RoborockLoggerAdapter
 from .roborock_client_v1 import COMMANDS_SECURED, RoborockClientV1
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class RoborockLocalClientV1(RoborockLocalClient, RoborockClientV1):
+    """Roborock local client for v1 devices."""
+
     def __init__(self, device_data: DeviceData, queue_timeout: int = 4):
+        """Initialize the Roborock local client."""
         RoborockLocalClient.__init__(self, device_data, queue_timeout)
-        RoborockClientV1.__init__(self, device_data, self._logger, "abc")
+        RoborockClientV1.__init__(self, device_data, "abc")
+        self._logger = RoborockLoggerAdapter(device_data.device.name, _LOGGER)
 
     def build_roborock_message(
         self, method: RoborockCommand | str, params: list | dict | int | None = None

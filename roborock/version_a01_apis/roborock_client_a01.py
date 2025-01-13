@@ -1,6 +1,8 @@
 import dataclasses
 import json
+import logging
 import typing
+from abc import ABC, abstractmethod
 from collections.abc import Callable
 from datetime import time
 
@@ -37,6 +39,8 @@ from roborock.roborock_message import (
     RoborockMessageProtocol,
     RoborockZeoProtocol,
 )
+
+_LOGGER = logging.getLogger(__name__)
 
 
 @dataclasses.dataclass
@@ -101,9 +105,12 @@ zeo_data_protocol_entries = {
 }
 
 
-class RoborockClientA01(RoborockClient):
-    def __init__(self, endpoint: str, device_info: DeviceData, category: RoborockCategory, queue_timeout: int = 4):
-        super().__init__(endpoint, device_info, queue_timeout)
+class RoborockClientA01(RoborockClient, ABC):
+    """Roborock client base class for A01 devices."""
+
+    def __init__(self, device_info: DeviceData, category: RoborockCategory, queue_timeout: int = 4):
+        """Initialize the Roborock client."""
+        super().__init__(device_info, queue_timeout)
         self.category = category
 
     def on_message_received(self, messages: list[RoborockMessage]) -> None:
@@ -137,8 +144,8 @@ class RoborockClientA01(RoborockClient):
                         if queue and queue.protocol == protocol:
                             queue.set_result(converted_response)
 
+    @abstractmethod
     async def update_values(
         self, dyad_data_protocols: list[RoborockDyadDataProtocol | RoborockZeoProtocol]
     ) -> dict[RoborockDyadDataProtocol | RoborockZeoProtocol, typing.Any]:
         """This should handle updating for each given protocol."""
-        raise NotImplementedError
