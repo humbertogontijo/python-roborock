@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-import base64
 import logging
 import threading
 import uuid
+from abc import ABC
 from asyncio import Lock
 from typing import Any
 from urllib.parse import urlparse
@@ -13,18 +13,15 @@ import paho.mqtt.client as mqtt
 from .api import KEEPALIVE, RoborockClient
 from .containers import DeviceData, UserData
 from .exceptions import RoborockException, VacuumError
-from .protocol import MessageParser, Utils, md5hex
+from .protocol import MessageParser, md5hex
 from .roborock_future import RoborockFuture
-from .roborock_message import RoborockMessage
-from .roborock_typing import RoborockCommand
-from .util import RoborockLoggerAdapter
 
 _LOGGER = logging.getLogger(__name__)
 CONNECT_REQUEST_ID = 0
 DISCONNECT_REQUEST_ID = 1
 
 
-class RoborockMqttClient(RoborockClient, mqtt.Client):
+class RoborockMqttClient(RoborockClient, mqtt.Client, ABC):
     _thread: threading.Thread
     _client_id: str
 
@@ -32,10 +29,8 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
         rriot = user_data.rriot
         if rriot is None:
             raise RoborockException("Got no rriot data from user_data")
-        endpoint = base64.b64encode(Utils.md5(rriot.k.encode())[8:14]).decode()
-        RoborockClient.__init__(self, endpoint, device_info, queue_timeout)
+        RoborockClient.__init__(self, device_info, queue_timeout)
         mqtt.Client.__init__(self, protocol=mqtt.MQTTv5)
-        self._logger = RoborockLoggerAdapter(device_info.device.name, _LOGGER)
         self._mqtt_user = rriot.u
         self._hashed_user = md5hex(self._mqtt_user + ":" + rriot.k)[2:10]
         url = urlparse(rriot.r.m)
@@ -49,7 +44,6 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
         self._mqtt_password = rriot.s
         self._hashed_password = md5hex(self._mqtt_password + ":" + rriot.k)[16:]
         super().username_pw_set(self._hashed_user, self._hashed_password)
-        self._endpoint = base64.b64encode(Utils.md5(rriot.k.encode())[8:14]).decode()
         self._waiting_queue: dict[int, RoborockFuture] = {}
         self._mutex = Lock()
         self.update_client_id()
@@ -164,13 +158,3 @@ class RoborockMqttClient(RoborockClient, mqtt.Client):
         info = self.publish(f"rr/m/i/{self._mqtt_user}/{self._hashed_user}/{self.device_info.device.duid}", msg)
         if info.rc != mqtt.MQTT_ERR_SUCCESS:
             raise RoborockException(f"Failed to publish ({mqtt.error_string(info.rc)})")
-
-    async def send_message(self, roborock_message: RoborockMessage):
-        raise NotImplementedError
-
-    async def _send_command(
-        self,
-        method: RoborockCommand | str,
-        params: list | dict | int | None = None,
-    ):
-        raise NotImplementedError

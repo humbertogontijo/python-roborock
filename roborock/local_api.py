@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from abc import ABC
 from asyncio import Lock, TimerHandle, Transport
 
 import async_timeout
@@ -11,14 +12,15 @@ from .api import RoborockClient
 from .exceptions import RoborockConnectionException, RoborockException
 from .protocol import MessageParser
 from .roborock_message import RoborockMessage, RoborockMessageProtocol
-from .roborock_typing import RoborockCommand
-from .util import RoborockLoggerAdapter
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class RoborockLocalClient(RoborockClient, asyncio.Protocol):
+class RoborockLocalClient(RoborockClient, asyncio.Protocol, ABC):
+    """Roborock local client base class."""
+
     def __init__(self, device_data: DeviceData, queue_timeout: int = 4):
+        """Initialize the Roborock local client."""
         if device_data.host is None:
             raise RoborockException("Host is required")
         self.host = device_data.host
@@ -28,8 +30,7 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
         self.transport: Transport | None = None
         self._mutex = Lock()
         self.keep_alive_task: TimerHandle | None = None
-        self._logger = RoborockLoggerAdapter(device_data.device.name, _LOGGER)
-        RoborockClient.__init__(self, "abc", device_data, queue_timeout)
+        RoborockClient.__init__(self, device_data, queue_timeout)
 
     def data_received(self, message):
         if self.remaining:
@@ -106,13 +107,6 @@ class RoborockLocalClient(RoborockClient, asyncio.Protocol):
                 random=23,
             )
         )
-
-    async def _send_command(
-        self,
-        method: RoborockCommand | str,
-        params: list | dict | int | None = None,
-    ):
-        raise NotImplementedError
 
     def _send_msg_raw(self, data: bytes):
         try:
