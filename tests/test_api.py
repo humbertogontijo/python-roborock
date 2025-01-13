@@ -51,8 +51,7 @@ async def test_can_create_mqtt_roborock():
 async def test_sync_connect(mqtt_client):
     with patch("paho.mqtt.client.Client.connect", return_value=mqtt.MQTT_ERR_SUCCESS):
         with patch("paho.mqtt.client.Client.loop_start", return_value=mqtt.MQTT_ERR_SUCCESS):
-            connecting, connected_future = mqtt_client.sync_connect()
-            assert connecting is True
+            connected_future = mqtt_client.sync_connect()
             assert connected_future is not None
 
             connected_future.cancel()

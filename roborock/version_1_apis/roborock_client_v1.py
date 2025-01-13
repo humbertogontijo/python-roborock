@@ -378,20 +378,17 @@ class RoborockClientV1(RoborockClient):
                             if queue and queue.protocol == protocol:
                                 error = data_point_response.get("error")
                                 if error:
-                                    queue.resolve(
-                                        (
-                                            None,
-                                            VacuumError(
-                                                error.get("code"),
-                                                error.get("message"),
-                                            ),
-                                        )
+                                    queue.set_exception(
+                                        VacuumError(
+                                            error.get("code"),
+                                            error.get("message"),
+                                        ),
                                     )
                                 else:
                                     result = data_point_response.get("result")
                                     if isinstance(result, list) and len(result) == 1:
                                         result = result[0]
-                                    queue.resolve((result, None))
+                                    queue.set_result(result)
                             else:
                                 self._logger.debug("Received response for unknown request id %s", request_id)
                         else:
@@ -451,13 +448,13 @@ class RoborockClientV1(RoborockClient):
                         if queue:
                             if isinstance(decompressed, list):
                                 decompressed = decompressed[0]
-                            queue.resolve((decompressed, None))
+                            queue.set_result(decompressed)
                         else:
                             self._logger.debug("Received response for unknown request id %s", request_id)
                 else:
                     queue = self._waiting_queue.get(data.seq)
                     if queue:
-                        queue.resolve((data.payload, None))
+                        queue.set_result(data.payload)
                     else:
                         self._logger.debug("Received response for unknown request id %s", data.seq)
         except Exception as ex:
