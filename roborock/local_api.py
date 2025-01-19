@@ -25,6 +25,14 @@ class _LocalProtocol(asyncio.Protocol):
     messages_cb: Callable[[bytes], None]
     connection_lost_cb: Callable[[Exception | None], None]
 
+    def data_received(self, bytes) -> None:
+        """Called when data is received from the transport."""
+        self.messages_cb(bytes)
+
+    def connection_lost(self, exc: Exception | None) -> None:
+        """Called when the transport connection is lost."""
+        self.connection_lost_cb(exc)
+
 
 class RoborockLocalClient(RoborockClient, ABC):
     """Roborock local client base class."""
