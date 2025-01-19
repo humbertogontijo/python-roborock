@@ -1,6 +1,31 @@
 # CHANGELOG
 
 
+## v2.9.2 (2025-01-19)
+
+### Bug Fixes
+
+- Update local API protocol broken during refactoring and add additional tests for API calls
+  ([#293](https://github.com/Python-roborock/python-roborock/pull/293),
+  [`ea8e55a`](https://github.com/Python-roborock/python-roborock/commit/ea8e55a0b9c54e7c7d6235ad0e73f7b75ec4de7b))
+
+* test: add an additional local API test and fix bug in test fixture
+
+* test: fix formatting
+
+* fix: Update local API
+
+### Chores
+
+- Remove dacite and update readme
+  ([#294](https://github.com/Python-roborock/python-roborock/pull/294),
+  [`699a2c5`](https://github.com/Python-roborock/python-roborock/commit/699a2c5ed5362ee4004d2888037baf929869e98c))
+
+- Update CI to run on one platform, but multiple python versions
+  ([#292](https://github.com/Python-roborock/python-roborock/pull/292),
+  [`16ab4ff`](https://github.com/Python-roborock/python-roborock/commit/16ab4ff433d25df9daa4bf102569c39bbd686420))
+
+
 ## v2.9.1 (2025-01-13)
 
 ### Bug Fixes
