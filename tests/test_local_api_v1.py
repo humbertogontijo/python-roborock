@@ -1,17 +1,17 @@
 """Tests for the Roborock Local Client V1."""
 
-from queue import Queue
-from unittest.mock import patch
 import json
-from typing import Any
 from collections.abc import AsyncGenerator
+from queue import Queue
+from typing import Any
+from unittest.mock import patch
 
 import pytest
 
+from roborock.containers import RoomMapping
 from roborock.protocol import MessageParser
 from roborock.roborock_message import RoborockMessage, RoborockMessageProtocol
 from roborock.version_1_apis import RoborockLocalClientV1
-from roborock.containers import DeviceData, RoomMapping, S7MaxVStatus
 
 from .mock_data import LOCAL_KEY
 
@@ -27,6 +27,7 @@ def build_rpc_response(seq: int, message: dict[str, Any]) -> bytes:
             }
         ).encode(),
     )
+
 
 def build_raw_response(protocol: RoborockMessageProtocol, seq: int, payload: bytes) -> bytes:
     """Build an encoded RPC response message."""
@@ -56,10 +57,10 @@ async def test_async_connect(
     assert not local_client.is_connected()
 
 
-
 @pytest.fixture(name="connected_local_client")
 async def connected_local_client_fixture(
-    response_queue: Queue, local_client: RoborockLocalClientV1,
+    response_queue: Queue,
+    local_client: RoborockLocalClientV1,
 ) -> AsyncGenerator[RoborockLocalClientV1, None]:
     response_queue.put(build_raw_response(RoborockMessageProtocol.HELLO_RESPONSE, 1, b"ignored"))
     response_queue.put(build_raw_response(RoborockMessageProtocol.PING_RESPONSE, 2, b"ignored"))
@@ -79,8 +80,8 @@ async def test_get_room_mapping(
     message = build_rpc_response(
         seq=test_request_id,
         message={
-             "id": test_request_id,
-             "result": [[16, "2362048"], [17, "2362044"]],
+            "id": test_request_id,
+            "result": [[16, "2362048"], [17, "2362044"]],
         },
     )
     response_queue.put(message)
