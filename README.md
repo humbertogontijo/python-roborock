@@ -54,7 +54,7 @@ async def main():
     device_data = DeviceData(device, product_info[device.product_id].model)
     mqtt_client = RoborockMqttClientV1(user_data, device_data)
     networking = await mqtt_client.get_networking()
-    local_device_data = DeviceData(device, product_info[device.product_id].model, networking)
+    local_device_data = DeviceData(device, product_info[device.product_id].model, networking.ip)
     local_client = RoborockLocalClientV1(local_device_data)
     # You can use the send_command to send any command to the device
     status = await local_client.send_command(RoborockCommand.GET_STATUS)
