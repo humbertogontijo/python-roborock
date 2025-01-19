@@ -209,7 +209,7 @@ def create_local_connection_fixture(request_handler: RequestHandler) -> Generato
             if response is not None:
                 _LOGGER.debug("Replying with %s", response)
                 loop = asyncio.get_running_loop()
-                loop.call_soon(protocol.data_received, response)
+                loop.call_soon(protocol.messages_cb, response)
 
         closed = asyncio.Event()
 
