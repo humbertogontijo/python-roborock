@@ -108,9 +108,9 @@ zeo_data_protocol_entries = {
 class RoborockClientA01(RoborockClient, ABC):
     """Roborock client base class for A01 devices."""
 
-    def __init__(self, device_info: DeviceData, category: RoborockCategory, queue_timeout: int = 4):
+    def __init__(self, device_info: DeviceData, category: RoborockCategory):
         """Initialize the Roborock client."""
-        super().__init__(device_info, queue_timeout)
+        super().__init__(device_info)
         self.category = category
 
     def on_message_received(self, messages: list[RoborockMessage]) -> None:

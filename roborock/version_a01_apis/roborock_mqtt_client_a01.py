@@ -34,8 +34,9 @@ class RoborockMqttClientA01(RoborockMqttClient, RoborockClientA01):
         if rriot is None:
             raise RoborockException("Got no rriot data from user_data")
 
-        RoborockMqttClient.__init__(self, user_data, device_info, queue_timeout)
-        RoborockClientA01.__init__(self, device_info, category, queue_timeout)
+        RoborockMqttClient.__init__(self, user_data, device_info)
+        RoborockClientA01.__init__(self, device_info, category)
+        self.queue_timeout = queue_timeout
         self._logger = RoborockLoggerAdapter(device_info.device.name, _LOGGER)
 
     async def send_message(self, roborock_message: RoborockMessage):
