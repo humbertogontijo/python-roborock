@@ -74,11 +74,6 @@ class RoborockMqttClient(RoborockClient, ABC):
         self._waiting_queue: dict[int, RoborockFuture] = {}
         self._mutex = Lock()
 
-    async def async_release(self) -> None:
-        """Release the MQTT client."""
-        await super().async_release()
-        await self.event_loop.run_in_executor(None, self._mqtt_client.loop_stop)
-
     def _mqtt_on_connect(self, *args, **kwargs):
         _, __, ___, rc, ____ = args
         connection_queue = self._waiting_queue.get(CONNECT_REQUEST_ID)
@@ -161,10 +156,9 @@ class RoborockMqttClient(RoborockClient, ABC):
     async def async_disconnect(self) -> None:
         async with self._mutex:
             if disconnected_future := self.sync_disconnect():
-                try:
-                    await disconnected_future
-                except VacuumError as err:
-                    raise RoborockException(err) from err
+                # There are no errors set on this future
+                await disconnected_future
+            await self.event_loop.run_in_executor(None, self._mqtt_client.loop_stop)
 
     async def async_connect(self) -> None:
         async with self._mutex:
