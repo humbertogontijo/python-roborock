@@ -36,7 +36,7 @@ from . import mqtt_packet
 
 
 @pytest.fixture(name="a01_mqtt_client")
-async def a01_mqtt_client_fixture(mock_create_connection: None, mock_select: None) -> RoborockMqttClientA01:
+async def a01_mqtt_client_fixture(mock_create_connection: None, mock_select: None) -> AsyncGenerator[RoborockMqttClientA01, None]:
     user_data = UserData.from_dict(USER_DATA)
     home_data = HomeData.from_dict(
         {
@@ -49,7 +49,15 @@ async def a01_mqtt_client_fixture(mock_create_connection: None, mock_select: Non
         device=home_data.devices[0],
         model=home_data.products[0].model,
     )
-    return RoborockMqttClientA01(user_data, device_info, RoborockCategory.WASHING_MACHINE)
+    client = RoborockMqttClientA01(user_data, device_info, RoborockCategory.WASHING_MACHINE)
+    try:
+        yield client
+    finally:
+        if not client.is_connected():
+            try:
+                await client.async_release()
+            except Exception:
+                pass
 
 
 @pytest.fixture(name="connected_a01_mqtt_client")

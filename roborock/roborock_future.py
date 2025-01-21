@@ -33,4 +33,7 @@ class RoborockFuture:
             async with async_timeout.timeout(timeout):
                 return await self.fut
         finally:
-            self.fut.cancel()
+            try:
+                self.fut.cancel()
+            except Exception:
+                pass
