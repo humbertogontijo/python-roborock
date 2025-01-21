@@ -71,3 +71,4 @@ select=["E", "F", "UP", "I"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+log_cli_level = "DEBUG"
