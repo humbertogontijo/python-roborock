@@ -156,6 +156,8 @@ class RoborockMqttClient(RoborockClient, ABC):
     async def async_disconnect(self) -> None:
         async with self._mutex:
             if disconnected_future := self.sync_disconnect():
+                # Cleanup the mqtt client threads
+                await self.event_loop.run_in_executor(None, self._mqtt_client.loop_stop)
                 try:
                     await disconnected_future
                 except VacuumError as err:
