@@ -3,7 +3,7 @@ import io
 import logging
 import re
 from asyncio import Protocol
-from collections.abc import Callable, Generator
+from collections.abc import AsyncGenerator, Callable, Generator
 from queue import Queue
 from typing import Any
 from unittest.mock import Mock, patch
@@ -138,7 +138,7 @@ def select_fixture(mock_sock: Mock, fake_socket_handler: FakeSocketHandler) -> G
 
 
 @pytest.fixture(name="mqtt_client")
-async def mqtt_client(mock_create_connection: None, mock_select: None) -> Generator[RoborockMqttClientV1, None, None]:
+async def mqtt_client(mock_create_connection: None, mock_select: None) -> AsyncGenerator[RoborockMqttClientV1, None]:
     user_data = UserData.from_dict(USER_DATA)
     home_data = HomeData.from_dict(HOME_DATA_RAW)
     device_info = DeviceData(
@@ -232,7 +232,7 @@ def create_local_connection_fixture(request_handler: RequestHandler) -> Generato
 
 
 @pytest.fixture(name="local_client")
-async def local_client_fixture(mock_create_local_connection: None) -> Generator[RoborockLocalClientV1, None, None]:
+async def local_client_fixture(mock_create_local_connection: None) -> AsyncGenerator[RoborockLocalClientV1, None]:
     home_data = HomeData.from_dict(HOME_DATA_RAW)
     device_info = DeviceData(
         device=home_data.devices[0],
