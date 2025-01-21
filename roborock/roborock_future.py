@@ -80,11 +80,6 @@ class RoborockFuture:
         """Get the result from the future or raises an error."""
         try:
             async with async_timeout.timeout(timeout):
-                response = await self.fut
-                # This should be moved to the specific client that handles this
-                # and set an exception directly rather than patching an exception here
-                if response == "unknown_method":
-                    raise UnknownMethodError("Unknown method")
-                return response
+                return await self.fut
         finally:
             self.fut.cancel()
