@@ -21,7 +21,6 @@ from .roborock_future import RoborockFuture
 from .roborock_message import (
     RoborockMessage,
 )
-from .roborock_typing import RoborockCommand
 from .util import get_next_int, get_running_loop_or_create_one
 
 _LOGGER = logging.getLogger(__name__)
@@ -124,11 +123,3 @@ class RoborockClient(ABC):
     @abstractmethod
     async def send_message(self, roborock_message: RoborockMessage):
         """Send a message to the Roborock device."""
-
-    @abstractmethod
-    async def _send_command(
-        self,
-        method: RoborockCommand | str,
-        params: list | dict | int | None = None,
-    ):
-        """Send a command to the Roborock device."""

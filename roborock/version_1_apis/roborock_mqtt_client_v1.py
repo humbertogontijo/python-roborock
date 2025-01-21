@@ -1,5 +1,6 @@
 import base64
 import logging
+from typing import Any
 
 from vacuum_map_parser_base.config.color import ColorsPalette
 from vacuum_map_parser_base.config.image_config import ImageConfig

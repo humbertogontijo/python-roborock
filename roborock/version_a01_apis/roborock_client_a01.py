@@ -123,10 +123,12 @@ class RoborockClientA01(RoborockClient, ABC):
                 payload = message.payload
                 try:
                     payload = unpad(payload, AES.block_size)
-                except Exception:
+                except Exception as err:
+                    self._logger.debug("Failed to unpad payload: %s", err)
                     continue
                 payload_json = json.loads(payload.decode())
                 for data_point_number, data_point in payload_json.get("dps").items():
+                    self._logger.debug("data point number=%s", data_point_number)
                     data_point_protocol: RoborockDyadDataProtocol | RoborockZeoProtocol
                     entries: dict
                     if self.category == RoborockCategory.WET_DRY_VAC:

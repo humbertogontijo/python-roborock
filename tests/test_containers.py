@@ -10,7 +10,17 @@ from roborock.code_mappings import (
     RoborockStateCode,
 )
 
-from .mock_data import CLEAN_RECORD, CLEAN_SUMMARY, CONSUMABLE, DND_TIMER, HOME_DATA_RAW, PRODUCT_ID, STATUS, USER_DATA
+from .mock_data import (
+    CLEAN_RECORD,
+    CLEAN_SUMMARY,
+    CONSUMABLE,
+    DND_TIMER,
+    HOME_DATA_RAW,
+    LOCAL_KEY,
+    PRODUCT_ID,
+    STATUS,
+    USER_DATA,
+)
 
 
 def test_user_data():
@@ -64,7 +74,7 @@ def test_home_data():
     assert device.name == "Roborock S7 MaxV"
     assert device.attribute is None
     assert device.active_time == 1672364449
-    assert device.local_key == "key123"
+    assert device.local_key == LOCAL_KEY
     assert device.runtime_env is None
     assert device.time_zone_id == "America/Los_Angeles"
     assert device.icon_url == "no_url"

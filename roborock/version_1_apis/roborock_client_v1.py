@@ -4,7 +4,7 @@ import json
 import math
 import struct
 import time
-from abc import ABC
+from abc import ABC, abstractmethod
 from collections.abc import Callable, Coroutine
 from typing import Any, TypeVar, final
 
@@ -78,12 +78,15 @@ RT = TypeVar("RT", bound=RoborockBase)
 EVICT_TIME = 60
 
 
+_SendCommandT = Callable[[RoborockCommand | str, list | dict | int | None], Any]
+
+
 class AttributeCache:
-    def __init__(self, attribute: RoborockAttribute, api: RoborockClient):
+    def __init__(self, attribute: RoborockAttribute, loop: asyncio.AbstractEventLoop, send_command: _SendCommandT):
         self.attribute = attribute
-        self.api = api
+        self._send_command = send_command
         self.attribute = attribute
-        self.task = RepeatableTask(self.api.event_loop, self._async_value, EVICT_TIME)
+        self.task = RepeatableTask(loop, self._async_value, EVICT_TIME)
         self._value: Any = None
         self._mutex = asyncio.Lock()
         self.unsupported: bool = False
@@ -96,7 +99,7 @@ class AttributeCache:
         if self.unsupported:
             return None
         try:
-            self._value = await self.api._send_command(self.attribute.get_command)
+            self._value = await self._send_command(self.attribute.get_command, None)
         except UnknownMethodError as err:
             # Limit the amount of times we call unsupported methods
             self.unsupported = True
@@ -115,21 +118,21 @@ class AttributeCache:
     async def update_value(self, params) -> None:
         if self.attribute.set_command is None:
             raise RoborockException(f"{self.attribute.attribute} have no set command")
-        response = await self.api._send_command(self.attribute.set_command, params)
+        response = await self._send_command(self.attribute.set_command, params)
         await self._async_value()
         return response
 
     async def add_value(self, params):
         if self.attribute.add_command is None:
             raise RoborockException(f"{self.attribute.attribute} have no add command")
-        response = await self.api._send_command(self.attribute.add_command, params)
+        response = await self._send_command(self.attribute.add_command, params)
         await self._async_value()
         return response
 
     async def close_value(self, params=None) -> None:
         if self.attribute.close_command is None:
             raise RoborockException(f"{self.attribute.attribute} have no close command")
-        response = await self.api._send_command(self.attribute.close_command, params)
+        response = await self._send_command(self.attribute.close_command, params)
         await self._async_value()
         return response
 
@@ -153,7 +156,8 @@ class RoborockClientV1(RoborockClient, ABC):
         super().__init__(device_info)
         self._status_type: type[Status] = ModelStatus.get(device_info.model, S7MaxVStatus)
         self.cache: dict[CacheableAttribute, AttributeCache] = {
-            cacheable_attribute: AttributeCache(attr, self) for cacheable_attribute, attr in get_cache_map().items()
+            cacheable_attribute: AttributeCache(attr, self.event_loop, self._send_command)
+            for cacheable_attribute, attr in get_cache_map().items()
         }
         if device_info.device.duid not in self._listeners:
             self._listeners[device_info.device.duid] = ListenerModel({}, self.cache)
@@ -363,6 +367,14 @@ class RoborockClientV1(RoborockClient, ABC):
             ).encode()
         )
         return request_id, timestamp, payload
+
+    @abstractmethod
+    async def _send_command(
+        self,
+        method: RoborockCommand | str,
+        params: list | dict | int | None = None,
+    ) -> Any:
+        """Send a command to the Roborock device."""
 
     def on_message_received(self, messages: list[RoborockMessage]) -> None:
         try:
