@@ -52,7 +52,9 @@ async def a01_mqtt_client_fixture(
         device=home_data.devices[0],
         model=home_data.products[0].model,
     )
-    client = RoborockMqttClientA01(user_data, device_info, RoborockCategory.WASHING_MACHINE, queue_timeout=QUEUE_TIMEOUT)
+    client = RoborockMqttClientA01(
+        user_data, device_info, RoborockCategory.WASHING_MACHINE, queue_timeout=QUEUE_TIMEOUT
+    )
     try:
         yield client
     finally:

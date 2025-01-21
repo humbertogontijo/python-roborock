@@ -240,7 +240,7 @@ async def local_client_fixture(mock_create_local_connection: None) -> AsyncGener
         model=home_data.products[0].model,
         host=TEST_LOCAL_API_HOST,
     )
-    yield RoborockLocalClientV1(device_info, queue_timeout=QUEUE_TIMEOUT)
+    client = RoborockLocalClientV1(device_info, queue_timeout=QUEUE_TIMEOUT)
     try:
         yield client
     finally:
