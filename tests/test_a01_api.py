@@ -174,13 +174,13 @@ async def test_update_values(
 
     message = build_rpc_response(
         {
-            203: 6,
+            203: 6,  # spinning
         }
     )
     response_queue.put(mqtt_packet.gen_publish(MQTT_PUBLISH_TOPIC, payload=message))
 
     data = await connected_a01_mqtt_client.update_values([RoborockZeoProtocol.STATE])
-    assert data.get(RoborockZeoProtocol.STATE) == "spinningdata point number="
+    assert data.get(RoborockZeoProtocol.STATE) == "spinning"
 
 
 async def test_publish_failure(
