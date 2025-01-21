@@ -49,7 +49,7 @@ class RoborockClient(ABC):
 
     def __del__(self) -> None:
         if self.is_connected():
-            self._logger.warning("Roborock client was not released properly")
+            self._logger.debug("Roborock is connected while being released")
 
     async def async_release(self) -> None:
         await self.async_disconnect()
