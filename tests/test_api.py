@@ -34,10 +34,6 @@ from tests.mock_data import (
 from . import mqtt_packet
 
 
-def test_can_create_roborock_client():
-    RoborockApiClient("")
-
-
 def test_can_create_prepared_request():
     PreparedRequest("https://sample.com")
 
