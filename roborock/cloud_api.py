@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 import threading
-import uuid
 from abc import ABC
 from asyncio import Lock
 from typing import Any
@@ -29,16 +28,10 @@ class _Mqtt(mqtt.Client):
     """
 
     _thread: threading.Thread
-    _client_id: str
 
     def __init__(self) -> None:
         """Initialize the MQTT client."""
         super().__init__(protocol=mqtt.MQTTv5)
-        self.reset_client_id()
-
-    def reset_client_id(self):
-        """Generate a new client id to make a new session when reconnecting."""
-        self._client_id = mqtt.base62(uuid.uuid4().int, padding=22)
 
     def maybe_restart_loop(self) -> None:
         """Ensure that the MQTT loop is running in case it previously exited."""
@@ -116,8 +109,6 @@ class RoborockMqttClient(RoborockClient, ABC):
         try:
             exc = RoborockException(mqtt.error_string(rc)) if rc != mqtt.MQTT_ERR_SUCCESS else None
             super().on_connection_lost(exc)
-            if rc == mqtt.MQTT_ERR_PROTOCOL:
-                self._mqtt_client.reset_client_id()
             connection_queue = self._waiting_queue.get(DISCONNECT_REQUEST_ID)
             if connection_queue:
                 connection_queue.set_result(True)
