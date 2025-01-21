@@ -1,6 +1,35 @@
 # CHANGELOG
 
 
+## v2.9.3 (2025-01-21)
+
+### Bug Fixes
+
+- Remove methods no longer available in paho-mqtt
+  ([#298](https://github.com/Python-roborock/python-roborock/pull/298),
+  [`685edc8`](https://github.com/Python-roborock/python-roborock/commit/685edc825fbf2062d61c3294ea82c4566442dd64))
+
+### Chores
+
+- Remove test that creates abstract base class
+  ([#299](https://github.com/Python-roborock/python-roborock/pull/299),
+  [`a55b804`](https://github.com/Python-roborock/python-roborock/commit/a55b804fddff318d704cc04e6c4190514e3e3375))
+
+- **deps-dev**: Bump aioresponses from 0.7.7 to 0.7.8
+  ([#295](https://github.com/Python-roborock/python-roborock/pull/295),
+  [`ab7ffb3`](https://github.com/Python-roborock/python-roborock/commit/ab7ffb36190090e6d5b39150da4ebe2f2e22fbd4))
+
+Bumps [aioresponses](https://github.com/pnuckowski/aioresponses) from 0.7.7 to 0.7.8. - [Release
+  notes](https://github.com/pnuckowski/aioresponses/releases) -
+  [Commits](https://github.com/pnuckowski/aioresponses/compare/0.7.7...0.7.8)
+
+--- updated-dependencies: - dependency-name: aioresponses dependency-type: direct:development
+  update-type: version-update:semver-patch ...
+
+Signed-off-by: dependabot[bot] <support@github.com> Co-authored-by: dependabot[bot]
+  <49699333+dependabot[bot]@users.noreply.github.com>
+
+
 ## v2.9.2 (2025-01-19)
 
 ### Bug Fixes
