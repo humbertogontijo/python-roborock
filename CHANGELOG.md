@@ -1,6 +1,27 @@
 # CHANGELOG
 
 
+## v2.9.5 (2025-01-21)
+
+### Bug Fixes
+
+- Fix queue timeout variable and set default in tests of 10 seconds
+  ([#302](https://github.com/Python-roborock/python-roborock/pull/302),
+  [`9c75e3a`](https://github.com/Python-roborock/python-roborock/commit/9c75e3a67fc8f411c5496b5864a9a0e90a573c8a))
+
+* test: set queue timeout of 10
+
+* test: cleanup lint errors
+
+* fix: set queue_timeout in the client leaf base classes
+
+* chore: fix test fixture after merging
+
+- Log an explicit message when intentionally resetting the connection
+  ([#304](https://github.com/Python-roborock/python-roborock/pull/304),
+  [`a20d2ac`](https://github.com/Python-roborock/python-roborock/commit/a20d2ac46c7553c7b7c7dffbbc86ee0da370418d))
+
+
 ## v2.9.4 (2025-01-21)
 
 ### Bug Fixes
