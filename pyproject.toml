@@ -72,3 +72,5 @@ select=["E", "F", "UP", "I"]
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 log_cli_level = "DEBUG"
+log_format = "%(asctime)s %(levelname)s %(name)s:%(filename)s:%(lineno)s %(message)s"
+log_date_format = "%Y-%m-%d %H:%M:%S"
