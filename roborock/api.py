@@ -91,6 +91,7 @@ class RoborockClient(ABC):
 
     async def validate_connection(self) -> None:
         if not self.should_keepalive():
+            self._logger.info("Resetting Roborock connection due to kepalive timeout")
             await self.async_disconnect()
         await self.async_connect()
 
