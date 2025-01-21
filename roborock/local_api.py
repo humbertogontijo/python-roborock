@@ -37,7 +37,7 @@ class _LocalProtocol(asyncio.Protocol):
 class RoborockLocalClient(RoborockClient, ABC):
     """Roborock local client base class."""
 
-    def __init__(self, device_data: DeviceData, queue_timeout: int = 4):
+    def __init__(self, device_data: DeviceData):
         """Initialize the Roborock local client."""
         if device_data.host is None:
             raise RoborockException("Host is required")
@@ -48,7 +48,7 @@ class RoborockLocalClient(RoborockClient, ABC):
         self.transport: Transport | None = None
         self._mutex = Lock()
         self.keep_alive_task: TimerHandle | None = None
-        RoborockClient.__init__(self, device_data, queue_timeout)
+        RoborockClient.__init__(self, device_data)
         self._local_protocol = _LocalProtocol(self._data_received, self._connection_lost)
 
     def _data_received(self, message):

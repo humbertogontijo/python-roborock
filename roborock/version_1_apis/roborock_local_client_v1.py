@@ -17,8 +17,9 @@ class RoborockLocalClientV1(RoborockLocalClient, RoborockClientV1):
 
     def __init__(self, device_data: DeviceData, queue_timeout: int = 4):
         """Initialize the Roborock local client."""
-        RoborockLocalClient.__init__(self, device_data, queue_timeout)
+        RoborockLocalClient.__init__(self, device_data)
         RoborockClientV1.__init__(self, device_data, "abc")
+        self.queue_timeout = queue_timeout
         self._logger = RoborockLoggerAdapter(device_data.device.name, _LOGGER)
 
     def build_roborock_message(
