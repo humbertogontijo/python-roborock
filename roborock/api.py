@@ -31,8 +31,9 @@ class RoborockClient(ABC):
     """Roborock client base class."""
 
     _logger: logging.LoggerAdapter
+    queue_timeout: int
 
-    def __init__(self, device_info: DeviceData, queue_timeout: int = 4) -> None:
+    def __init__(self, device_info: DeviceData) -> None:
         """Initialize RoborockClient."""
         self.event_loop = get_running_loop_or_create_one()
         self.device_info = device_info
@@ -45,7 +46,6 @@ class RoborockClient(ABC):
             "misc_info": {"Nonce": base64.b64encode(self._nonce).decode("utf-8")}
         }
         self.is_available: bool = True
-        self.queue_timeout = queue_timeout
 
     def __del__(self) -> None:
         if self.is_connected():

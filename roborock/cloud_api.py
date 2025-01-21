@@ -46,12 +46,12 @@ class _Mqtt(mqtt.Client):
 class RoborockMqttClient(RoborockClient, ABC):
     """Roborock MQTT client base class."""
 
-    def __init__(self, user_data: UserData, device_info: DeviceData, queue_timeout: int = 10) -> None:
+    def __init__(self, user_data: UserData, device_info: DeviceData) -> None:
         """Initialize the Roborock MQTT client."""
         rriot = user_data.rriot
         if rriot is None:
             raise RoborockException("Got no rriot data from user_data")
-        RoborockClient.__init__(self, device_info, queue_timeout)
+        RoborockClient.__init__(self, device_info)
         self._mqtt_user = rriot.u
         self._hashed_user = md5hex(self._mqtt_user + ":" + rriot.k)[2:10]
         url = urlparse(rriot.r.m)
