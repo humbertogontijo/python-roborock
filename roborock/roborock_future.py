@@ -8,7 +8,7 @@ from typing import Any
 
 import async_timeout
 
-from .exceptions import UnknownMethodError, VacuumError
+from .exceptions import VacuumError
 from .roborock_message import RoborockMessageProtocol
 
 _LOGGER = logging.getLogger(__name__)
