@@ -36,7 +36,9 @@ from . import mqtt_packet
 
 
 @pytest.fixture(name="a01_mqtt_client")
-async def a01_mqtt_client_fixture(mock_create_connection: None, mock_select: None) -> AsyncGenerator[RoborockMqttClientA01, None]:
+async def a01_mqtt_client_fixture(
+    mock_create_connection: None, mock_select: None
+) -> AsyncGenerator[RoborockMqttClientA01, None]:
     user_data = UserData.from_dict(USER_DATA)
     home_data = HomeData.from_dict(
         {
