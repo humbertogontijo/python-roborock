@@ -82,6 +82,8 @@ class RoborockMqttClient(RoborockClient, ABC):
             self._logger.error(message)
             if connection_queue:
                 connection_queue.set_exception(VacuumError(message))
+            else:
+                self._logger.debug("Failed to notify connect future, not in queue")
             return
         self._logger.info(f"Connected to mqtt {self._mqtt_host}:{self._mqtt_port}")
         topic = f"rr/m/o/{self._mqtt_user}/{self._hashed_user}/{self.device_info.device.duid}"
@@ -154,10 +156,9 @@ class RoborockMqttClient(RoborockClient, ABC):
     async def async_disconnect(self) -> None:
         async with self._mutex:
             if disconnected_future := self.sync_disconnect():
-                try:
-                    await disconnected_future
-                except VacuumError as err:
-                    raise RoborockException(err) from err
+                # There are no errors set on this future
+                await disconnected_future
+            await self.event_loop.run_in_executor(None, self._mqtt_client.loop_stop)
 
     async def async_connect(self) -> None:
         async with self._mutex:

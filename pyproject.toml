@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "python-roborock"
-version = "2.9.3"
+version = "2.9.4"
 description = "A package to control Roborock vacuums."
 authors = ["humbertogontijo <humbertogontijo@users.noreply.github.com>"]
 license = "GPL-3.0-only"
@@ -46,6 +46,7 @@ codespell = "*"
 pyshark = "^0.6"
 aioresponses = "^0.7.7"
 freezegun = "^1.5.1"
+pytest-timeout = "^2.3.1"
 
 [tool.semantic_release]
 branch = "main"
@@ -71,3 +72,5 @@ select=["E", "F", "UP", "I"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+timeout = 20

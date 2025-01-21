@@ -1,6 +1,72 @@
 # CHANGELOG
 
 
+## v2.9.4 (2025-01-21)
+
+### Bug Fixes
+
+- Set unique sequence numbers on outgoing messages
+  ([#300](https://github.com/Python-roborock/python-roborock/pull/300),
+  [`14f03c7`](https://github.com/Python-roborock/python-roborock/commit/14f03c7df1c574ab87ea056227bb95f9150f4832))
+
+- Bump paho-mqtt from 1.6.1 to 2.1.0
+  ([#288](https://github.com/Python-roborock/python-roborock/pull/288),
+  [`777b736`](https://github.com/Python-roborock/python-roborock/commit/777b736440a3633c089bf09ab9d7240e54e0fb0e))
+
+Bumps [paho-mqtt](https://github.com/eclipse/paho.mqtt.python) from 1.6.1 to 2.1.0. - [Release
+  notes](https://github.com/eclipse/paho.mqtt.python/releases) -
+  [Changelog](https://github.com/eclipse-paho/paho.mqtt.python/blob/master/ChangeLog.txt) -
+  [Commits](https://github.com/eclipse/paho.mqtt.python/compare/v1.6.1...v2.1.0)
+
+--- updated-dependencies: - dependency-name: paho-mqtt dependency-type: direct:production
+  update-type: version-update:semver-major ...
+
+Signed-off-by: dependabot[bot] <support@github.com> Co-authored-by: dependabot[bot]
+  <49699333+dependabot[bot]@users.noreply.github.com>
+
+### Chores
+
+- Fix flaky tests by cleaning up threads
+  ([#303](https://github.com/Python-roborock/python-roborock/pull/303),
+  [`6e29e74`](https://github.com/Python-roborock/python-roborock/commit/6e29e7440f61ddde9a67b25c87864ed0cbf1a097))
+
+* chore: set log level to debug to aid in tracking down flaky tests
+
+* test: update log format to include timestamps and dates
+
+test: update logmessage with package name chore: fix tests to use valid zeo codes
+
+* test: fix zeo test assertion
+
+* test: add logging when updating future
+
+* test: make the client read socket always available for reading to avoid getting blocked
+
+* test: revert socket changes
+
+* test: set function loop scope
+
+* test: add pytest-timeout with a 20 second hard timeout
+
+* test: explicitly disconnect threads
+
+* test: fix formatting
+
+* test: fix lint errors
+
+* fix: stop the mqtt loop on disconnect
+
+* fix: release the mqtt thread on release
+
+* test: revert log changes
+
+* chore: cleanup/revert changes
+
+* chore: revert mqtt client check
+
+* fix: always stop the event loop when disconnecting
+
+
 ## v2.9.3 (2025-01-21)
 
 ### Bug Fixes
