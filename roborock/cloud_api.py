@@ -77,8 +77,7 @@ class RoborockMqttClient(RoborockClient, ABC):
     async def async_release(self) -> None:
         """Release the MQTT client."""
         await super().async_release()
-        if self._mqtt_client:
-            await self.event_loop.run_in_executor(None, self._mqtt_client.loop_stop)
+        await self.event_loop.run_in_executor(None, self._mqtt_client.loop_stop)
 
     def _mqtt_on_connect(self, *args, **kwargs):
         _, __, ___, rc, ____ = args
