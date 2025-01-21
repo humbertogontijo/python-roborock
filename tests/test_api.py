@@ -33,6 +33,7 @@ from tests.mock_data import (
 )
 
 from . import mqtt_packet
+from .conftest import QUEUE_TIMEOUT
 
 
 def test_can_create_prepared_request():

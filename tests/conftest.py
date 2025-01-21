@@ -22,6 +22,7 @@ _LOGGER = logging.getLogger(__name__)
 
 # Used by fixtures to handle incoming requests and prepare responses
 RequestHandler = Callable[[bytes], bytes | None]
+QUEUE_TIMEOUT = 10
 
 
 class FakeSocketHandler:
@@ -145,7 +146,7 @@ async def mqtt_client(mock_create_connection: None, mock_select: None) -> AsyncG
         device=home_data.devices[0],
         model=home_data.products[0].model,
     )
-    client = RoborockMqttClientV1(user_data, device_info)
+    client = RoborockMqttClientV1(user_data, device_info, queue_timeout=QUEUE_TIMEOUT)
     try:
         yield client
     finally:
@@ -239,7 +240,7 @@ async def local_client_fixture(mock_create_local_connection: None) -> AsyncGener
         model=home_data.products[0].model,
         host=TEST_LOCAL_API_HOST,
     )
-    client = RoborockLocalClientV1(device_info)
+    yield RoborockLocalClientV1(device_info, queue_timeout=QUEUE_TIMEOUT)
     try:
         yield client
     finally:
