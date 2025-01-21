@@ -131,7 +131,7 @@ def select_fixture(mock_sock: Mock, fake_socket_handler: FakeSocketHandler) -> G
         return sock is not mock_sock or (fake_socket_handler.pending() > 0)
 
     def handle_select(rlist: list, wlist: list, *args: Any) -> list:
-        return [list(filter(is_ready, rlist)), list(filter(is_ready, wlist))]
+        return [rlist, list(filter(is_ready, wlist))]
 
     with patch("paho.mqtt.client.select.select", side_effect=handle_select):
         yield
