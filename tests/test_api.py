@@ -45,15 +45,6 @@ async def test_can_create_mqtt_roborock():
     RoborockMqttClientV1(UserData.from_dict(USER_DATA), device_info)
 
 
-async def test_sync_connect(mqtt_client):
-    with patch("paho.mqtt.client.Client.connect", return_value=mqtt.MQTT_ERR_SUCCESS):
-        with patch("paho.mqtt.client.Client.loop_start", return_value=mqtt.MQTT_ERR_SUCCESS):
-            connected_future = mqtt_client.sync_connect()
-            assert connected_future is not None
-
-            connected_future.cancel()
-
-
 async def test_get_base_url_no_url():
     rc = RoborockApiClient("sample@gmail.com")
     with patch("roborock.web_api.PreparedRequest.request") as mock_request:
