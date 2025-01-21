@@ -128,8 +128,8 @@ class RoborockClientA01(RoborockClient, ABC):
                     continue
                 payload_json = json.loads(payload.decode())
                 for data_point_number, data_point in payload_json.get("dps").items():
-                    self._logger.debug("data point number=%s", data_point_number)
                     data_point_protocol: RoborockDyadDataProtocol | RoborockZeoProtocol
+                    self._logger.debug("received msg with dps, protocol: %s, %s", data_point_number, protocol)
                     entries: dict
                     if self.category == RoborockCategory.WET_DRY_VAC:
                         data_point_protocol = RoborockDyadDataProtocol(int(data_point_number))

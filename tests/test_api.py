@@ -1,5 +1,6 @@
 import asyncio
 import json
+import logging
 from collections.abc import AsyncGenerator
 from queue import Queue
 from typing import Any
@@ -168,7 +169,7 @@ async def test_async_connect(received_requests: Queue, connected_mqtt_client: Ro
     assert received_requests.qsize() >= 2  # Connect and Subscribe
 
 
-async def test_connect_failure(
+async def test_connect_failure_response(
     received_requests: Queue, response_queue: Queue, mqtt_client: RoborockMqttClientV1
 ) -> None:
     """Test the broker responding with a connect failure."""
@@ -201,6 +202,24 @@ async def test_disconnect_failure(connected_mqtt_client: RoborockMqttClientV1) -
         RoborockException, match="Failed to disconnect"
     ):
         await connected_mqtt_client.async_disconnect()
+
+
+async def test_disconnect_failure_response(
+    received_requests: Queue,
+    response_queue: Queue,
+    connected_mqtt_client: RoborockMqttClientV1,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Test the broker responding with a connect failure."""
+
+    # Enqueue a failed message -- however, the client does not process any
+    # further messages and there is no parsing error, and no failed log messages.
+    response_queue.put(mqtt_packet.gen_disconnect(reason_code=1))
+    assert connected_mqtt_client.is_connected()
+    with caplog.at_level(logging.ERROR, logger="homeassistant.components.nest"):
+        await connected_mqtt_client.async_disconnect()
+        assert not connected_mqtt_client.is_connected()
+        assert not caplog.records
 
 
 async def test_async_release(connected_mqtt_client: RoborockMqttClientV1) -> None:
