@@ -121,7 +121,7 @@ class RoborockMqttClient(RoborockClient, ABC):
         """Check if the mqtt client is connected."""
         return self._mqtt_client.is_connected()
 
-    def sync_disconnect(self) -> Any:
+    def _sync_disconnect(self) -> Any:
         if not self.is_connected():
             return None
 
@@ -139,7 +139,7 @@ class RoborockMqttClient(RoborockClient, ABC):
 
         return disconnected_future
 
-    def sync_connect(self) -> Any:
+    def _sync_connect(self) -> Any:
         if self.is_connected():
             self._mqtt_client.maybe_restart_loop()
             return None
@@ -155,14 +155,14 @@ class RoborockMqttClient(RoborockClient, ABC):
 
     async def async_disconnect(self) -> None:
         async with self._mutex:
-            if disconnected_future := self.sync_disconnect():
+            if disconnected_future := self._sync_disconnect():
                 # There are no errors set on this future
                 await disconnected_future
             await self.event_loop.run_in_executor(None, self._mqtt_client.loop_stop)
 
     async def async_connect(self) -> None:
         async with self._mutex:
-            if connected_future := self.sync_connect():
+            if connected_future := self._sync_connect():
                 try:
                     await connected_future
                 except VacuumError as err:

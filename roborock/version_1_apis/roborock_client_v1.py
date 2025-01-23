@@ -164,10 +164,6 @@ class RoborockClientV1(RoborockClient, ABC):
         self.listener_model = self._listeners[device_info.device.duid]
         self._endpoint = endpoint
 
-    def release(self):
-        super().release()
-        [item.stop() for item in self.cache.values()]
-
     async def async_release(self) -> None:
         await super().async_release()
         [item.stop() for item in self.cache.values()]

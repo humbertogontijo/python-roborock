@@ -48,10 +48,8 @@ class RoborockClient(ABC):
         self.is_available: bool = True
 
     def __del__(self) -> None:
-        self.release()
-
-    def release(self) -> None:
-        self.sync_disconnect()
+        if self.is_connected():
+            self._logger.debug("Roborock is connected while being released")
 
     async def async_release(self) -> None:
         await self.async_disconnect()
@@ -65,12 +63,12 @@ class RoborockClient(ABC):
         """Connect to the Roborock device."""
 
     @abstractmethod
-    def sync_disconnect(self) -> Any:
+    async def async_disconnect(self) -> Any:
         """Disconnect from the Roborock device."""
 
     @abstractmethod
-    async def async_disconnect(self) -> Any:
-        """Disconnect from the Roborock device."""
+    def is_connected(self) -> bool:
+        """Return True if the client is connected to the device."""
 
     @abstractmethod
     def on_message_received(self, messages: list[RoborockMessage]) -> None:

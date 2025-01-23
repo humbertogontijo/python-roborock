@@ -61,7 +61,7 @@ class RoborockLocalClient(RoborockClient, ABC):
 
     def _connection_lost(self, exc: Exception | None):
         """Called when the transport connection is lost."""
-        self.sync_disconnect()
+        self._sync_disconnect()
         self.on_connection_lost(exc)
 
     def is_connected(self):
@@ -79,7 +79,7 @@ class RoborockLocalClient(RoborockClient, ABC):
         async with self._mutex:
             try:
                 if not self.is_connected():
-                    self.sync_disconnect()
+                    self._sync_disconnect()
                     async with async_timeout.timeout(self.queue_timeout):
                         self._logger.debug(f"Connecting to {self.host}")
                         self.transport, _ = await self.event_loop.create_connection(  # type: ignore
@@ -93,7 +93,7 @@ class RoborockLocalClient(RoborockClient, ABC):
             await self.hello()
             await self.keep_alive_func()
 
-    def sync_disconnect(self) -> None:
+    def _sync_disconnect(self) -> None:
         if self.transport and self.event_loop.is_running():
             self._logger.debug(f"Disconnecting from {self.host}")
             self.transport.close()
@@ -102,7 +102,7 @@ class RoborockLocalClient(RoborockClient, ABC):
 
     async def async_disconnect(self) -> None:
         async with self._mutex:
-            self.sync_disconnect()
+            self._sync_disconnect()
 
     async def hello(self):
         request_id = 1
