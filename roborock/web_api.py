@@ -67,9 +67,25 @@ class RoborockApiClient:
         md5.update(self._device_identifier.encode())
         return base64.b64encode(md5.digest()).decode()
 
-    def _get_hawk_authentication(self, rriot: RRiot, url: str) -> str:
+    def _process_extra_hawk_values(self, values: dict | None) -> str:
+        if values is None:
+            return ""
+        else:
+            sorted_keys = sorted(values.keys())
+            result = []
+            for key in sorted_keys:
+                value = values.get(key)
+                result.append(f"{key}={value}")
+            return hashlib.md5("&".join(result).encode()).hexdigest()
+
+    def _get_hawk_authentication(
+        self, rriot: RRiot, url: str, formdata: dict | None = None, params: dict | None = None
+    ) -> str:
         timestamp = math.floor(time.time())
         nonce = secrets.token_urlsafe(6)
+        formdata_str = self._process_extra_hawk_values(formdata)
+        params_str = self._process_extra_hawk_values(params)
+
         prestr = ":".join(
             [
                 rriot.u,
@@ -77,12 +93,81 @@ class RoborockApiClient:
                 nonce,
                 str(timestamp),
                 hashlib.md5(url.encode()).hexdigest(),
-                "",
-                "",
+                params_str,
+                formdata_str,
             ]
         )
         mac = base64.b64encode(hmac.new(rriot.h.encode(), prestr.encode(), hashlib.sha256).digest()).decode()
-        return f'Hawk id="{rriot.u}", s="{rriot.s}", ts="{timestamp}", nonce="{nonce}", mac="{mac}"'
+        return f'Hawk id="{rriot.u}",s="{rriot.s}",ts="{timestamp}",nonce="{nonce}",mac="{mac}"'
+
+    async def nc_prepare(self, user_data: UserData, timezone: str) -> dict:
+        """This gets a few critical parameters for adding a device to your account."""
+        if (
+            user_data.rriot is None
+            or user_data.rriot.r is None
+            or user_data.rriot.u is None
+            or user_data.rriot.r.a is None
+        ):
+            raise RoborockException("Your userdata is missing critical attributes.")
+        base_url = user_data.rriot.r.a
+        prepare_request = PreparedRequest(base_url)
+        hid = await self._get_home_id(user_data)
+        from aiohttp import FormData
+
+        data = FormData()
+        data.add_field("hid", hid)
+        data.add_field("tzid", timezone)
+
+        prepare_response = await prepare_request.request(
+            "post",
+            "/nc/prepare",
+            headers={
+                "Authorization": self._get_hawk_authentication(
+                    user_data.rriot, "/nc/prepare", {"hid": hid, "tzid": timezone}
+                ),
+            },
+            data=data,
+        )
+
+        if prepare_response is None:
+            raise RoborockException("prepare_response is None")
+        if not prepare_response.get("success"):
+            raise RoborockException(f"{prepare_response.get('msg')} - response code: {prepare_response.get('code')}")
+
+        return prepare_response["result"]
+
+    async def add_device(self, user_data: UserData, s: str, t: str) -> dict:
+        """This will add a new device to your account
+        it is recommended to only use this if you know what you are doing."""
+        if (
+            user_data.rriot is None
+            or user_data.rriot.r is None
+            or user_data.rriot.u is None
+            or user_data.rriot.r.a is None
+        ):
+            raise RoborockException("Your userdata is missing critical attributes.")
+        base_url = user_data.rriot.r.a
+        add_device_request = PreparedRequest(base_url)
+
+        add_device_response = await add_device_request.request(
+            "GET",
+            "/user/devices/newadd",
+            headers={
+                "Authorization": self._get_hawk_authentication(
+                    user_data.rriot, "/user/devices/newadd", params={"s": s, "t": t}
+                ),
+            },
+            params={"s": s, "t": t},
+        )
+
+        if add_device_response is None:
+            raise RoborockException("add_device is None")
+        if not add_device_response.get("success"):
+            raise RoborockException(
+                f"{add_device_response.get('msg')} - response code: {add_device_response.get('code')}"
+            )
+
+        return add_device_response["result"]
 
     async def request_code(self) -> None:
         base_url = await self._get_base_url()

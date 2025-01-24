@@ -26,3 +26,13 @@ async def test_get_home_data_v2():
     ud = await api.code_login(4123)
     hd = await api.get_home_data_v2(ud)
     assert hd == HomeData.from_dict(HOME_DATA_RAW)
+
+
+async def test_nc_prepare():
+    """Test adding a device and that nothing breaks"""
+    api = RoborockApiClient(username="test_user@gmail.com")
+    await api.request_code()
+    ud = await api.code_login(4123)
+    prepare = await api.nc_prepare(ud, "America/New_York")
+    new_device = await api.add_device(ud, prepare["s"], prepare["t"])
+    assert new_device["duid"] == "rand_duid"
