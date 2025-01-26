@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from abc import ABC
-from asyncio import Lock, TimerHandle, Transport
+from asyncio import Lock, TimerHandle, Transport, get_running_loop
 from collections.abc import Callable
 from dataclasses import dataclass
 
@@ -72,7 +72,8 @@ class RoborockLocalClient(RoborockClient, ABC):
             await self.ping()
         except RoborockException:
             pass
-        self.keep_alive_task = self.event_loop.call_later(10, lambda: asyncio.create_task(self.keep_alive_func()))
+        loop = asyncio.get_running_loop()
+        self.keep_alive_task = loop.call_later(10, lambda: asyncio.create_task(self.keep_alive_func()))
 
     async def async_connect(self) -> None:
         should_ping = False
@@ -82,7 +83,8 @@ class RoborockLocalClient(RoborockClient, ABC):
                     self._sync_disconnect()
                     async with async_timeout.timeout(self.queue_timeout):
                         self._logger.debug(f"Connecting to {self.host}")
-                        self.transport, _ = await self.event_loop.create_connection(  # type: ignore
+                        loop = get_running_loop()
+                        self.transport, _ = await loop.create_connection(  # type: ignore
                             lambda: self._local_protocol, self.host, 58867
                         )
                         self._logger.info(f"Connected to {self.host}")
@@ -94,7 +96,8 @@ class RoborockLocalClient(RoborockClient, ABC):
             await self.keep_alive_func()
 
     def _sync_disconnect(self) -> None:
-        if self.transport and self.event_loop.is_running():
+        loop = asyncio.get_running_loop()
+        if self.transport and loop.is_running():
             self._logger.debug(f"Disconnecting from {self.host}")
             self.transport.close()
         if self.keep_alive_task:
