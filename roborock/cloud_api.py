@@ -158,7 +158,8 @@ class RoborockMqttClient(RoborockClient, ABC):
             if disconnected_future := self._sync_disconnect():
                 # There are no errors set on this future
                 await disconnected_future
-            await self.event_loop.run_in_executor(None, self._mqtt_client.loop_stop)
+            # Stop the loop but don't wait for it to fully shutdown
+            self.event_loop.run_in_executor(None, self._mqtt_client.loop_stop)
 
     async def async_connect(self) -> None:
         async with self._mutex:
