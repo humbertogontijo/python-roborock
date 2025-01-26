@@ -47,10 +47,6 @@ class RoborockClient(ABC):
         }
         self.is_available: bool = True
 
-    def __del__(self) -> None:
-        if self.is_connected():
-            self._logger.debug("Roborock is connected while being released")
-
     async def async_release(self) -> None:
         await self.async_disconnect()
 
