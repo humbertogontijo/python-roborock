@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import logging
 import threading
 from abc import ABC
@@ -158,7 +159,8 @@ class RoborockMqttClient(RoborockClient, ABC):
             if disconnected_future := self._sync_disconnect():
                 # There are no errors set on this future
                 await disconnected_future
-            await self.event_loop.run_in_executor(None, self._mqtt_client.loop_stop)
+            loop = asyncio.get_running_loop()
+            await loop.run_in_executor(None, self._mqtt_client.loop_stop)
 
     async def async_connect(self) -> None:
         async with self._mutex:

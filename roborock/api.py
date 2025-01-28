@@ -21,7 +21,7 @@ from .roborock_future import RoborockFuture
 from .roborock_message import (
     RoborockMessage,
 )
-from .util import get_next_int, get_running_loop_or_create_one
+from .util import get_next_int
 
 _LOGGER = logging.getLogger(__name__)
 KEEPALIVE = 60
@@ -35,7 +35,6 @@ class RoborockClient(ABC):
 
     def __init__(self, device_info: DeviceData) -> None:
         """Initialize RoborockClient."""
-        self.event_loop = get_running_loop_or_create_one()
         self.device_info = device_info
         self._nonce = secrets.token_bytes(16)
         self._waiting_queue: dict[int, RoborockFuture] = {}

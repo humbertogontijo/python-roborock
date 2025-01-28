@@ -74,8 +74,7 @@ def run_sync():
 
 
 class RepeatableTask:
-    def __init__(self, loop: AbstractEventLoop, callback: Callable[[], Coroutine], interval: int):
-        self.loop = loop
+    def __init__(self, callback: Callable[[], Coroutine], interval: int):
         self.callback = callback
         self.interval = interval
         self._task: TimerHandle | None = None
@@ -86,7 +85,8 @@ class RepeatableTask:
             response = await self.callback()
         except RoborockException:
             pass
-        self._task = self.loop.call_later(self.interval, self._run_task_soon)
+        loop = asyncio.get_running_loop()
+        self._task = loop.call_later(self.interval, self._run_task_soon)
         return response
 
     def _run_task_soon(self):
