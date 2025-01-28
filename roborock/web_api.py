@@ -9,7 +9,7 @@ import secrets
 import time
 
 import aiohttp
-from aiohttp import ContentTypeError
+from aiohttp import ContentTypeError, FormData
 
 from roborock.containers import HomeData, HomeDataRoom, ProductResponse, RRiot, UserData
 from roborock.exceptions import (
@@ -112,7 +112,6 @@ class RoborockApiClient:
         base_url = user_data.rriot.r.a
         prepare_request = PreparedRequest(base_url)
         hid = await self._get_home_id(user_data)
-        from aiohttp import FormData
 
         data = FormData()
         data.add_field("hid", hid)
@@ -138,7 +137,9 @@ class RoborockApiClient:
 
     async def add_device(self, user_data: UserData, s: str, t: str) -> dict:
         """This will add a new device to your account
-        it is recommended to only use this if you know what you are doing."""
+        it is recommended to only use this during a pairing cycle with a device.
+        Please see here: https://github.com/Python-roborock/Roborockmitmproxy/blob/main/handshake_protocol.md
+        """
         if (
             user_data.rriot is None
             or user_data.rriot.r is None
