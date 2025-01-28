@@ -1,6 +1,15 @@
 # CHANGELOG
 
 
+## v2.9.7 (2025-01-28)
+
+### Bug Fixes
+
+- Never create a new asyncio loop
+  ([#310](https://github.com/Python-roborock/python-roborock/pull/310),
+  [`ed7db1f`](https://github.com/Python-roborock/python-roborock/commit/ed7db1f09f379f509a38a61a445fb2c41b384f25))
+
+
 ## v2.9.6 (2025-01-26)
 
 ### Bug Fixes
