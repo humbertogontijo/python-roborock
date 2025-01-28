@@ -82,11 +82,11 @@ _SendCommandT = Callable[[RoborockCommand | str, list | dict | int | None], Any]
 
 
 class AttributeCache:
-    def __init__(self, attribute: RoborockAttribute, loop: asyncio.AbstractEventLoop, send_command: _SendCommandT):
+    def __init__(self, attribute: RoborockAttribute, send_command: _SendCommandT):
         self.attribute = attribute
         self._send_command = send_command
         self.attribute = attribute
-        self.task = RepeatableTask(loop, self._async_value, EVICT_TIME)
+        self.task = RepeatableTask(self._async_value, EVICT_TIME)
         self._value: Any = None
         self._mutex = asyncio.Lock()
         self.unsupported: bool = False
@@ -156,7 +156,7 @@ class RoborockClientV1(RoborockClient, ABC):
         super().__init__(device_info)
         self._status_type: type[Status] = ModelStatus.get(device_info.model, S7MaxVStatus)
         self.cache: dict[CacheableAttribute, AttributeCache] = {
-            cacheable_attribute: AttributeCache(attr, self.event_loop, self._send_command)
+            cacheable_attribute: AttributeCache(attr, self._send_command)
             for cacheable_attribute, attr in get_cache_map().items()
         }
         if device_info.device.duid not in self._listeners:

@@ -1,6 +1,34 @@
 # CHANGELOG
 
 
+## v2.9.7 (2025-01-28)
+
+### Bug Fixes
+
+- Never create a new asyncio loop
+  ([#310](https://github.com/Python-roborock/python-roborock/pull/310),
+  [`ed7db1f`](https://github.com/Python-roborock/python-roborock/commit/ed7db1f09f379f509a38a61a445fb2c41b384f25))
+
+
+## v2.9.6 (2025-01-26)
+
+### Bug Fixes
+
+- Remove the __del__ warning for disconnected clients
+  ([#308](https://github.com/Python-roborock/python-roborock/pull/308),
+  [`235752b`](https://github.com/Python-roborock/python-roborock/commit/235752bd77e4617323366b56439bf8981b071430))
+
+### Refactoring
+
+- Breaking change to remove sync APIs
+  ([#306](https://github.com/Python-roborock/python-roborock/pull/306),
+  [`3c30d93`](https://github.com/Python-roborock/python-roborock/commit/3c30d933f680cc567b10ad6566b02289eade5b3f))
+
+* refactor: breaking change to remove sync APIs
+
+* chore: downgrade log to a debug message
+
+
 ## v2.9.5 (2025-01-21)
 
 ### Bug Fixes
