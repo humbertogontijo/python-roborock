@@ -1,6 +1,15 @@
 # CHANGELOG
 
 
+## v2.9.8 (2025-01-30)
+
+### Bug Fixes
+
+- Ignore ping id during id check
+  ([#316](https://github.com/Python-roborock/python-roborock/pull/316),
+  [`b3d74b4`](https://github.com/Python-roborock/python-roborock/commit/b3d74b4bc9fa581da0485cf68a46c23f53fdbf50))
+
+
 ## v2.9.7 (2025-01-28)
 
 ### Bug Fixes
