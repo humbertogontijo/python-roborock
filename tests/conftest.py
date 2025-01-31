@@ -200,6 +200,57 @@ def mock_rest() -> aioresponses:
             status=200,
             payload={"api": None, "code": 200, "result": HOME_DATA_RAW, "status": "ok", "success": True},
         )
+        mocked.post(
+            re.compile(r"https://api-.*\.roborock\.com/nc/prepare"),
+            status=200,
+            payload={
+                "api": None,
+                "result": {"r": "US", "s": "ffffff", "t": "eOf6d2BBBB"},
+                "status": "ok",
+                "success": True,
+            },
+        )
+
+        mocked.get(
+            re.compile(r"https://api-.*\.roborock\.com/user/devices/newadd/*"),
+            status=200,
+            payload={
+                "api": "获取新增设备信息",
+                "result": {
+                    "activeTime": 1737724598,
+                    "attribute": None,
+                    "cid": None,
+                    "createTime": 0,
+                    "deviceStatus": None,
+                    "duid": "rand_duid",
+                    "extra": "{}",
+                    "f": False,
+                    "featureSet": "0",
+                    "fv": "02.16.12",
+                    "iconUrl": "",
+                    "lat": None,
+                    "localKey": "random_lk",
+                    "lon": None,
+                    "name": "S7",
+                    "newFeatureSet": "0000000000002000",
+                    "online": True,
+                    "productId": "rand_prod_id",
+                    "pv": "1.0",
+                    "roomId": None,
+                    "runtimeEnv": None,
+                    "setting": None,
+                    "share": False,
+                    "shareTime": None,
+                    "silentOtaSwitch": False,
+                    "sn": "Rand_sn",
+                    "timeZoneId": "America/New_York",
+                    "tuyaMigrated": False,
+                    "tuyaUuid": None,
+                },
+                "status": "ok",
+                "success": True,
+            },
+        )
         yield mocked
 
 
