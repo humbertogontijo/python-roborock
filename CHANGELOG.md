@@ -1,6 +1,19 @@
 # CHANGELOG
 
 
+## v2.10.0 (2025-01-31)
+
+### Features
+
+- Add commands to add a new device
+  ([#307](https://github.com/Python-roborock/python-roborock/pull/307),
+  [`430c248`](https://github.com/Python-roborock/python-roborock/commit/430c24806fa06a5cec6c7fb3945a9b9cbfbc2f7a))
+
+* feat: add commands to add a new device
+
+* chore: mr comments
+
+
 ## v2.9.8 (2025-01-30)
 
 ### Bug Fixes
