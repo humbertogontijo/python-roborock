@@ -11,7 +11,7 @@ import time
 import aiohttp
 from aiohttp import ContentTypeError, FormData
 
-from roborock.containers import HomeData, HomeDataRoom, ProductResponse, RRiot, UserData
+from roborock.containers import HomeData, HomeDataRoom, HomeDataScene, ProductResponse, RRiot, UserData
 from roborock.exceptions import (
     RoborockAccountDoesNotExist,
     RoborockException,
@@ -354,6 +354,46 @@ class RoborockApiClient:
             return output_list
         else:
             raise RoborockException("home_response result was an unexpected type")
+
+    async def get_scenes(self, user_data: UserData, device_id: int) -> list[HomeDataScene]:
+        rriot = user_data.rriot
+        if rriot is None:
+            raise RoborockException("rriot is none")
+        if rriot.r.a is None:
+            raise RoborockException("Missing field 'a' in rriot reference")
+        scenes_request = PreparedRequest(
+            rriot.r.a,
+            {
+                "Authorization": self._get_hawk_authentication(rriot, f"/user/scene/device/{str(device_id)}"),
+            },
+        )
+        scenes_response = await scenes_request.request("get", f"/user/scene/device/{str(device_id)}")
+        if not scenes_response.get("success"):
+            raise RoborockException(scenes_response)
+        scenes = scenes_response.get("result")
+        if isinstance(scenes, list):
+            output_list = []
+            for scene in scenes:
+                output_list.append(HomeDataScene.from_dict(scene))
+            return output_list
+        else:
+            raise RoborockException("home_response result was an unexpected type")
+
+    async def execute_scene(self, user_data: UserData, scene_id: int) -> None:
+        rriot = user_data.rriot
+        if rriot is None:
+            raise RoborockException("rriot is none")
+        if rriot.r.a is None:
+            raise RoborockException("Missing field 'a' in rriot reference")
+        execute_scene_request = PreparedRequest(
+            rriot.r.a,
+            {
+                "Authorization": self._get_hawk_authentication(rriot, f"/user/scene/{str(scene_id)}/execute"),
+            },
+        )
+        execute_scene_response = await execute_scene_request.request("post", f"/user/scene/{str(scene_id)}/execute")
+        if not execute_scene_response.get("success"):
+            raise RoborockException(execute_scene_response)
 
     async def get_products(self, user_data: UserData) -> ProductResponse:
         """Gets all products and their schemas, good for determining status codes and model numbers."""

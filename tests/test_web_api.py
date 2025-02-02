@@ -1,4 +1,4 @@
-from roborock import HomeData, UserData
+from roborock import HomeData, HomeDataScene, UserData
 from roborock.web_api import RoborockApiClient
 from tests.mock_data import HOME_DATA_RAW, USER_DATA
 
@@ -36,3 +36,18 @@ async def test_nc_prepare():
     prepare = await api.nc_prepare(ud, "America/New_York")
     new_device = await api.add_device(ud, prepare["s"], prepare["t"])
     assert new_device["duid"] == "rand_duid"
+
+
+async def test_get_scenes():
+    """Test that we can get scenes"""
+    api = RoborockApiClient(username="test_user@gmail.com")
+    ud = await api.pass_login("password")
+    sc = await api.get_scenes(ud, 123456)
+    assert sc == [
+        HomeDataScene.from_dict(
+            {
+                "id": 5925425,
+                "name": "My plan",
+            }
+        )
+    ]

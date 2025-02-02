@@ -15,7 +15,7 @@ from roborock import HomeData, UserData
 from roborock.containers import DeviceData
 from roborock.version_1_apis.roborock_local_client_v1 import RoborockLocalClientV1
 from roborock.version_1_apis.roborock_mqtt_client_v1 import RoborockMqttClientV1
-from tests.mock_data import HOME_DATA_RAW, TEST_LOCAL_API_HOST, USER_DATA
+from tests.mock_data import HOME_DATA_RAW, HOME_DATA_SCENES_RAW, TEST_LOCAL_API_HOST, USER_DATA
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -250,6 +250,11 @@ def mock_rest() -> aioresponses:
                 "status": "ok",
                 "success": True,
             },
+        )
+        mocked.get(
+            re.compile(r"https://api-.*\.roborock\.com/user/scene/device/123456"),
+            status=200,
+            payload={"api": None, "code": 200, "result": HOME_DATA_SCENES_RAW, "status": "ok", "success": True},
         )
         yield mocked
 
