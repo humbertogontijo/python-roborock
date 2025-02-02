@@ -372,10 +372,7 @@ class RoborockApiClient:
             raise RoborockException(scenes_response)
         scenes = scenes_response.get("result")
         if isinstance(scenes, list):
-            output_list = []
-            for scene in scenes:
-                output_list.append(HomeDataScene.from_dict(scene))
-            return output_list
+            return [HomeDataScene.from_dict(scene) for scene in scenes]
         else:
             raise RoborockException("home_response result was an unexpected type")
 

@@ -1,3 +1,5 @@
+from yarl import URL
+
 from roborock import HomeData, HomeDataScene, UserData
 from roborock.web_api import RoborockApiClient
 from tests.mock_data import HOME_DATA_RAW, USER_DATA
@@ -51,3 +53,11 @@ async def test_get_scenes():
             }
         )
     ]
+
+
+async def test_execute_scene(mock_rest):
+    """Test that we can execute a scene"""
+    api = RoborockApiClient(username="test_user@gmail.com")
+    ud = await api.pass_login("password")
+    await api.execute_scene(ud, 123456)
+    assert ("post", URL("https://api-us.roborock.com/user/scene/123456/execute")) in mock_rest.requests

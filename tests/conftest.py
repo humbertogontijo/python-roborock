@@ -252,9 +252,14 @@ def mock_rest() -> aioresponses:
             },
         )
         mocked.get(
-            re.compile(r"https://api-.*\.roborock\.com/user/scene/device/123456"),
+            re.compile(r"https://api-.*\.roborock\.com/user/scene/device/.*"),
             status=200,
             payload={"api": None, "code": 200, "result": HOME_DATA_SCENES_RAW, "status": "ok", "success": True},
+        )
+        mocked.post(
+            re.compile(r"https://api-.*\.roborock\.com/user/scene/.*/execute"),
+            status=200,
+            payload={"api": None, "code": 200, "result": None, "status": "ok", "success": True},
         )
         yield mocked
 
