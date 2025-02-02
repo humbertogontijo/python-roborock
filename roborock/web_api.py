@@ -388,7 +388,7 @@ class RoborockApiClient:
                 "Authorization": self._get_hawk_authentication(rriot, f"/user/scene/{str(scene_id)}/execute"),
             },
         )
-        execute_scene_response = await execute_scene_request.request("post", f"/user/scene/{str(scene_id)}/execute")
+        execute_scene_response = await execute_scene_request.request("POST", f"/user/scene/{str(scene_id)}/execute")
         if not execute_scene_response.get("success"):
             raise RoborockException(execute_scene_response)
 
