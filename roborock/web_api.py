@@ -374,7 +374,7 @@ class RoborockApiClient:
         if isinstance(scenes, list):
             return [HomeDataScene.from_dict(scene) for scene in scenes]
         else:
-            raise RoborockException("home_response result was an unexpected type")
+            raise RoborockException("scene_response result was an unexpected type")
 
     async def execute_scene(self, user_data: UserData, scene_id: int) -> None:
         rriot = user_data.rriot
