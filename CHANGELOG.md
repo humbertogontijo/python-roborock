@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v2.10.1 (2025-02-03)
+
+### Bug Fixes
+
+- Delete in cli ([#320](https://github.com/Python-roborock/python-roborock/pull/320),
+  [`6704f55`](https://github.com/Python-roborock/python-roborock/commit/6704f55915005d771d698e58dcbac5ec46a385e5))
+
+
 ## v2.10.0 (2025-01-31)
 
 ### Features

@@ -169,7 +169,7 @@ async def command(ctx, cmd, device_id, params):
     device_info = DeviceData(device=device, model=model)
     mqtt_client = RoborockMqttClientV1(login_data.user_data, device_info)
     await mqtt_client.send_command(cmd, json.loads(params) if params is not None else None)
-    mqtt_client.__del__()
+    await mqtt_client.async_release()
 
 
 @click.command()
