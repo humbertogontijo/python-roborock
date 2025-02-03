@@ -38,7 +38,7 @@ LOCAL_KEY = "key123key123key1"  # 16 bytes / 128 bits
 PRODUCT_ID = "product-id-123"
 HOME_DATA_SCENES_RAW = [
     {
-        "id": 5925425,
+        "id": 123456,
         "name": "My plan",
         "param": json.dumps(
             {
@@ -50,7 +50,7 @@ HOME_DATA_SCENES_RAW = [
                             "id": 5,
                             "type": "CMD",
                             "name": "",
-                            "entityId": "1C3LfIPN9fLI0vV3dmJe3E",
+                            "entityId": "EEEEEEEEEEEEEE",
                             "param": json.dumps(
                                 {
                                     "id": 5,
@@ -73,8 +73,8 @@ HOME_DATA_SCENES_RAW = [
                         {
                             "id": 4,
                             "type": "CMD",
-                            "name": "Study Living room Dining room Bedroom Hall",
-                            "entityId": "1C3LfIPN9fLI0vV3dmJe3E",
+                            "name": "",
+                            "entityId": "EEEEEEEEEEEEEE",
                             "param": json.dumps(
                                 {
                                     "id": 4,
@@ -82,7 +82,7 @@ HOME_DATA_SCENES_RAW = [
                                     "params": {
                                         "data": [
                                             {
-                                                "tid": "1738240000786",
+                                                "tid": "111111111111111111",
                                                 "segs": [
                                                     {"sid": 19},
                                                     {"sid": 18},
@@ -111,7 +111,7 @@ HOME_DATA_SCENES_RAW = [
                     ],
                 },
                 "matchType": "NONE",
-                "tagId": "1002",
+                "tagId": "4444",
             }
         ),
         "enabled": True,
