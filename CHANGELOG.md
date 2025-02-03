@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v2.11.1 (2025-02-03)
+
+### Bug Fixes
+
+- Typing of scene api call ([#324](https://github.com/Python-roborock/python-roborock/pull/324),
+  [`61e27ae`](https://github.com/Python-roborock/python-roborock/commit/61e27aedfbb363913f80ace3932fa4adf61f9792))
+
+
 ## v2.11.0 (2025-02-03)
 
 ### Chores
