@@ -440,6 +440,12 @@ class HomeDataRoom(RoborockBase):
 
 
 @dataclass
+class HomeDataScene(RoborockBase):
+    id: int
+    name: str
+
+
+@dataclass
 class HomeData(RoborockBase):
     id: int
     name: str

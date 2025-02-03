@@ -1,6 +1,7 @@
 """Mock data for Roborock tests."""
 
 import hashlib
+import json
 
 # All data is based on a U.S. customer with a Roborock S7 MaxV Ultra
 USER_EMAIL = "user@domain.com"
@@ -35,6 +36,89 @@ USER_DATA = {
 }
 LOCAL_KEY = "key123key123key1"  # 16 bytes / 128 bits
 PRODUCT_ID = "product-id-123"
+HOME_DATA_SCENES_RAW = [
+    {
+        "id": 1234567,
+        "name": "My plan",
+        "param": json.dumps(
+            {
+                "triggers": [],
+                "action": {
+                    "type": "S",
+                    "items": [
+                        {
+                            "id": 5,
+                            "type": "CMD",
+                            "name": "",
+                            "entityId": "EEEEEEEEEEEEEE",
+                            "param": json.dumps(
+                                {
+                                    "id": 5,
+                                    "method": "do_scenes_app_start",
+                                    "params": [
+                                        {
+                                            "fan_power": 104,
+                                            "water_box_mode": 200,
+                                            "mop_mode": 300,
+                                            "mop_template_id": 300,
+                                            "repeat": 1,
+                                            "auto_dustCollection": 1,
+                                            "source": 101,
+                                        }
+                                    ],
+                                }
+                            ),
+                            "finishDpIds": [130],
+                        },
+                        {
+                            "id": 4,
+                            "type": "CMD",
+                            "name": "",
+                            "entityId": "EEEEEEEEEEEEEE",
+                            "param": json.dumps(
+                                {
+                                    "id": 4,
+                                    "method": "do_scenes_segments",
+                                    "params": {
+                                        "data": [
+                                            {
+                                                "tid": "111111111111111111",
+                                                "segs": [
+                                                    {"sid": 19},
+                                                    {"sid": 18},
+                                                    {"sid": 22},
+                                                    {"sid": 21},
+                                                    {"sid": 16},
+                                                ],
+                                                "map_flag": 0,
+                                                "fan_power": 105,
+                                                "water_box_mode": 201,
+                                                "mop_mode": 300,
+                                                "mop_template_id": 300,
+                                                "repeat": 1,
+                                                "clean_order_mode": 1,
+                                                "auto_dry": 1,
+                                                "auto_dustCollection": 1,
+                                                "region_num": 0,
+                                            }
+                                        ],
+                                        "source": 101,
+                                    },
+                                }
+                            ),
+                            "finishDpIds": [130],
+                        },
+                    ],
+                },
+                "matchType": "NONE",
+                "tagId": "4444",
+            }
+        ),
+        "enabled": True,
+        "extra": None,
+        "type": "WORKFLOW",
+    }
+]
 HOME_DATA_RAW = {
     "id": 123456,
     "name": "My Home",

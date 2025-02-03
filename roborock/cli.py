@@ -115,6 +115,38 @@ async def list_devices(ctx):
 
 @click.command()
 @click.option("--device_id", required=True)
+@click.pass_context
+@run_sync()
+async def list_scenes(ctx, device_id):
+    context: RoborockContext = ctx.obj
+    login_data = context.login_data()
+    if not login_data.home_data:
+        await _discover(ctx)
+        login_data = context.login_data()
+    client = RoborockApiClient(login_data.email)
+    scenes = await client.get_scenes(login_data.user_data, device_id)
+    output_list = []
+    for scene in scenes:
+        output_list.append(scene.as_dict())
+    click.echo(json.dumps(output_list, indent=4))
+
+
+@click.command()
+@click.option("--scene_id", required=True)
+@click.pass_context
+@run_sync()
+async def execute_scene(ctx, scene_id):
+    context: RoborockContext = ctx.obj
+    login_data = context.login_data()
+    if not login_data.home_data:
+        await _discover(ctx)
+        login_data = context.login_data()
+    client = RoborockApiClient(login_data.email)
+    await client.execute_scene(login_data.user_data, scene_id)
+
+
+@click.command()
+@click.option("--device_id", required=True)
 @click.option("--cmd", required=True)
 @click.option("--params", required=False)
 @click.pass_context
@@ -192,6 +224,8 @@ async def parser(_, local_key, device_ip, file):
 cli.add_command(login)
 cli.add_command(discover)
 cli.add_command(list_devices)
+cli.add_command(list_scenes)
+cli.add_command(execute_scene)
 cli.add_command(command)
 cli.add_command(parser)
 
