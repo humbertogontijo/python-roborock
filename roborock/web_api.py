@@ -355,7 +355,7 @@ class RoborockApiClient:
         else:
             raise RoborockException("home_response result was an unexpected type")
 
-    async def get_scenes(self, user_data: UserData, device_id: int) -> list[HomeDataScene]:
+    async def get_scenes(self, user_data: UserData, device_id: str) -> list[HomeDataScene]:
         rriot = user_data.rriot
         if rriot is None:
             raise RoborockException("rriot is none")

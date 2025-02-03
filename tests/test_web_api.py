@@ -42,7 +42,7 @@ async def test_get_scenes():
     """Test that we can get scenes"""
     api = RoborockApiClient(username="test_user@gmail.com")
     ud = await api.pass_login("password")
-    sc = await api.get_scenes(ud, 123456)
+    sc = await api.get_scenes(ud, "123456")
     assert sc == [
         HomeDataScene.from_dict(
             {
