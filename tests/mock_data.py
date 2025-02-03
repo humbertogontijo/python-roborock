@@ -38,7 +38,7 @@ LOCAL_KEY = "key123key123key1"  # 16 bytes / 128 bits
 PRODUCT_ID = "product-id-123"
 HOME_DATA_SCENES_RAW = [
     {
-        "id": 123456,
+        "id": 1234567,
         "name": "My plan",
         "param": json.dumps(
             {

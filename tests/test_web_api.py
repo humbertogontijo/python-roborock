@@ -46,7 +46,7 @@ async def test_get_scenes():
     assert sc == [
         HomeDataScene.from_dict(
             {
-                "id": 5925425,
+                "id": 1234567,
                 "name": "My plan",
             }
         )
