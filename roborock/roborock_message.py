@@ -36,6 +36,7 @@ class RoborockDataProtocol(RoborockEnum):
     TASK_CANCEL_IN_MOTION = 132
     CHARGE_STATUS = 133
     DRYING_STATUS = 134
+    OFFLINE_STATUS = 135
 
     @classmethod
     def _missing_(cls: type[RoborockEnum], key) -> RoborockEnum:
