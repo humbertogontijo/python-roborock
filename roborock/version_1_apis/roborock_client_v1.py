@@ -430,6 +430,12 @@ class RoborockClientV1(RoborockClient, ABC):
                                     consumable = Consumable.from_dict(value)
                                     for listener in self.listener_model.protocol_handlers.get(data_protocol, []):
                                         listener(consumable)
+                                elif data_protocol in {
+                                    RoborockDataProtocol.ADDITIONAL_PROPS,
+                                    RoborockDataProtocol.DRYING_STATUS,
+                                }:
+                                    # Known data protocol, but not yet sure how to correctly utilize it.
+                                    return
                                 else:
                                     self._logger.warning(
                                         f"Unknown data protocol {data_point_number}, please create an "
