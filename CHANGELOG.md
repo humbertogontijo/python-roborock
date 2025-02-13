@@ -1,6 +1,15 @@
 # CHANGELOG
 
 
+## v2.11.2 (2025-02-13)
+
+### Bug Fixes
+
+- Add some extra data protocol checking
+  ([#331](https://github.com/Python-roborock/python-roborock/pull/331),
+  [`4af1490`](https://github.com/Python-roborock/python-roborock/commit/4af1490ea4db0dbeb5d5666019d9433af4f3d273))
+
+
 ## v2.11.1 (2025-02-03)
 
 ### Bug Fixes
