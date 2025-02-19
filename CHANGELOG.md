@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v2.11.3 (2025-02-19)
+
+### Bug Fixes
+
+- Q revo curv mappings ([#332](https://github.com/Python-roborock/python-roborock/pull/332),
+  [`83d010a`](https://github.com/Python-roborock/python-roborock/commit/83d010acbc100f06ae322adde1eedcfd0f78efc8))
+
+
 ## v2.11.2 (2025-02-13)
 
 ### Bug Fixes
