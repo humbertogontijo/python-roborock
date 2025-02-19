@@ -259,7 +259,9 @@ class RoborockFanSpeedQRevoCurv(RoborockFanPowerCode):
     balanced = 102
     turbo = 103
     max = 104
-    max_plus = 105
+    off = 105
+    custom = 106
+    max_plus = 108
     smart_mode = 110
 
 
@@ -291,6 +293,7 @@ class RoborockMopModeCode(RoborockEnum):
 class RoborockMopModeQRevoCurv(RoborockMopModeCode):
     standard = 300
     deep = 301
+    custom = 302
     deep_plus = 303
     fast = 304
     smart_mode = 306
@@ -373,6 +376,7 @@ class RoborockMopIntensityQRevoCurv(RoborockMopIntensityCode):
     low = 201
     medium = 202
     high = 203
+    custom = 204
     custom_water_flow = 207
     smart_mode = 209
 
